@@ -595,9 +595,7 @@ async function lancerRattrapage() {
                 if (ok) { rattrapage.sent++; state.stats.sent++; rattrapageLog(`✅ [${date}] Inscription ${coureur} → asso ${nomAsso}`, 'ok'); }
                 else { rattrapage.errors++; }
               } else { rattrapage.skipped++; rattrapageLog(`⚠️ [${date}] Asso "${nomAsso}" — email référent introuvable`, 'warn'); }
-            } else { rattrapage.skipped++; rattrapageLog(`⚠️ [${date}] Inscription ${`${p.first_name || ''} ${p.last_name || ''}`.trim()} — asso_soutenue vide`, 'warn'); }
-              rattrapageLog(`⚠️ [${date}] Inscription ${coureur} — email asso "${nomAsso}" introuvable`, 'warn');
-            }
+            } else { rattrapage.skipped++; rattrapageLog(`⚠️ [${date}] Inscription — asso_soutenue vide`, 'warn'); }
           }
         }
 
