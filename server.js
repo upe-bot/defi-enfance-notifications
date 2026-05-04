@@ -239,7 +239,7 @@ async function fetchOhmePayments() {
     return [];
   }
   try {
-    const res = await fetch(`${CONFIG.ohmeBase}/api/v1/payments?limit=200&sort=created_at:desc`, {
+    const res = await fetch(`${CONFIG.ohmeBase}/api/v1/payments?limit=200`, {
       headers: {
         'Accept':        'application/json',
         'client-name':   CONFIG.ohmeClientName,
@@ -248,7 +248,7 @@ async function fetchOhmePayments() {
     });
     if (!res.ok) throw new Error(`HTTP ${res.status} — ${res.statusText}`);
     const json = await res.json();
-    return Array.isArray(json) ? json : (json.data || json.payments || json.results || []);
+    return json.data || [];
   } catch (e) {
     addLog(`Erreur Ohme : ${e.message}`, 'error');
     state.stats.errors++;
@@ -412,29 +412,31 @@ function rattrapageLog(msg, type = 'info') {
 }
 
 async function fetchAllOhmePayments() {
-  // Récupère toutes les pages Ohme jusqu'à avoir tout
-  if (!CONFIG.ohmeKey || !CONFIG.ohmeBase) return [];
+  if (!CONFIG.ohmeClientName || !CONFIG.ohmeClientSecret || !CONFIG.ohmeBase) return [];
   let all = [];
-  let page = 1;
-  const limit = 200;
+  let cursor = null;
+  const limit = 500;
   while (true) {
     try {
-      const res = await fetch(
-        `${CONFIG.ohmeBase}/api/v1/payments?limit=${limit}&page=${page}&sort=created_at:asc`,
-        { headers: {
-            'Accept':        'application/json',
-            'client-name':   CONFIG.ohmeClientName,
-            'client-secret': CONFIG.ohmeClientSecret,
-        }}
-      );
-      if (!res.ok) { rattrapageLog(`Erreur HTTP ${res.status} page ${page}`, 'error'); break; }
+      const url = cursor
+        ? `${CONFIG.ohmeBase}/api/v1/payments?limit=${limit}&cursor=${cursor}`
+        : `${CONFIG.ohmeBase}/api/v1/payments?limit=${limit}`;
+      const res = await fetch(url, {
+        headers: {
+          'Accept':        'application/json',
+          'client-name':   CONFIG.ohmeClientName,
+          'client-secret': CONFIG.ohmeClientSecret,
+        }
+      });
+      if (!res.ok) { rattrapageLog(`Erreur HTTP ${res.status}`, 'error'); break; }
       const json = await res.json();
-      const items = Array.isArray(json) ? json : (json.data || json.payments || json.results || []);
+      const items = json.data || [];
       all = all.concat(items);
-      if (items.length < limit) break; // dernière page
-      page++;
+      rattrapageLog(`📦 ${all.length} paiements récupérés…`, 'info');
+      if (items.length < limit) break;
+      cursor = items[items.length - 1].id;
     } catch (e) {
-      rattrapageLog(`Exception fetch page ${page} : ${e.message}`, 'error');
+      rattrapageLog(`Exception fetch : ${e.message}`, 'error');
       break;
     }
   }
