@@ -299,9 +299,9 @@ async function processPayments(payments) {
   for (const p of payments) {
     if (state.processedIds.has(p.id)) continue;
 
-    // Champ exact Ohme : nom_de_levent
-    const eventName = (p.nom_de_levent || p.event_name || '').toUpperCase();
-    if (!eventName.includes('DÉFI') && !eventName.includes('DEFI')) {
+    // Seuls les paiements Défi Enfance ont nom_de_levent renseigné
+    const eventName = (p.nom_de_levent || '').trim();
+    if (!eventName) {
       state.processedIds.add(p.id);
       continue;
     }
@@ -522,8 +522,8 @@ async function lancerRattrapage() {
 
       // Filtrer sur DÉFI + dates plancher
       const eligibles = all.filter(p => {
-        const eventName = (p.nom_de_levent || p.event_name || '').toUpperCase();
-        if (!eventName.includes('DÉFI') && !eventName.includes('DEFI')) return false;
+        const eventName = (p.nom_de_levent || '').trim();
+        if (!eventName) return false;
         const type = (p.payment_type || p.type || '').toLowerCase();
         const date = new Date(p.date || p.created_at || 0);
         if (type === 'don'         && date < RATTRAPAGE_DATE_DONS) return false;
