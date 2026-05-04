@@ -299,58 +299,69 @@ async function processPayments(payments) {
   for (const p of payments) {
     if (state.processedIds.has(p.id)) continue;
 
-    // Filtrer sur DÉFI dans le nom de l'événement
-    const eventName = (p.event_name || p.campaign_name || p.event || '').toUpperCase();
+    // Champ exact Ohme : nom_de_levent
+    const eventName = (p.nom_de_levent || p.event_name || '').toUpperCase();
     if (!eventName.includes('DÉFI') && !eventName.includes('DEFI')) {
       state.processedIds.add(p.id);
       continue;
     }
 
+    // Type de paiement Ohme : payment_type_id ou type
     const type = (p.payment_type || p.type || '').toLowerCase();
 
     // ── CAS 1 : DON ──────────────────────────────────────
     if (type === 'don') {
       state.stats.dons++;
       newCount++;
-      const donateur    = `${p.donor_first_name || p.first_name || ''} ${p.donor_last_name || p.last_name || ''}`.trim();
-      const montant     = p.amount || '?';
-      const emailDon    = p.donor_email || p.email || '';
-      const association = p.association_name || p.asso_name || '';
+      const donateur = `${p.first_name || ''} ${p.last_name || ''}`.trim();
+      const montant  = p.amount || '?';
+      const emailDon = p.email || '';
 
-      // Don pour un coureur individuel ?
-      const sponsoredContactEmail = p.sponsored_contact_email || p.coureur_email || '';
-      const sponsoredContactName  = p.sponsored_contact_name  || p.coureur_name  || '';
+      // Champ Ohme : coureur_parraine → c'est un contact Ohme (même orthographe)
+      const coureurParraine = (p.coureur_parraine || '').trim();
+      // Champ Ohme : equipe_parraine → c'est une structure Ohme (même orthographe)
+      const equipeParraine  = (p.equipe_parraine  || '').trim();
 
-      if (sponsoredContactEmail) {
-        const html = tplDonCoureur({
-          coureurPrenom: (sponsoredContactName).split(' ')[0] || 'cher coureur',
-          donateur, montant, email_donateur: emailDon, association,
-        });
-        const ok = await sendBrevo(sponsoredContactEmail, '❤️ Nouveau don pour ton Défi Enfance !', html);
-        if (ok) {
-          state.stats.sent++;
-          addLog(`✅ Don ${montant}€ de ${donateur} → email envoyé à ${sponsoredContactName}`, 'ok');
-          addEvent('❤️', `Don de ${montant} €`, `${donateur} → ${sponsoredContactName}`, 'don');
+      if (coureurParraine) {
+        // Chercher le contact dans Ohme pour récupérer son email
+        const contact = await fetchOhmeContactByName(coureurParraine);
+        const emailCoureur = contact ? (contact.email || '') : '';
+        const coureurPrenom = coureurParraine.split(' ')[0];
+        const assoSoutenue  = p.asso_soutenue || '';
+
+        if (emailCoureur) {
+          const html = tplDonCoureur({ coureurPrenom, donateur, montant, email_donateur: emailDon, association: assoSoutenue });
+          const ok = await sendBrevo(emailCoureur, '❤️ Nouveau don pour ton Défi Enfance !', html);
+          if (ok) {
+            state.stats.sent++;
+            addLog(`✅ Don ${montant}€ de ${donateur} → ${coureurParraine}`, 'ok');
+            addEvent('❤️', `Don de ${montant} €`, `${donateur} → ${coureurParraine}`, 'don');
+          }
+        } else {
+          addLog(`⚠️ Don → coureur "${coureurParraine}" introuvable dans Ohme`, 'warn');
         }
-      }
 
-      // Don pour une équipe ?
-      const chefEmail  = p.sponsored_structure_chef_email || p.equipe_chef_email || '';
-      const chefPrenom = p.sponsored_structure_chef_prenom || p.equipe_chef_prenom || 'Bonjour';
-      const nomEquipe  = p.sponsored_structure_name || p.equipe_name || '';
+      } else if (equipeParraine) {
+        // Chercher la structure dans Ohme pour récupérer email_referent_defi_enfance et nom_du_referent
+        const structure = await fetchOhmeStructureByName(equipeParraine);
+        const chefEmail  = structure ? (structure.email_referent_defi_enfance || '') : '';
+        const chefNom    = structure ? (structure.nom_du_referent_defi_enfance || '') : '';
+        const chefPrenom = chefNom.split(' ')[0] || 'Bonjour';
 
-      if (!sponsoredContactEmail && chefEmail) {
-        const html = tplDonEquipe({ chefPrenom, nomEquipe, donateur, montant, email_donateur: emailDon });
-        const ok   = await sendBrevo(chefEmail, '❤️ Nouveau don pour votre équipe au Défi Enfance !', html);
-        if (ok) {
-          state.stats.sent++;
-          addLog(`✅ Don ${montant}€ de ${donateur} → email envoyé au chef d'équipe ${nomEquipe}`, 'ok');
-          addEvent('🏆', `Don de ${montant} € pour équipe`, `${donateur} → ${nomEquipe}`, 'don');
+        if (chefEmail) {
+          const html = tplDonEquipe({ chefPrenom, nomEquipe: equipeParraine, donateur, montant, email_donateur: emailDon });
+          const ok = await sendBrevo(chefEmail, '❤️ Nouveau don pour votre équipe au Défi Enfance !', html);
+          if (ok) {
+            state.stats.sent++;
+            addLog(`✅ Don ${montant}€ de ${donateur} → équipe ${equipeParraine}`, 'ok');
+            addEvent('🏆', `Don de ${montant} € pour équipe`, `${donateur} → ${equipeParraine}`, 'don');
+          }
+        } else {
+          addLog(`⚠️ Don → équipe "${equipeParraine}" — email référent introuvable`, 'warn');
         }
-      }
 
-      if (!sponsoredContactEmail && !chefEmail) {
-        addLog(`⚠️ Don ${montant}€ de ${donateur} — aucun destinataire trouvé (coureur/équipe)`, 'warn');
+      } else {
+        addLog(`⚠️ Don ${montant}€ de ${donateur} — aucun coureur ni équipe parrainé(e) renseigné(e)`, 'warn');
       }
     }
 
@@ -358,22 +369,30 @@ async function processPayments(payments) {
     else if (type === 'billetterie') {
       state.stats.bill++;
       newCount++;
-      const coureur      = `${p.donor_first_name || p.first_name || ''} ${p.donor_last_name || p.last_name || ''}`.trim();
-      const emailCoureur = p.donor_email || p.email || '';
-      const nomAsso      = p.association_name || p.asso_name || '';
-      const emailAsso    = p.association_email || p.asso_email || '';
-      const ville        = (p.event_name || '').replace(/DÉFI\s*ENFANCE?\s*/gi, '').replace(/\d{4}/g, '').trim();
+      const coureur      = `${p.first_name || ''} ${p.last_name || ''}`.trim();
+      const emailCoureur = p.email || '';
+      // Champ Ohme : asso_soutenue → nom de la structure (même orthographe)
+      const nomAsso      = (p.asso_soutenue || '').trim();
+      const ville        = (p.nom_de_levent || '').replace(/DÉFI\s*ENFANCE?\s*/gi, '').replace(/\d{4}/g, '').trim();
 
-      if (emailAsso) {
-        const html = tplInscriptionAsso({ nomAsso, coureur, email_coureur: emailCoureur, ville });
-        const ok   = await sendBrevo(emailAsso, '🏃 Nouveau coureur pour votre cause — Défi Enfance !', html);
-        if (ok) {
-          state.stats.sent++;
-          addLog(`✅ Inscription ${coureur} → email envoyé à l'asso ${nomAsso}`, 'ok');
-          addEvent('🏃', `Inscription de ${coureur}`, `Association : ${nomAsso}`, 'bill');
+      if (nomAsso) {
+        // Chercher la structure dans Ohme pour récupérer l'email du référent
+        const structure = await fetchOhmeStructureByName(nomAsso);
+        const emailAsso = structure ? (structure.email_referent_defi_enfance || '') : '';
+
+        if (emailAsso) {
+          const html = tplInscriptionAsso({ nomAsso, coureur, email_coureur: emailCoureur, ville });
+          const ok = await sendBrevo(emailAsso, '🏃 Nouveau coureur pour votre cause — Défi Enfance !', html);
+          if (ok) {
+            state.stats.sent++;
+            addLog(`✅ Inscription ${coureur} → asso ${nomAsso}`, 'ok');
+            addEvent('🏃', `Inscription de ${coureur}`, `Association : ${nomAsso}`, 'bill');
+          }
+        } else {
+          addLog(`⚠️ Inscription ${coureur} — email référent asso "${nomAsso}" introuvable`, 'warn');
         }
       } else {
-        addLog(`⚠️ Inscription ${coureur} — email association "${nomAsso}" introuvable dans Ohme`, 'warn');
+        addLog(`⚠️ Inscription ${coureur} — champ asso_soutenue vide`, 'warn');
       }
     }
 
@@ -381,6 +400,34 @@ async function processPayments(payments) {
   }
 
   if (newCount === 0) addLog('Aucun nouveau paiement à traiter', 'info');
+}
+
+// ── Chercher un contact Ohme par nom (pour récupérer l'email du coureur parrainé)
+async function fetchOhmeContactByName(name) {
+  try {
+    const res = await fetch(
+      `${CONFIG.ohmeBase}/api/v1/contacts?search=${encodeURIComponent(name)}&limit=1`,
+      { headers: { 'Accept': 'application/json', 'client-name': CONFIG.ohmeClientName, 'client-secret': CONFIG.ohmeClientSecret } }
+    );
+    if (!res.ok) return null;
+    const json = await res.json();
+    const items = json.data || [];
+    return items.length > 0 ? items[0] : null;
+  } catch { return null; }
+}
+
+// ── Chercher une structure Ohme par nom (pour récupérer l'email référent)
+async function fetchOhmeStructureByName(name) {
+  try {
+    const res = await fetch(
+      `${CONFIG.ohmeBase}/api/v1/structures?search=${encodeURIComponent(name)}&limit=1`,
+      { headers: { 'Accept': 'application/json', 'client-name': CONFIG.ohmeClientName, 'client-secret': CONFIG.ohmeClientSecret } }
+    );
+    if (!res.ok) return null;
+    const json = await res.json();
+    const items = json.data || [];
+    return items.length > 0 ? items[0] : null;
+  } catch { return null; }
 }
 
 // ══════════════════════════════════════════════════════
@@ -475,10 +522,10 @@ async function lancerRattrapage() {
 
       // Filtrer sur DÉFI + dates plancher
       const eligibles = all.filter(p => {
-        const eventName = (p.event_name || p.campaign_name || p.event || '').toUpperCase();
+        const eventName = (p.nom_de_levent || p.event_name || '').toUpperCase();
         if (!eventName.includes('DÉFI') && !eventName.includes('DEFI')) return false;
         const type = (p.payment_type || p.type || '').toLowerCase();
-        const date = new Date(p.created_at || p.date || p.payment_date || 0);
+        const date = new Date(p.date || p.created_at || 0);
         if (type === 'don'         && date < RATTRAPAGE_DATE_DONS) return false;
         if (type === 'billetterie' && date < RATTRAPAGE_DATE_BILL) return false;
         return type === 'don' || type === 'billetterie';
@@ -490,57 +537,65 @@ async function lancerRattrapage() {
       for (const p of eligibles) {
         rattrapage.done++;
         const type = (p.payment_type || p.type || '').toLowerCase();
-        const date = new Date(p.created_at || p.date || 0).toLocaleDateString('fr-FR');
+        const date = new Date(p.date || p.created_at || 0).toLocaleDateString('fr-FR');
 
         // ── DON ──
         if (type === 'don') {
-          const donateur    = `${p.donor_first_name || p.first_name || ''} ${p.donor_last_name || p.last_name || ''}`.trim();
-          const montant     = p.amount || '?';
-          const emailDon    = p.donor_email || p.email || '';
-          const association = p.association_name || p.asso_name || '';
-          const sponsoredContactEmail = p.sponsored_contact_email || p.coureur_email || '';
-          const sponsoredContactName  = p.sponsored_contact_name  || p.coureur_name  || '';
-          const chefEmail   = p.sponsored_structure_chef_email || p.equipe_chef_email || '';
-          const chefPrenom  = p.sponsored_structure_chef_prenom || p.equipe_chef_prenom || 'Bonjour';
-          const nomEquipe   = p.sponsored_structure_name || p.equipe_name || '';
+          const donateur        = `${p.first_name || ''} ${p.last_name || ''}`.trim();
+          const montant         = p.amount || '?';
+          const emailDon        = p.email || '';
+          const coureurParraine = (p.coureur_parraine || '').trim();
+          const equipeParraine  = (p.equipe_parraine  || '').trim();
 
-          if (sponsoredContactEmail) {
-            const html = tplDonCoureur({ coureurPrenom: sponsoredContactName.split(' ')[0] || 'cher coureur', donateur, montant, email_donateur: emailDon, association });
-            const ok = await sendBrevo(sponsoredContactEmail, '❤️ Nouveau don pour ton Défi Enfance !', html);
-            if (ok) { rattrapage.sent++; state.stats.sent++; rattrapageLog(`✅ [${date}] Don ${montant}€ de ${donateur} → ${sponsoredContactName}`, 'ok'); }
-            else    { rattrapage.errors++; }
-          } else if (chefEmail) {
-            const html = tplDonEquipe({ chefPrenom, nomEquipe, donateur, montant, email_donateur: emailDon });
-            const ok = await sendBrevo(chefEmail, '❤️ Nouveau don pour votre équipe au Défi Enfance !', html);
-            if (ok) { rattrapage.sent++; state.stats.sent++; rattrapageLog(`✅ [${date}] Don ${montant}€ de ${donateur} → équipe ${nomEquipe}`, 'ok'); }
-            else    { rattrapage.errors++; }
+          if (coureurParraine) {
+            const contact = await fetchOhmeContactByName(coureurParraine);
+            const emailCoureur = contact ? (contact.email || '') : '';
+            if (emailCoureur) {
+              const html = tplDonCoureur({ coureurPrenom: coureurParraine.split(' ')[0], donateur, montant, email_donateur: emailDon, association: p.asso_soutenue || '' });
+              const ok = await sendBrevo(emailCoureur, '❤️ Nouveau don pour ton Défi Enfance !', html);
+              if (ok) { rattrapage.sent++; state.stats.sent++; rattrapageLog(`✅ [${date}] Don ${montant}€ de ${donateur} → ${coureurParraine}`, 'ok'); }
+              else { rattrapage.errors++; }
+            } else { rattrapage.skipped++; rattrapageLog(`⚠️ [${date}] Coureur "${coureurParraine}" introuvable`, 'warn'); }
+
+          } else if (equipeParraine) {
+            const structure = await fetchOhmeStructureByName(equipeParraine);
+            const chefEmail = structure ? (structure.email_referent_defi_enfance || '') : '';
+            const chefNom   = structure ? (structure.nom_du_referent_defi_enfance || '') : '';
+            if (chefEmail) {
+              const html = tplDonEquipe({ chefPrenom: chefNom.split(' ')[0] || 'Bonjour', nomEquipe: equipeParraine, donateur, montant, email_donateur: emailDon });
+              const ok = await sendBrevo(chefEmail, '❤️ Nouveau don pour votre équipe au Défi Enfance !', html);
+              if (ok) { rattrapage.sent++; state.stats.sent++; rattrapageLog(`✅ [${date}] Don ${montant}€ de ${donateur} → équipe ${equipeParraine}`, 'ok'); }
+              else { rattrapage.errors++; }
+            } else { rattrapage.skipped++; rattrapageLog(`⚠️ [${date}] Équipe "${equipeParraine}" — référent introuvable`, 'warn'); }
+
           } else {
             rattrapage.skipped++;
-            rattrapageLog(`⚠️ [${date}] Don ${montant}€ de ${donateur} — destinataire introuvable`, 'warn');
+            rattrapageLog(`⚠️ [${date}] Don ${montant}€ de ${donateur} — aucun coureur ni équipe parrainé(e)`, 'warn');
           }
         }
 
         // ── BILLETTERIE ──
         else if (type === 'billetterie') {
-          // Règle : ignorer si Asso soutenue == Équipe
           if (shouldSkipBilletterie(p)) {
             rattrapage.skipped++;
-            const coureur = `${p.donor_first_name || p.first_name || ''} ${p.donor_last_name || p.last_name || ''}`.trim();
+            const coureur = `${p.first_name || ''} ${p.last_name || ''}`.trim();
             rattrapageLog(`⏭️ [${date}] Inscription ${coureur} — même asso que l'équipe, ignoré`, 'info');
           } else {
-            const coureur      = `${p.donor_first_name || p.first_name || ''} ${p.donor_last_name || p.last_name || ''}`.trim();
-            const emailCoureur = p.donor_email || p.email || '';
-            const nomAsso      = p.association_name || p.asso_name || p['asso_soutenue'] || p['Asso soutenue'] || '';
-            const emailAsso    = p.association_email || p.asso_email || '';
-            const ville        = (p.event_name || '').replace(/DÉFI\s*ENFANCE?\s*/gi, '').replace(/\d{4}/g, '').trim();
+            const coureur      = `${p.first_name || ''} ${p.last_name || ''}`.trim();
+            const emailCoureur = p.email || '';
+            const nomAsso      = (p.asso_soutenue || '').trim();
+            const ville        = (p.nom_de_levent || '').replace(/DÉFI\s*ENFANCE?\s*/gi, '').replace(/\d{4}/g, '').trim();
 
-            if (emailAsso) {
-              const html = tplInscriptionAsso({ nomAsso, coureur, email_coureur: emailCoureur, ville });
-              const ok = await sendBrevo(emailAsso, '🏃 Nouveau coureur pour votre cause — Défi Enfance !', html);
-              if (ok) { rattrapage.sent++; state.stats.sent++; rattrapageLog(`✅ [${date}] Inscription ${coureur} → asso ${nomAsso}`, 'ok'); }
-              else    { rattrapage.errors++; }
-            } else {
-              rattrapage.skipped++;
+            if (nomAsso) {
+              const structure = await fetchOhmeStructureByName(nomAsso);
+              const emailAsso = structure ? (structure.email_referent_defi_enfance || '') : '';
+              if (emailAsso) {
+                const html = tplInscriptionAsso({ nomAsso, coureur, email_coureur: emailCoureur, ville });
+                const ok = await sendBrevo(emailAsso, '🏃 Nouveau coureur pour votre cause — Défi Enfance !', html);
+                if (ok) { rattrapage.sent++; state.stats.sent++; rattrapageLog(`✅ [${date}] Inscription ${coureur} → asso ${nomAsso}`, 'ok'); }
+                else { rattrapage.errors++; }
+              } else { rattrapage.skipped++; rattrapageLog(`⚠️ [${date}] Asso "${nomAsso}" — email référent introuvable`, 'warn'); }
+            } else { rattrapage.skipped++; rattrapageLog(`⚠️ [${date}] Inscription ${`${p.first_name || ''} ${p.last_name || ''}`.trim()} — asso_soutenue vide`, 'warn'); }
               rattrapageLog(`⚠️ [${date}] Inscription ${coureur} — email asso "${nomAsso}" introuvable`, 'warn');
             }
           }
