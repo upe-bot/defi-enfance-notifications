@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: defi-enfance-notifications
+    env: node
+    plan: free
+    buildCommand: npm install
+    startCommand: node server.js
+    healthCheckPath: /api/status
+    envVars:
+      - key: OHME_API_KEY
+        sync: false
+      - key: OHME_BASE_URL
+        sync: false
+      - key: BREVO_API_KEY
+        sync: false
+      - key: SENDER_EMAIL
+        value: contact@defienfance.fr
+      - key: SENDER_NAME
+        value: Défi Enfance
+      - key: POLL_INTERVAL_MS
+        value: "600000"
+      - key: DASHBOARD_PASSWORD
+        sync: false
