@@ -13,13 +13,14 @@ app.use(express.static(path.join(__dirname, 'public')));
 //  CONFIG
 // ══════════════════════════════════════════════════════
 const CONFIG = {
-  ohmeKey:      process.env.OHME_API_KEY     || '',
-  ohmeBase:     (process.env.OHME_BASE_URL   || '').replace(/\/$/, ''),
-  brevoKey:     process.env.BREVO_API_KEY    || '',
-  senderEmail:  process.env.SENDER_EMAIL     || 'contact@defienfance.fr',
-  senderName:   process.env.SENDER_NAME      || 'Défi Enfance',
-  pollInterval: parseInt(process.env.POLL_INTERVAL_MS || '600000'),
-  dashPassword: process.env.DASHBOARD_PASSWORD || '',
+  ohmeClientName:   process.env.OHME_CLIENT_NAME   || '',
+  ohmeClientSecret: process.env.OHME_CLIENT_SECRET || '',
+  ohmeBase:         (process.env.OHME_BASE_URL     || '').replace(/\/$/, ''),
+  brevoKey:         process.env.BREVO_API_KEY      || '',
+  senderEmail:      process.env.SENDER_EMAIL       || 'contact@defienfance.fr',
+  senderName:       process.env.SENDER_NAME        || 'Défi Enfance',
+  pollInterval:     parseInt(process.env.POLL_INTERVAL_MS || '600000'),
+  dashPassword:     process.env.DASHBOARD_PASSWORD || '',
 };
 
 // ══════════════════════════════════════════════════════
@@ -233,15 +234,16 @@ function tplInscriptionAsso({ nomAsso, coureur, email_coureur, ville }) {
 //  OHME — FETCH PAIEMENTS
 // ══════════════════════════════════════════════════════
 async function fetchOhmePayments() {
-  if (!CONFIG.ohmeKey || !CONFIG.ohmeBase) {
-    addLog('Clé API Ohme ou URL manquante dans les variables d\'environnement', 'warn');
+  if (!CONFIG.ohmeClientName || !CONFIG.ohmeClientSecret || !CONFIG.ohmeBase) {
+    addLog('Clé API Ohme (client-name ou client-secret) ou URL manquante', 'warn');
     return [];
   }
   try {
     const res = await fetch(`${CONFIG.ohmeBase}/api/v1/payments?limit=200&sort=created_at:desc`, {
       headers: {
-        'Authorization': `Bearer ${CONFIG.ohmeKey}`,
-        'Content-Type':  'application/json',
+        'Accept':        'application/json',
+        'client-name':   CONFIG.ohmeClientName,
+        'client-secret': CONFIG.ohmeClientSecret,
       },
     });
     if (!res.ok) throw new Error(`HTTP ${res.status} — ${res.statusText}`);
@@ -419,7 +421,11 @@ async function fetchAllOhmePayments() {
     try {
       const res = await fetch(
         `${CONFIG.ohmeBase}/api/v1/payments?limit=${limit}&page=${page}&sort=created_at:asc`,
-        { headers: { 'Authorization': `Bearer ${CONFIG.ohmeKey}`, 'Content-Type': 'application/json' } }
+        { headers: {
+            'Accept':        'application/json',
+            'client-name':   CONFIG.ohmeClientName,
+            'client-secret': CONFIG.ohmeClientSecret,
+        }}
       );
       if (!res.ok) { rattrapageLog(`Erreur HTTP ${res.status} page ${page}`, 'error'); break; }
       const json = await res.json();
@@ -656,5 +662,6 @@ app.listen(PORT, () => {
   console.log(`✅ Serveur Défi Enfance démarré sur le port ${PORT}`);
   console.log(`   Polling Ohme toutes les ${CONFIG.pollInterval / 60000} minutes`);
   console.log(`   Ohme : ${CONFIG.ohmeBase || '⚠️ URL manquante'}`);
+  console.log(`   Ohme client-name : ${CONFIG.ohmeClientName ? '✅ présent' : '⚠️ manquant'}`);
   console.log(`   Brevo : ${CONFIG.brevoKey ? '✅ clé présente' : '⚠️ clé manquante'}`);
 });
