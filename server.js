@@ -300,27 +300,34 @@ async function processPayments(payments) {
     if (state.processedIds.has(p.id)) continue;
 
     // Seuls les paiements Défi Enfance ont nom_de_levent renseigné
-    const eventName = (p.nom_de_levent || '').trim();
+    // Les champs personnalisés sont dans p.custom_fields ou directement dans p
+    const eventName = (
+      p.nom_de_levent ||
+      (p.custom_fields && p.custom_fields.nom_de_levent) ||
+      ''
+    ).trim();
     if (!eventName) {
       state.processedIds.add(p.id);
       continue;
     }
 
-    // Type de paiement Ohme : payment_type_id ou type
-    const type = (p.payment_type || p.type || '').toLowerCase();
+    // Types de paiement Ohme : 1 = Don, 3 = Billetterie (IDs numériques)
+    const typeId = p.payment_type_id;
+    const isDon        = typeId === 1;
+    const isBilletterie = typeId === 3;
 
     // ── CAS 1 : DON ──────────────────────────────────────
-    if (type === 'don') {
+    if (isDon) {
       state.stats.dons++;
       newCount++;
       const donateur = `${p.first_name || ''} ${p.last_name || ''}`.trim();
       const montant  = p.amount || '?';
       const emailDon = p.email || '';
 
-      // Champ Ohme : coureur_parraine → c'est un contact Ohme (même orthographe)
-      const coureurParraine = (p.coureur_parraine || '').trim();
-      // Champ Ohme : equipe_parraine → c'est une structure Ohme (même orthographe)
-      const equipeParraine  = (p.equipe_parraine  || '').trim();
+      // Champs personnalisés Ohme
+      const cf = p.custom_fields || p;
+      const coureurParraine = (cf.coureur_parraine || '').trim();
+      const equipeParraine  = (cf.equipe_parraine  || '').trim();
 
       if (coureurParraine) {
         // Chercher le contact dans Ohme pour récupérer son email
@@ -366,14 +373,14 @@ async function processPayments(payments) {
     }
 
     // ── CAS 2 : BILLETTERIE ───────────────────────────────
-    else if (type === 'billetterie') {
+    else if (isBilletterie) {
       state.stats.bill++;
       newCount++;
       const coureur      = `${p.first_name || ''} ${p.last_name || ''}`.trim();
       const emailCoureur = p.email || '';
-      // Champ Ohme : asso_soutenue → nom de la structure (même orthographe)
-      const nomAsso      = (p.asso_soutenue || '').trim();
-      const ville        = (p.nom_de_levent || '').replace(/DÉFI\s*ENFANCE?\s*/gi, '').replace(/\d{4}/g, '').trim();
+      const cf           = p.custom_fields || p;
+      const nomAsso      = (cf.asso_soutenue || '').trim();
+      const ville        = eventName.replace(/défi\s*enfance?\s*/gi, '').replace(/\d{4}/g, '').trim();
 
       if (nomAsso) {
         // Chercher la structure dans Ohme pour récupérer l'email du référent
@@ -522,13 +529,13 @@ async function lancerRattrapage() {
 
       // Filtrer sur DÉFI + dates plancher
       const eligibles = all.filter(p => {
-        const eventName = (p.nom_de_levent || '').trim();
+        const eventName = (p.nom_de_levent || (p.custom_fields && p.custom_fields.nom_de_levent) || '').trim();
         if (!eventName) return false;
-        const type = (p.payment_type || p.type || '').toLowerCase();
-        const date = new Date(p.date || p.created_at || 0);
-        if (type === 'don'         && date < RATTRAPAGE_DATE_DONS) return false;
-        if (type === 'billetterie' && date < RATTRAPAGE_DATE_BILL) return false;
-        return type === 'don' || type === 'billetterie';
+        const typeId = p.payment_type_id;
+        const date   = new Date(p.date || p.created_at || 0);
+        if (typeId === 1 && date < RATTRAPAGE_DATE_DONS)  return false;
+        if (typeId === 3 && date < RATTRAPAGE_DATE_BILL)  return false;
+        return typeId === 1 || typeId === 3;
       });
 
       rattrapage.total = eligibles.length;
@@ -536,16 +543,17 @@ async function lancerRattrapage() {
 
       for (const p of eligibles) {
         rattrapage.done++;
-        const type = (p.payment_type || p.type || '').toLowerCase();
-        const date = new Date(p.date || p.created_at || 0).toLocaleDateString('fr-FR');
+        const typeId = p.payment_type_id;
+        const date   = new Date(p.date || p.created_at || 0).toLocaleDateString('fr-FR');
+        const cf     = p.custom_fields || p;
 
         // ── DON ──
-        if (type === 'don') {
+        if (typeId === 1) {
           const donateur        = `${p.first_name || ''} ${p.last_name || ''}`.trim();
           const montant         = p.amount || '?';
           const emailDon        = p.email || '';
-          const coureurParraine = (p.coureur_parraine || '').trim();
-          const equipeParraine  = (p.equipe_parraine  || '').trim();
+          const coureurParraine = (cf.coureur_parraine || '').trim();
+          const equipeParraine  = (cf.equipe_parraine  || '').trim();
 
           if (coureurParraine) {
             const contact = await fetchOhmeContactByName(coureurParraine);
@@ -575,7 +583,7 @@ async function lancerRattrapage() {
         }
 
         // ── BILLETTERIE ──
-        else if (type === 'billetterie') {
+        else if (typeId === 3) {
           if (shouldSkipBilletterie(p)) {
             rattrapage.skipped++;
             const coureur = `${p.first_name || ''} ${p.last_name || ''}`.trim();
@@ -583,8 +591,9 @@ async function lancerRattrapage() {
           } else {
             const coureur      = `${p.first_name || ''} ${p.last_name || ''}`.trim();
             const emailCoureur = p.email || '';
-            const nomAsso      = (p.asso_soutenue || '').trim();
-            const ville        = (p.nom_de_levent || '').replace(/DÉFI\s*ENFANCE?\s*/gi, '').replace(/\d{4}/g, '').trim();
+            const nomAsso      = (cf.asso_soutenue || '').trim();
+            const eventNom     = (cf.nom_de_levent || p.nom_de_levent || '');
+            const ville        = eventNom.replace(/défi\s*enfance?\s*/gi, '').replace(/\d{4}/g, '').trim();
 
             if (nomAsso) {
               const structure = await fetchOhmeStructureByName(nomAsso);
