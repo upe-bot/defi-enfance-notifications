@@ -366,7 +366,22 @@ async function processPayments(payments) {
         }
 
       } else {
-        addLog(`⚠️ Don ${montant}€ de ${donateur} — aucun coureur ni équipe parrainé(e) renseigné(e)`, 'warn');
+        // Don non fléché → notifier la structure "Défi Enfance"
+        addLog(`ℹ️ Don ${montant}€ de ${donateur} — non fléché, notification → Défi Enfance`, 'info');
+        const structure  = await fetchOhmeStructureByName('Défi Enfance');
+        const chefEmail  = structure ? (structure.email_referent_defi_enfance    || '') : '';
+        const chefPrenom = structure ? (structure.prenom_du_referent_defi_enfance || structure.nom_du_referent_defi_enfance?.split(' ')[0] || 'Bonjour') : 'Bonjour';
+        if (chefEmail) {
+          const html = tplDonEquipe({ chefPrenom, nomEquipe: 'Défi Enfance', donateur, montant, email_donateur: emailDon });
+          const ok = await sendBrevo(chefEmail, '❤️ Nouveau don non fléché pour le Défi Enfance !', html);
+          if (ok) {
+            state.stats.sent++;
+            addLog(`✅ Don non fléché ${montant}€ de ${donateur} → Défi Enfance (${chefPrenom})`, 'ok');
+            addEvent('❤️', `Don non fléché de ${montant} €`, `${donateur} → Défi Enfance`, 'don');
+          }
+        } else {
+          addLog(`⚠️ Don non fléché — structure "Défi Enfance" introuvable dans Ohme`, 'warn');
+        }
       }
     }
 
@@ -575,8 +590,16 @@ async function lancerRattrapage() {
             } else { rattrapage.skipped++; rattrapageLog(`⚠️ [${date}] Équipe "${equipeParraine}" — référent introuvable`, 'warn'); }
 
           } else {
-            rattrapage.skipped++;
-            rattrapageLog(`⚠️ [${date}] Don ${montant}€ de ${donateur} — aucun coureur ni équipe parrainé(e)`, 'warn');
+            // Don non fléché → notifier la structure "Défi Enfance"
+            const structure  = await fetchOhmeStructureByName('Défi Enfance');
+            const chefEmail  = structure ? (structure.email_referent_defi_enfance    || '') : '';
+            const chefPrenom = structure ? (structure.prenom_du_referent_defi_enfance || structure.nom_du_referent_defi_enfance?.split(' ')[0] || 'Bonjour') : 'Bonjour';
+            if (chefEmail) {
+              const html = tplDonEquipe({ chefPrenom, nomEquipe: 'Défi Enfance', donateur, montant, email_donateur: emailDon });
+              const ok = await sendBrevo(chefEmail, '❤️ Nouveau don non fléché pour le Défi Enfance !', html);
+              if (ok) { rattrapage.sent++; state.stats.sent++; rattrapageLog(`✅ [${date}] Don non fléché ${montant}€ de ${donateur} → Défi Enfance`, 'ok'); }
+              else { rattrapage.errors++; }
+            } else { rattrapage.skipped++; rattrapageLog(`⚠️ [${date}] Don non fléché — structure "Défi Enfance" introuvable`, 'warn'); }
           }
         }
 
