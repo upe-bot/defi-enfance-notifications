@@ -363,28 +363,74 @@ async function processPayments(payments) {
 async function fetchOhmeContactByName(name) {
   try {
     const res = await fetch(
-      `${CONFIG.ohmeBase}/api/v1/contacts?search=${encodeURIComponent(name)}&limit=1`,
+      `${CONFIG.ohmeBase}/api/v1/contacts?search=${encodeURIComponent(name)}&limit=5`,
       { headers: { 'Accept': 'application/json', 'client-name': CONFIG.ohmeClientName, 'client-secret': CONFIG.ohmeClientSecret } }
     );
-    if (!res.ok) return null;
+    if (!res.ok) {
+      addLog(`⚠️ Contacts API erreur ${res.status} pour "${name}"`, 'warn');
+      return null;
+    }
     const json = await res.json();
     const items = json.data || [];
-    return items.length > 0 ? items[0] : null;
-  } catch { return null; }
+    if (items.length === 0) {
+      addLog(`⚠️ Contact "${name}" introuvable dans Ohme`, 'warn');
+      return null;
+    }
+    // Trouver le contact dont le nom correspond exactement
+    const contact = items.find(c => {
+      const fullName = `${c.first_name || ''} ${c.last_name || ''}`.trim().toLowerCase();
+      return fullName === name.toLowerCase();
+    }) || items[0];
+
+    addLog(`🔍 Contact "${contact.first_name} ${contact.last_name}" trouvé — email: "${contact.email || 'VIDE'}"`, 'info');
+    return contact;
+  } catch(e) {
+    addLog(`⚠️ Exception fetchContact "${name}" : ${e.message}`, 'warn');
+    return null;
+  }
 }
 
 // ── Chercher une structure Ohme par nom (pour récupérer l'email référent)
 async function fetchOhmeStructureByName(name) {
   try {
     const res = await fetch(
-      `${CONFIG.ohmeBase}/api/v1/structures?search=${encodeURIComponent(name)}&limit=1`,
+      `${CONFIG.ohmeBase}/api/v1/structures?search=${encodeURIComponent(name)}&limit=5`,
       { headers: { 'Accept': 'application/json', 'client-name': CONFIG.ohmeClientName, 'client-secret': CONFIG.ohmeClientSecret } }
     );
-    if (!res.ok) return null;
+    if (!res.ok) {
+      addLog(`⚠️ Structures API erreur ${res.status} pour "${name}"`, 'warn');
+      return null;
+    }
     const json = await res.json();
     const items = json.data || [];
-    return items.length > 0 ? items[0] : null;
-  } catch { return null; }
+
+    if (items.length === 0) {
+      addLog(`⚠️ Structure "${name}" introuvable dans Ohme`, 'warn');
+      return null;
+    }
+
+    // Trouver la structure dont le nom correspond exactement (ou prendre la première)
+    const structure = items.find(s => (s.name || '').toLowerCase() === name.toLowerCase()) || items[0];
+
+    // Les champs personnalisés Ohme peuvent être dans custom_fields ou directement à la racine
+    const cf = structure.custom_fields || structure;
+
+    // Construire un objet unifié avec les champs attendus
+    const result = {
+      ...structure,
+      email_referent_defi_enfance:    cf.email_referent_defi_enfance    || structure.email_referent_defi_enfance    || '',
+      prenom_du_referent_defi_enfance: cf.prenom_du_referent_defi_enfance || structure.prenom_du_referent_defi_enfance || '',
+      nom_du_referent_defi_enfance:   cf.nom_du_referent_defi_enfance   || structure.nom_du_referent_defi_enfance   || '',
+    };
+
+    // Log de debug pour vérifier les champs reçus
+    addLog(`🔍 Structure "${structure.name}" trouvée — email référent: "${result.email_referent_defi_enfance || 'VIDE'}"`, 'info');
+
+    return result;
+  } catch(e) {
+    addLog(`⚠️ Exception fetchStructure "${name}" : ${e.message}`, 'warn');
+    return null;
+  }
 }
 
 // ══════════════════════════════════════════════════════
