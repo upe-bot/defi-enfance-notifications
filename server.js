@@ -362,9 +362,17 @@ async function processPayments(payments) {
 // ── Chercher un contact Ohme par nom (pour récupérer l'email du coureur parrainé)
 async function fetchOhmeContactByName(name) {
   try {
-    // Paramètre "name" pour filtrer par nom (prénom + nom)
+    await sleep(OHME_DELAY_MS);
+    const parts     = name.trim().split(' ');
+    const firstname = parts[0] || '';
+    const lastname  = parts.slice(1).join(' ') || '';
+
+    const params = new URLSearchParams({ limit: '5' });
+    if (firstname) params.set('firstname', firstname);
+    if (lastname)  params.set('lastname',  lastname);
+
     const res = await fetch(
-      `${CONFIG.ohmeBase}/api/v1/contacts?name=${encodeURIComponent(name)}&limit=5`,
+      `${CONFIG.ohmeBase}/api/v1/contacts?${params.toString()}`,
       { headers: { 'Accept': 'application/json', 'client-name': CONFIG.ohmeClientName, 'client-secret': CONFIG.ohmeClientSecret } }
     );
     if (!res.ok) {
@@ -381,22 +389,27 @@ async function fetchOhmeContactByName(name) {
 
     // Trouver le contact dont le nom complet correspond exactement
     const contact = items.find(c => {
-      const fullName = `${c.first_name || ''} ${c.last_name || ''}`.trim().toLowerCase();
+      const fullName = `${c.firstname || c.first_name || ''} ${c.lastname || c.last_name || ''}`.trim().toLowerCase();
       return fullName === name.toLowerCase();
     }) || items[0];
 
-    addLog(`🔍 Contact "${contact.first_name} ${contact.last_name}" trouvé — email: "${contact.email || 'VIDE'}"`, 'info');
-    return contact;
+    const email = contact.email || '';
+    addLog(`🔍 Contact "${contact.firstname || contact.first_name} ${contact.lastname || contact.last_name}" trouvé — email: "${email || 'VIDE'}"`, 'info');
+    return { ...contact, email };
   } catch(e) {
     addLog(`⚠️ Exception fetchContact "${name}" : ${e.message}`, 'warn');
     return null;
   }
 }
 
+// Délai pour éviter le rate limiting Ohme (429)
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const OHME_DELAY_MS = 800; // 800ms entre chaque appel API Ohme
+
 // ── Chercher une structure Ohme par nom (pour récupérer l'email référent)
 async function fetchOhmeStructureByName(name) {
   try {
-    // Étape 1 : chercher par nom exact (paramètre "name" et non "search")
+    await sleep(OHME_DELAY_MS);
     const res = await fetch(
       `${CONFIG.ohmeBase}/api/v1/structures?name=${encodeURIComponent(name)}&limit=5`,
       { headers: { 'Accept': 'application/json', 'client-name': CONFIG.ohmeClientName, 'client-secret': CONFIG.ohmeClientSecret } }
@@ -417,6 +430,7 @@ async function fetchOhmeStructureByName(name) {
     const structure = items.find(s => (s.name || '').toLowerCase() === name.toLowerCase()) || items[0];
 
     // Étape 2 : récupérer la structure individuelle pour avoir les champs personnalisés
+    await sleep(OHME_DELAY_MS);
     const res2 = await fetch(
       `${CONFIG.ohmeBase}/api/v1/structures/${structure.id}`,
       { headers: { 'Accept': 'application/json', 'client-name': CONFIG.ohmeClientName, 'client-secret': CONFIG.ohmeClientSecret } }
