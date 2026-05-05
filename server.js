@@ -630,14 +630,34 @@ app.get('/api/events', (req, res) => {
 
 // Envoi de test
 app.post('/api/test-email', async (req, res) => {
-  const { to } = req.body;
+  const { to, template } = req.body;
   if (!to) return res.status(400).json({ error: 'Email requis' });
-  const html = tplDonCoureur({
-    coureurPrenom: 'Test', donateur: 'Jean-Claude Martin',
-    montant: '20', email_donateur: 'jc.martin@test.fr',
-    association: 'Les Enfants du Soleil',
-  });
-  const ok = await sendBrevo(to, '🧪 Test — Défi Enfance Notifications', html);
+
+  const donnees = {
+    don_coureur: {
+      subject: '🧪 Test — ❤️ Nouveau don pour ton Défi Enfance !',
+      html: tplDonCoureur({ coureurPrenom: 'Pierre', donateur: 'Jean-Claude Martin', montant: '20', email_donateur: 'jc.martin@test.fr', association: 'Les Enfants du Soleil' })
+    },
+    don_equipe: {
+      subject: '🧪 Test — 🏆 Nouveau don pour votre équipe !',
+      html: tplDonEquipe({ chefPrenom: 'Sophie', nomEquipe: 'Les Gazelles Solidaires', donateur: 'Marie Dupont', montant: '50', email_donateur: 'marie.dupont@test.fr' })
+    },
+    don_nonfleche: {
+      subject: '🧪 Test — ❤️ Don non fléché reçu !',
+      html: tplDonEquipe({ chefPrenom: 'Responsable', nomEquipe: 'Défi Enfance', donateur: 'Thomas Bernard', montant: '30', email_donateur: 't.bernard@test.fr' })
+    },
+    inscription_asso: {
+      subject: '🧪 Test — 🏃 Nouveau coureur pour votre cause !',
+      html: tplInscriptionAsso({ nomAsso: 'Espoir Enfants', coureur: 'Lucas Moreau', email_coureur: 'l.moreau@test.fr', ville: 'Angers' })
+    },
+    merci_donateur: {
+      subject: '🧪 Test — 🙏 Merci pour votre don au Défi Enfance !',
+      html: tplMerciDonateur({ prenomDonateur: 'Jean-Claude', montant: '20', donateur: 'Jean-Claude Martin' })
+    },
+  };
+
+  const tpl = donnees[template] || donnees['don_coureur'];
+  const ok = await sendBrevo(to, tpl.subject, tpl.html);
   res.json({ success: ok });
 });
 
