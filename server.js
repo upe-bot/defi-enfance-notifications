@@ -362,8 +362,9 @@ async function processPayments(payments) {
 // ── Chercher un contact Ohme par nom (pour récupérer l'email du coureur parrainé)
 async function fetchOhmeContactByName(name) {
   try {
+    // Paramètre "name" pour filtrer par nom (prénom + nom)
     const res = await fetch(
-      `${CONFIG.ohmeBase}/api/v1/contacts?search=${encodeURIComponent(name)}&limit=5`,
+      `${CONFIG.ohmeBase}/api/v1/contacts?name=${encodeURIComponent(name)}&limit=5`,
       { headers: { 'Accept': 'application/json', 'client-name': CONFIG.ohmeClientName, 'client-secret': CONFIG.ohmeClientSecret } }
     );
     if (!res.ok) {
@@ -372,11 +373,13 @@ async function fetchOhmeContactByName(name) {
     }
     const json = await res.json();
     const items = json.data || [];
+
     if (items.length === 0) {
       addLog(`⚠️ Contact "${name}" introuvable dans Ohme`, 'warn');
       return null;
     }
-    // Trouver le contact dont le nom correspond exactement
+
+    // Trouver le contact dont le nom complet correspond exactement
     const contact = items.find(c => {
       const fullName = `${c.first_name || ''} ${c.last_name || ''}`.trim().toLowerCase();
       return fullName === name.toLowerCase();
@@ -393,8 +396,9 @@ async function fetchOhmeContactByName(name) {
 // ── Chercher une structure Ohme par nom (pour récupérer l'email référent)
 async function fetchOhmeStructureByName(name) {
   try {
+    // Étape 1 : chercher par nom exact (paramètre "name" et non "search")
     const res = await fetch(
-      `${CONFIG.ohmeBase}/api/v1/structures?search=${encodeURIComponent(name)}&limit=5`,
+      `${CONFIG.ohmeBase}/api/v1/structures?name=${encodeURIComponent(name)}&limit=5`,
       { headers: { 'Accept': 'application/json', 'client-name': CONFIG.ohmeClientName, 'client-secret': CONFIG.ohmeClientSecret } }
     );
     if (!res.ok) {
@@ -409,24 +413,32 @@ async function fetchOhmeStructureByName(name) {
       return null;
     }
 
-    // Trouver la structure dont le nom correspond exactement (ou prendre la première)
+    // Trouver la correspondance exacte ou prendre la première
     const structure = items.find(s => (s.name || '').toLowerCase() === name.toLowerCase()) || items[0];
 
-    // Les champs personnalisés Ohme peuvent être dans custom_fields ou directement à la racine
-    const cf = structure.custom_fields || structure;
+    // Étape 2 : récupérer la structure individuelle pour avoir les champs personnalisés
+    const res2 = await fetch(
+      `${CONFIG.ohmeBase}/api/v1/structures/${structure.id}`,
+      { headers: { 'Accept': 'application/json', 'client-name': CONFIG.ohmeClientName, 'client-secret': CONFIG.ohmeClientSecret } }
+    );
+    if (!res2.ok) {
+      addLog(`⚠️ Erreur récupération structure individuelle id=${structure.id}`, 'warn');
+      return structure; // on retourne quand même ce qu'on a
+    }
+    const detail = await res2.json();
+    const s = detail.data || detail;
+    const cf = s.custom_fields || s;
 
-    // Construire un objet unifié avec les champs attendus
     const result = {
-      ...structure,
-      email_referent_defi_enfance:    cf.email_referent_defi_enfance    || structure.email_referent_defi_enfance    || '',
-      prenom_du_referent_defi_enfance: cf.prenom_du_referent_defi_enfance || structure.prenom_du_referent_defi_enfance || '',
-      nom_du_referent_defi_enfance:   cf.nom_du_referent_defi_enfance   || structure.nom_du_referent_defi_enfance   || '',
+      ...s,
+      email_referent_defi_enfance:     cf.email_referent_defi_enfance     || s.email_referent_defi_enfance     || '',
+      prenom_du_referent_defi_enfance: cf.prenom_du_referent_defi_enfance  || s.prenom_du_referent_defi_enfance || '',
+      nom_du_referent_defi_enfance:    cf.nom_du_referent_defi_enfance     || s.nom_du_referent_defi_enfance    || '',
     };
 
-    // Log de debug pour vérifier les champs reçus
-    addLog(`🔍 Structure "${structure.name}" trouvée — email référent: "${result.email_referent_defi_enfance || 'VIDE'}"`, 'info');
-
+    addLog(`🔍 Structure "${s.name}" — email référent: "${result.email_referent_defi_enfance || 'VIDE'}"`, 'info');
     return result;
+
   } catch(e) {
     addLog(`⚠️ Exception fetchStructure "${name}" : ${e.message}`, 'warn');
     return null;
