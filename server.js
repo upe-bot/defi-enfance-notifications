@@ -349,18 +349,16 @@ async function processPayments(payments) {
         }
 
       } else if (equipeParraine) {
-        // Chercher la structure dans Ohme pour récupérer email_referent_defi_enfance et nom_du_referent
-        const structure = await fetchOhmeStructureByName(equipeParraine);
-        const chefEmail  = structure ? (structure.email_referent_defi_enfance || '') : '';
-        const chefNom    = structure ? (structure.nom_du_referent_defi_enfance || '') : '';
-        const chefPrenom = chefNom.split(' ')[0] || 'Bonjour';
+        const structure  = await fetchOhmeStructureByName(equipeParraine);
+        const chefEmail  = structure ? (structure.email_referent_defi_enfance   || '') : '';
+        const chefPrenom = structure ? (structure.prenom_du_referent_defi_enfance || structure.nom_du_referent_defi_enfance?.split(' ')[0] || 'Bonjour') : 'Bonjour';
 
         if (chefEmail) {
           const html = tplDonEquipe({ chefPrenom, nomEquipe: equipeParraine, donateur, montant, email_donateur: emailDon });
           const ok = await sendBrevo(chefEmail, '❤️ Nouveau don pour votre équipe au Défi Enfance !', html);
           if (ok) {
             state.stats.sent++;
-            addLog(`✅ Don ${montant}€ de ${donateur} → équipe ${equipeParraine}`, 'ok');
+            addLog(`✅ Don ${montant}€ de ${donateur} → équipe ${equipeParraine} (${chefPrenom})`, 'ok');
             addEvent('🏆', `Don de ${montant} € pour équipe`, `${donateur} → ${equipeParraine}`, 'don');
           }
         } else {
@@ -566,13 +564,13 @@ async function lancerRattrapage() {
             } else { rattrapage.skipped++; rattrapageLog(`⚠️ [${date}] Coureur "${coureurParraine}" introuvable`, 'warn'); }
 
           } else if (equipeParraine) {
-            const structure = await fetchOhmeStructureByName(equipeParraine);
-            const chefEmail = structure ? (structure.email_referent_defi_enfance || '') : '';
-            const chefNom   = structure ? (structure.nom_du_referent_defi_enfance || '') : '';
+            const structure  = await fetchOhmeStructureByName(equipeParraine);
+            const chefEmail  = structure ? (structure.email_referent_defi_enfance    || '') : '';
+            const chefPrenom = structure ? (structure.prenom_du_referent_defi_enfance || structure.nom_du_referent_defi_enfance?.split(' ')[0] || 'Bonjour') : 'Bonjour';
             if (chefEmail) {
-              const html = tplDonEquipe({ chefPrenom: chefNom.split(' ')[0] || 'Bonjour', nomEquipe: equipeParraine, donateur, montant, email_donateur: emailDon });
+              const html = tplDonEquipe({ chefPrenom, nomEquipe: equipeParraine, donateur, montant, email_donateur: emailDon });
               const ok = await sendBrevo(chefEmail, '❤️ Nouveau don pour votre équipe au Défi Enfance !', html);
-              if (ok) { rattrapage.sent++; state.stats.sent++; rattrapageLog(`✅ [${date}] Don ${montant}€ de ${donateur} → équipe ${equipeParraine}`, 'ok'); }
+              if (ok) { rattrapage.sent++; state.stats.sent++; rattrapageLog(`✅ [${date}] Don ${montant}€ de ${donateur} → équipe ${equipeParraine} (${chefPrenom})`, 'ok'); }
               else { rattrapage.errors++; }
             } else { rattrapage.skipped++; rattrapageLog(`⚠️ [${date}] Équipe "${equipeParraine}" — référent introuvable`, 'warn'); }
 
