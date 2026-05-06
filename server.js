@@ -55,14 +55,15 @@ function saveProcessedIds() {
 //  ÉTAT SERVEUR
 // ══════════════════════════════════════════════════════
 const state = {
-  isRunning:    false,
-  processedIds: loadProcessedIds(), // ← chargés depuis le disque au démarrage
-  stats:        { sent: 0, dons: 0, bill: 0, errors: 0 },
-  logs:         [],
-  events:       [],
-  lastPoll:     null,
-  nextPoll:     null,
-  pollTimer:    null,
+  isRunning:      false,
+  processedIds:   loadProcessedIds(),
+  donsEnAttente:  loadDonsEnAttente(),
+  stats:          { sent: 0, dons: 0, bill: 0, errors: 0 },
+  logs:           [],
+  events:         [],
+  lastPoll:       null,
+  nextPoll:       null,
+  pollTimer:      null,
 };
 
 function addLog(msg, type = 'info') {
@@ -75,6 +76,30 @@ function addLog(msg, type = 'info') {
 function addEvent(icon, title, sub, type) {
   state.events.unshift({ icon, title, sub, type, ts: new Date().toISOString() });
   if (state.events.length > 20) state.events.pop();
+}
+
+// ══════════════════════════════════════════════════════
+//  FILE D'ATTENTE — DONS NON FLÉCHÉS
+// ══════════════════════════════════════════════════════
+const ATTENTE_FILE = '/tmp/defi-enfance-dons-attente.json';
+
+function loadDonsEnAttente() {
+  try {
+    if (fs.existsSync(ATTENTE_FILE)) return JSON.parse(fs.readFileSync(ATTENTE_FILE, 'utf8'));
+  } catch(e) {}
+  return [];
+}
+
+function saveDonsEnAttente() {
+  try { fs.writeFileSync(ATTENTE_FILE, JSON.stringify(state.donsEnAttente)); } catch(e) {}
+}
+
+function addDonEnAttente(don) {
+  // Éviter les doublons
+  if (state.donsEnAttente.find(d => d.paiementId === don.paiementId)) return;
+  state.donsEnAttente.push({ ...don, addedAt: new Date().toISOString() });
+  saveDonsEnAttente();
+  addLog(`⏸️ Don en attente ajouté : ${don.donateur} — ${don.montant}€`, 'warn');
 }
 
 // ══════════════════════════════════════════════════════
@@ -180,7 +205,8 @@ const CSS_COMMUN = `
 //  TEMPLATES EMAIL
 // ══════════════════════════════════════════════════════
 function tplDonCoureur({ coureurPrenom, donateur, montant, email_donateur, association }) {
-  return `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Antonio:wght@700&display=swap" rel="stylesheet"><style>${CSS_COMMUN}</style></head><body><div class="outer"><div class="logo-header"><div class="logo-text">🤝 Défi Enfance</div><div class="logo-sub">Générateur de victoires pour l'enfance</div></div><div class="header"><h1>❤️ Nouveau don pour toi !</h1><p>Générateur de victoires pour l'enfance</p></div><div class="body"><div class="greeting">Bonjour ${coureurPrenom} 👋</div><div class="intro">Nous sommes heureux de t'annoncer qu'un nouveau don vient d'être enregistré sur <strong>ta page de collecte Défi Enfance</strong> !</div><div class="don-box"><div class="don-amount">${montant} €</div><div class="don-label">Don reçu de ${donateur}</div></div><div class="card"><h3>📋 Coordonnées du donateur</h3><div class="row"><span class="ic">👤</span><div><strong>Nom :</strong> ${donateur}</div></div><div class="row"><span class="ic">✉️</span><div><strong>Email :</strong> <a href="mailto:${email_donateur}" style="color:#fb0089">${email_donateur}</a></div></div></div><div class="note magenta">💌 <strong>N'hésite pas à remercier ${donateur} personnellement</strong> — un message sincère fait toujours une grande différence !</div><div class="cta-box"><p>✨ <strong>Et si tu faisais grimper ta collecte pour l'enfance encore plus haut ?</strong><br>Partage ta page et invite tes proches à te soutenir !</p><a href="${URL_COUREURS}" class="cta-btn">🏃 Voir ma page de collecte</a></div><div class="divider"></div><div style="font-size:.75rem;color:#888;text-align:center">Association soutenue : <strong>${association}</strong><br>Email envoyé automatiquement dans les 10 minutes suivant le don.</div></div><div class="footer"><div style="font-family:Arial,sans-serif;font-size:1.1rem;font-weight:700;color:#fb0089;letter-spacing:.08em;margin-bottom:6px">DÉFI ENFANCE</div><div class="footer-sub">Générateur de victoires pour l'enfance<br>contact@defienfance.fr</div></div></div></body></html>`;
+  const assoLine = association ? `<br>Association soutenue par ta collecte : <strong>${association}</strong>` : '';
+  return `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Antonio:wght@700&display=swap" rel="stylesheet"><style>${CSS_COMMUN}</style></head><body><div class="outer"><div class="logo-header"><div class="logo-text">🤝 Défi Enfance</div><div class="logo-sub">Générateur de victoires pour l'enfance</div></div><div class="header"><h1>❤️ Nouveau don pour toi !</h1><p>Générateur de victoires pour l'enfance</p></div><div class="body"><div class="greeting">Bonjour ${coureurPrenom} 👋</div><div class="intro">Nous sommes heureux de t'annoncer qu'un nouveau don vient d'être enregistré sur <strong>ta page de collecte Défi Enfance</strong> !</div><div class="don-box"><div class="don-amount">${montant} €</div><div class="don-label">Don reçu de ${donateur}</div></div><div class="card"><h3>📋 Coordonnées du donateur</h3><div class="row"><span class="ic">👤</span><div><strong>Nom :</strong> ${donateur}</div></div><div class="row"><span class="ic">✉️</span><div><strong>Email :</strong> <a href="mailto:${email_donateur}" style="color:#fb0089">${email_donateur}</a></div></div></div><div class="note magenta">💌 <strong>N'hésite pas à remercier ${donateur} personnellement</strong> — un message sincère fait toujours une grande différence !</div><div class="cta-box"><p>✨ <strong>Et si tu faisais grimper ta collecte pour l'enfance encore plus haut ?</strong><br>Partage ta page et invite tes proches à te soutenir !</p><a href="${URL_COUREURS}" class="cta-btn">🏃 Voir ma page de collecte</a></div><div class="divider"></div><div style="font-size:.75rem;color:#888;text-align:center">Email envoyé automatiquement dans les 10 minutes suivant le don.${assoLine}</div></div><div class="footer"><div style="font-family:Arial,sans-serif;font-size:1.1rem;font-weight:700;color:#fb0089;letter-spacing:.08em;margin-bottom:6px">DÉFI ENFANCE</div><div class="footer-sub">Générateur de victoires pour l'enfance<br>contact@defienfance.fr</div></div></div></body></html>`;
 }
 
 function tplDonEquipe({ chefPrenom, nomEquipe, donateur, montant, email_donateur }) {
@@ -301,7 +327,8 @@ async function processPayments(payments) {
         const contact = await fetchOhmeContactByName(coureurParraine);
         const emailCoureur = contact ? (contact.email || '') : '';
         const coureurPrenom = coureurParraine.split(' ')[0];
-        const assoSoutenue  = p.asso_soutenue || '';
+        // Champ personnalisé Ohme : asso_soutenue (dans custom_fields ou à la racine)
+        const assoSoutenue = (cf.asso_soutenue || p.asso_soutenue || '').trim();
 
         if (emailCoureur) {
           const html = tplDonCoureur({ coureurPrenom, donateur, montant, email_donateur: emailDon, association: assoSoutenue });
@@ -336,23 +363,17 @@ async function processPayments(payments) {
         }
 
       } else {
-        // Don non fléché → notifier la structure "Défi Enfance"
-        addLog(`ℹ️ Don ${montant}€ de ${donateur} — non fléché, notification → Défi Enfance`, 'info');
-        const structure  = await fetchOhmeStructureByName('Défi Enfance');
-        const chefEmail  = structure ? (structure.email_referent_defi_enfance    || '') : '';
-        const chefPrenom = structure ? (structure.prenom_du_referent_defi_enfance || structure.nom_du_referent_defi_enfance?.split(' ')[0] || 'Bonjour') : 'Bonjour';
-        if (chefEmail) {
-          const html = tplDonEquipe({ chefPrenom, nomEquipe: 'Défi Enfance', donateur, montant, email_donateur: emailDon });
-          const ok = await sendBrevo(chefEmail, '❤️ Nouveau don non fléché pour le Défi Enfance !', html);
-          if (ok) {
-            state.stats.sent++;
-            addLog(`✅ Don non fléché ${montant}€ de ${donateur} → Défi Enfance (${chefPrenom})`, 'ok');
-            addEvent('❤️', `Don non fléché de ${montant} €`, `${donateur} → Défi Enfance`, 'don');
-            scheduleMerciDonateur({ email: emailDon, prenom: donateur.split(' ')[0], montant, donateur });
-          }
-        } else {
-          addLog(`⚠️ Don non fléché — structure "Défi Enfance" introuvable dans Ohme`, 'warn');
-        }
+        // Don non fléché → mise en ATTENTE (pas d'email automatique)
+        addLog(`⏸️ Don ${montant}€ de ${donateur} — non fléché, mis en attente de validation`, 'warn');
+        addDonEnAttente({
+          paiementId: p.id,
+          donateur,
+          emailDon,
+          montant,
+          date: p.date || new Date().toISOString(),
+          eventName,
+        });
+        addEvent('⏸️', `Don en attente ${montant} €`, `${donateur} — à valider`, 'don');
       }
     }
 
@@ -809,6 +830,116 @@ app.post('/api/test-email', async (req, res) => {
 app.post('/api/poll-now', async (req, res) => {
   await poll();
   res.json({ success: true, stats: state.stats });
+});
+
+// ── DONS EN ATTENTE ──────────────────────────────────
+// Lister les dons en attente
+app.get('/api/dons-attente', (req, res) => {
+  res.json(state.donsEnAttente);
+});
+
+// Valider un don en attente — relit le paiement dans Ohme et envoie le bon email
+app.post('/api/dons-attente/:paiementId/valider', async (req, res) => {
+  const { paiementId } = req.params;
+
+  const don = state.donsEnAttente.find(d => d.paiementId === paiementId);
+  if (!don) return res.status(404).json({ error: 'Don introuvable' });
+
+  // Relire le paiement dans Ohme pour avoir les données à jour
+  let paiement = null;
+  try {
+    await sleep(OHME_DELAY_MS);
+    const res2 = await fetch(
+      `${CONFIG.ohmeBase}/api/v1/payments/${paiementId}`,
+      { headers: { 'Accept': 'application/json', 'client-name': CONFIG.ohmeClientName, 'client-secret': CONFIG.ohmeClientSecret } }
+    );
+    if (res2.ok) {
+      const json = await res2.json();
+      paiement = json.data || json;
+    }
+  } catch(e) {
+    addLog(`⚠️ Impossible de relire le paiement ${paiementId} : ${e.message}`, 'warn');
+  }
+
+  if (!paiement) return res.json({ success: false, error: 'Impossible de relire le paiement dans Ohme' });
+
+  const cf             = paiement.custom_fields || paiement;
+  const coureurParraine = (cf.coureur_parraine || '').trim();
+  const equipeParraine  = (cf.equipe_parraine  || '').trim();
+  const { donateur, emailDon, montant } = don;
+  let ok = false;
+
+  if (coureurParraine) {
+    // Fléché vers un coureur
+    const contact      = await fetchOhmeContactByName(coureurParraine);
+    const emailCoureur = contact ? (contact.email || '') : '';
+    const coureurPrenom = coureurParraine.split(' ')[0];
+    const assoSoutenue  = (cf.asso_soutenue || '').trim();
+    if (emailCoureur) {
+      const html = tplDonCoureur({ coureurPrenom, donateur, montant, email_donateur: emailDon, association: assoSoutenue });
+      ok = await sendBrevo(emailCoureur, '❤️ Nouveau don pour ton Défi Enfance !', html);
+      if (ok) {
+        state.stats.sent++;
+        scheduleMerciDonateur({ email: emailDon, prenom: donateur.split(' ')[0], montant, donateur });
+        addLog(`✅ Don validé → coureur ${coureurParraine} (${montant}€)`, 'ok');
+        addEvent('❤️', `Don validé ${montant}€`, `${donateur} → ${coureurParraine}`, 'don');
+      }
+    } else {
+      return res.json({ success: false, error: `Coureur "${coureurParraine}" introuvable dans Ohme — vérifiez l'orthographe` });
+    }
+
+  } else if (equipeParraine) {
+    // Fléché vers une équipe
+    const structure  = await fetchOhmeStructureByName(equipeParraine);
+    const chefEmail  = structure ? (structure.email_referent_defi_enfance || '') : '';
+    const chefPrenom = structure ? (structure.prenom_du_referent_defi_enfance || 'Bonjour') : 'Bonjour';
+    if (chefEmail) {
+      const html = tplDonEquipe({ chefPrenom, nomEquipe: equipeParraine, donateur, montant, email_donateur: emailDon });
+      ok = await sendBrevo(chefEmail, '❤️ Nouveau don pour votre équipe au Défi Enfance !', html);
+      if (ok) {
+        state.stats.sent++;
+        scheduleMerciDonateur({ email: emailDon, prenom: donateur.split(' ')[0], montant, donateur });
+        addLog(`✅ Don validé → équipe ${equipeParraine} (${montant}€)`, 'ok');
+        addEvent('🏆', `Don validé ${montant}€`, `${donateur} → ${equipeParraine}`, 'don');
+      }
+    } else {
+      return res.json({ success: false, error: `Équipe "${equipeParraine}" — référent introuvable dans Ohme` });
+    }
+
+  } else {
+    // Toujours non fléché → envoyer à Défi Enfance
+    const structure  = await fetchOhmeStructureByName('Défi Enfance');
+    const chefEmail  = structure ? (structure.email_referent_defi_enfance || '') : '';
+    const chefPrenom = structure ? (structure.prenom_du_referent_defi_enfance || 'Bonjour') : 'Bonjour';
+    if (chefEmail) {
+      const html = tplDonEquipe({ chefPrenom, nomEquipe: 'Défi Enfance', donateur, montant, email_donateur: emailDon });
+      ok = await sendBrevo(chefEmail, '❤️ Nouveau don non fléché pour le Défi Enfance !', html);
+      if (ok) {
+        state.stats.sent++;
+        scheduleMerciDonateur({ email: emailDon, prenom: donateur.split(' ')[0], montant, donateur });
+        addLog(`✅ Don non fléché confirmé → Défi Enfance (${montant}€)`, 'ok');
+        addEvent('❤️', `Don non fléché ${montant}€`, donateur, 'don');
+      }
+    } else {
+      return res.json({ success: false, error: 'Structure "Défi Enfance" introuvable dans Ohme' });
+    }
+  }
+
+  if (ok) {
+    state.donsEnAttente = state.donsEnAttente.filter(d => d.paiementId !== paiementId);
+    saveDonsEnAttente();
+  }
+
+  res.json({ success: ok });
+});
+
+// Ignorer un don en attente
+app.post('/api/dons-attente/:paiementId/ignorer', (req, res) => {
+  const { paiementId } = req.params;
+  state.donsEnAttente = state.donsEnAttente.filter(d => d.paiementId !== paiementId);
+  saveDonsEnAttente();
+  addLog(`🗑️ Don en attente ignoré : ${paiementId}`, 'info');
+  res.json({ success: true });
 });
 
 // ── RATTRAPAGE ──────────────────────────────────────
