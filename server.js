@@ -280,11 +280,39 @@ async function sendBrevo(to, subject, html) {
 // ══════════════════════════════════════════════════════
 //  TRAITEMENT DES PAIEMENTS
 // ══════════════════════════════════════════════════════
+// Date plancher depuis variable d'environnement Render
+// Format attendu : YYYY-MM-DDTHH:MM (heure française, ex: 2026-05-06T14:11)
+// Le serveur convertit automatiquement en UTC (France = UTC+2 en été)
+function getDatePlancher() {
+  const raw = process.env.PROCESS_SINCE || '';
+  if (!raw) return null;
+  try {
+    // Ajouter +02:00 (heure française été) pour convertir en UTC
+    const d = new Date(raw.includes('Z') || raw.includes('+') ? raw : raw + '+02:00');
+    if (isNaN(d.getTime())) throw new Error('Date invalide');
+    addLog(`📅 Date plancher : ${d.toLocaleString('fr-FR', { timeZone: 'Europe/Paris' })} (heure française)`, 'info');
+    return d;
+  } catch(e) {
+    console.log(`[WARN] PROCESS_SINCE invalide : ${raw}`);
+    return null;
+  }
+}
+
 async function processPayments(payments, ignoreDate = false) {
+  const datePlancher = ignoreDate ? null : getDatePlancher();
   let newCount = 0;
 
   for (const p of payments) {
     if (state.processedIds.has(p.id)) continue;
+
+    // Filtrer sur la date plancher si définie
+    if (datePlancher) {
+      const datePaiement = new Date(p.date || p.created_at || 0);
+      if (datePaiement < datePlancher) {
+        state.processedIds.add(p.id);
+        continue;
+      }
+    }
 
     // Seuls les paiements Défi Enfance ont nom_de_levent renseigné
     // Les champs personnalisés sont dans p.custom_fields ou directement dans p
@@ -1040,4 +1068,6 @@ app.listen(PORT, () => {
   console.log(`   Ohme client-name : ${CONFIG.ohmeClientName ? '✅ présent' : '⚠️ manquant'}`);
   console.log(`   Brevo : ${CONFIG.brevoKey ? '✅ clé présente' : '⚠️ clé manquante'}`);
   console.log(`   IDs déjà traités chargés : ${state.processedIds.size}`);
+  const dp = process.env.PROCESS_SINCE;
+  console.log(`   Date plancher : ${dp ? dp + ' (heure française)' : '⚠️ non définie — tous les paiements seront traités'}`);
 });
