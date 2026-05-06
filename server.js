@@ -13,21 +13,25 @@ app.use((req, res, next) => {
   const pwd = process.env.DASHBOARD_PASSWORD || '';
   if (!pwd) return next(); // pas de mot de passe configuré → accès libre
 
-  // Les routes API sont protégées par le header Authorization
+  // Toujours autoriser la page et l'action de login
+  if (req.path === '/login') return next();
+
+  // Routes API : vérifier le header x-dashboard-password
   if (req.path.startsWith('/api/')) {
     const auth = req.headers['x-dashboard-password'] || '';
     if (auth !== pwd) return res.status(401).json({ error: 'Non autorisé' });
     return next();
   }
 
-  // Pour le dashboard HTML : vérifier le cookie de session
+  // Fichiers statiques publics (JS, CSS, images) : toujours autoriser
+  if (req.path.match(/\.(js|css|png|jpg|ico|svg|woff|woff2)$/)) return next();
+
+  // Dashboard HTML : vérifier le cookie
   const cookie = req.headers.cookie || '';
   const token  = cookie.split(';').find(c => c.trim().startsWith('dash_token='));
-  const val    = token ? token.split('=')[1]?.trim() : '';
-  if (val === pwd) return next();
+  const val    = token ? token.trim().split('=').slice(1).join('=').trim() : '';
 
-  // Page de login si pas authentifié
-  if (req.path === '/login' && req.method === 'GET') return next();
+  if (val === pwd) return next();
   return res.redirect('/login');
 });
 
@@ -319,7 +323,7 @@ async function sendBrevo(to, subject, html) {
 // ══════════════════════════════════════════════════════
 
 // Version du serveur — incrémenter à chaque mise à jour de server.js
-const SERVER_VERSION = '45';
+const SERVER_VERSION = '46';
 const VERSION_FILE   = '/opt/render/project/src/defi-enfance-version.txt';
 
 function getLastVersion() {
