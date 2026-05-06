@@ -280,21 +280,11 @@ async function sendBrevo(to, subject, html) {
 // ══════════════════════════════════════════════════════
 //  TRAITEMENT DES PAIEMENTS
 // ══════════════════════════════════════════════════════
-// Date plancher : ignorer tous les paiements antérieurs au 06/05/2026 14h11 heure française (12h11 UTC)
-const DATE_PLANCHER = new Date('2026-05-06T12:11:00.000Z');
-
-async function processPayments(payments) {
+async function processPayments(payments, ignoreDate = false) {
   let newCount = 0;
 
   for (const p of payments) {
     if (state.processedIds.has(p.id)) continue;
-
-    // Ignorer les paiements antérieurs à la date plancher
-    const datePaiement = new Date(p.date || p.created_at || 0);
-    if (datePaiement < DATE_PLANCHER) {
-      state.processedIds.add(p.id);
-      continue;
-    }
 
     // Seuls les paiements Défi Enfance ont nom_de_levent renseigné
     // Les champs personnalisés sont dans p.custom_fields ou directement dans p
@@ -758,10 +748,7 @@ async function lancerRattrapage() {
 
 // Version sans filtre date plancher pour les envois forcés
 async function processPaymentsForced(payments) {
-  const savedPlancher = new Date(DATE_PLANCHER.getTime());
-  DATE_PLANCHER.setTime(0); // Remonter au 1er janvier 1970
-  await processPayments(payments);
-  DATE_PLANCHER.setTime(savedPlancher.getTime()); // Remettre la date plancher
+  await processPayments(payments, true);
 }
 
 // ══════════════════════════════════════════════════════
