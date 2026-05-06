@@ -119,6 +119,7 @@
     <div class="status-dot">
       <div class="dot running" id="statusDot"></div>
       <span id="statusLabel">Chargement…</span>
+      <a href="/logout" style="margin-left:16px;font-size:.72rem;color:rgba(255,255,255,0.4);text-decoration:none;border:1px solid rgba(255,255,255,0.15);padding:4px 10px;border-radius:6px">🚪 Déco</a>
     </div>
   </header>
 
@@ -263,7 +264,7 @@
           <option value="inscription_asso">🏃 Inscription → Association</option>
           <option value="inscription_coureur">🚀 Inscription → Coureur (bienvenue)</option>
           <option value="inscription_supporter">🚀 Inscription → Supporter (bienvenue)</option>
-          <option value="merci_donateur">🙏 Merci donateur J+1</option>
+          <option value="merci_donateur">🙏 Merci donateur (envoi immédiat)</option>
         </select>
       </div>
       <div class="actions">
@@ -283,7 +284,7 @@ let progressTimer = null;
 
 async function fetchStatus() {
   try {
-    const r = await fetch('/api/status');
+    const r = await apiFetch('/api/status');
     const d = await r.json();
     document.getElementById('statSent').textContent = d.stats.sent;
     document.getElementById('statDons').textContent = d.stats.dons;
@@ -320,7 +321,7 @@ function updateProgress(interval) {
 
 async function fetchLogs() {
   try {
-    const r = await fetch('/api/logs');
+    const r = await apiFetch('/api/logs');
     const logs = await r.json();
     const box = document.getElementById('logBox');
     if (!logs.length) { box.innerHTML = '<div class="log-empty">Aucun log disponible.</div>'; return; }
@@ -334,7 +335,7 @@ async function fetchLogs() {
 
 async function fetchEvents() {
   try {
-    const r = await fetch('/api/events');
+    const r = await apiFetch('/api/events');
     const evs = await r.json();
     const el = document.getElementById('eventsList');
     if (!evs.length) { el.innerHTML = '<div class="empty-state"><div class="big">🔍</div>Aucun événement détecté.</div>'; return; }
@@ -356,7 +357,7 @@ async function fetchEvents() {
 
 async function pollNow() {
   showToast('⚡ Poll lancé', 'Interrogation de Ohme en cours…');
-  await fetch('/api/poll-now', { method: 'POST' });
+  await apiFetch('/api/poll-now', { method: 'POST' });
   setTimeout(() => { fetchStatus(); fetchLogs(); fetchEvents(); }, 2000);
 }
 
@@ -367,7 +368,7 @@ async function sendTestEmail() {
   const to       = document.getElementById('testEmail').value.trim();
   const template = document.getElementById('testTemplate').value;
   if (!to) { showToast('⚠️ Attention', 'Saisissez une adresse email'); return; }
-  const r = await fetch('/api/test-email', {
+  const r = await apiFetch('/api/test-email', {
     method: 'POST', headers: {'Content-Type':'application/json'},
     body: JSON.stringify({ to, template })
   });
@@ -394,12 +395,12 @@ async function startRattrapage() {
   document.getElementById('rattrapageProgress').style.display = 'block';
   showToast('🕐 Rattrapage lancé', 'Récupération des paiements Ohme en cours…');
 
-  await fetch('/api/rattrapage/start', { method: 'POST' });
+  await apiFetch('/api/rattrapage/start', { method: 'POST' });
 
   // Polling du statut toutes les 3 secondes
   rattrapageTimer = setInterval(async () => {
     try {
-      const r = await fetch('/api/rattrapage/status');
+      const r = await apiFetch('/api/rattrapage/status');
       const d = await r.json();
 
       // Compteurs
@@ -444,7 +445,7 @@ async function forcerPaiement() {
   resultEl.style.color = 'var(--text-muted)';
   resultEl.textContent = '⏳ Traitement en cours…';
 
-  const r = await fetch('/api/forcer-paiement', {
+  const r = await apiFetch('/api/forcer-paiement', {
     method: 'POST', headers: {'Content-Type':'application/json'},
     body: JSON.stringify({ paiementId: id })
   });
@@ -466,7 +467,7 @@ async function forcerPaiement() {
 // ── DONS EN ATTENTE ──────────────────────────────────
 async function ignorerTous() {
   if (!confirm(`Ignorer tous les paiements en attente ? Aucun email ne sera envoyé pour ces paiements.`)) return;
-  const r = await fetch('/api/dons-attente/ignorer-tous', { method: 'POST' });
+  const r = await apiFetch('/api/dons-attente/ignorer-tous', { method: 'POST' });
   const d = await r.json();
   if (d.success) {
     showToast('🗑️ Ignorés !', `${d.count} paiement(s) ignorés`);
@@ -476,7 +477,7 @@ async function ignorerTous() {
 
 async function fetchDonsAttente() {
   try {
-    const r = await fetch('/api/dons-attente');
+    const r = await apiFetch('/api/dons-attente');
     const dons = await r.json();
     const el = document.getElementById('donsAttenteList');
     if (!dons.length) {
@@ -551,6 +552,15 @@ async function ignorerDon(paiementId) {
   document.getElementById(`don-${paiementId}`)?.remove();
   showToast('🗑️ Don ignoré', 'Retiré de la liste d\'attente');
   fetchDonsAttente();
+}
+
+// ── AUTH HELPER ──────────────────────────────────────
+function getPassword() {
+  return document.cookie.split(';').find(c => c.trim().startsWith('dash_token='))?.split('=')[1]?.trim() || '';
+}
+function apiFetch(url, options = {}) {
+  const headers = { 'Content-Type': 'application/json', 'x-dashboard-password': getPassword(), ...(options.headers || {}) };
+  return fetch(url, { ...options, headers });
 }
 
 // ── REFRESH ──────────────────────────────────────────
