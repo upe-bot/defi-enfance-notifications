@@ -226,10 +226,8 @@ async function fetchOhmePayments() {
     return [];
   }
   try {
-    // Récupérer les paiements des 2 derniers jours — suffisant pour ne rien rater
-    const twoDaysAgo = new Date(Date.now() - 2 * 24 * 60 * 60 * 1000);
-    const sinceDate  = twoDaysAgo.toISOString().substring(0, 10);
-    const url = `${CONFIG.ohmeBase}/api/v1/payments?limit=500&since_date=${sinceDate}`;
+    // Récupérer tous les paiements depuis le 1er avril 2026
+    const url = `${CONFIG.ohmeBase}/api/v1/payments?limit=500&since_date=2026-04-01`;
 
     const res = await fetch(url, {
       headers: {
@@ -286,8 +284,32 @@ async function sendBrevo(to, subject, html) {
 //  TRAITEMENT DES PAIEMENTS
 // ══════════════════════════════════════════════════════
 
+// Version du serveur — incrémenter à chaque mise à jour de server.js
+const SERVER_VERSION = '37';
+const VERSION_FILE   = '/opt/render/project/src/defi-enfance-version.txt';
+
+function getLastVersion() {
+  try {
+    if (fs.existsSync(VERSION_FILE)) return fs.readFileSync(VERSION_FILE, 'utf8').trim();
+  } catch(e) {}
+  return null;
+}
+
+function saveCurrentVersion() {
+  try { fs.writeFileSync(VERSION_FILE, SERVER_VERSION); } catch(e) {}
+}
+
 // Premier poll après redémarrage = mode validation manuelle
-let premierPoll = true;
+// UNIQUEMENT si la version du server.js a changé
+const lastVersion = getLastVersion();
+let premierPoll = lastVersion !== SERVER_VERSION;
+
+if (premierPoll) {
+  console.log(`🆕 Nouvelle version détectée (${lastVersion || 'aucune'} → ${SERVER_VERSION}) — mode validation manuelle activé`);
+  saveCurrentVersion();
+} else {
+  console.log(`✅ Même version (${SERVER_VERSION}) — mode automatique direct`);
+}
 
 async function processPayments(payments, ignoreDate = false) {
   let newCount = 0;
@@ -362,7 +384,6 @@ async function processPayments(payments, ignoreDate = false) {
         const contact = await fetchOhmeContactByName(coureurParraine);
         const emailCoureur = contact ? (contact.email || '') : '';
         const coureurPrenom = coureurParraine.split(' ')[0];
-        // Champ personnalisé Ohme : asso_soutenue (dans custom_fields ou à la racine)
         const assoSoutenue = (cf.asso_soutenue || p.asso_soutenue || '').trim();
 
         if (emailCoureur) {
@@ -372,8 +393,26 @@ async function processPayments(payments, ignoreDate = false) {
             state.stats.sent++;
             addLog(`✅ Don ${montant}€ de ${donateur} → ${coureurParraine}`, 'ok');
             addEvent('❤️', `Don de ${montant} €`, `${donateur} → ${coureurParraine}`, 'don');
-            // Programmer le merci J+1 au donateur
             scheduleMerciDonateur({ email: emailDon, prenom: donateur.split(' ')[0], montant, donateur });
+          }
+
+          // Notifier aussi le chef d'équipe si le coureur appartient à une équipe
+          const equipe = await fetchEquipeCoureur(contact ? contact.id : null);
+          if (equipe) {
+            const structure  = await fetchOhmeStructureByName(equipe);
+            const chefEmail  = structure ? (structure.email_referent_defi_enfance || '') : '';
+            const chefPrenom = structure ? (structure.prenom_du_referent_defi_enfance || 'Bonjour') : 'Bonjour';
+            if (chefEmail) {
+              const htmlEquipe = tplDonEquipe({ chefPrenom, nomEquipe: equipe, donateur, montant, email_donateur: emailDon });
+              const okEquipe = await sendBrevo(chefEmail, '❤️ Nouveau don pour votre équipe au Défi Enfance !', htmlEquipe);
+              if (okEquipe) {
+                state.stats.sent++;
+                addLog(`✅ Don ${montant}€ → chef équipe ${equipe} (${chefPrenom}) notifié`, 'ok');
+                addEvent('🏆', `Don équipe ${montant} €`, `${donateur} → équipe ${equipe}`, 'don');
+              }
+            } else {
+              addLog(`⚠️ Équipe "${equipe}" du coureur — email référent introuvable`, 'warn');
+            }
           }
         } else {
           addLog(`⚠️ Don → coureur "${coureurParraine}" introuvable dans Ohme`, 'warn');
@@ -524,6 +563,37 @@ async function fetchOhmeContactByName(name) {
 // Délai pour éviter le rate limiting Ohme (429)
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 const OHME_DELAY_MS = 800; // 800ms entre chaque appel API Ohme
+
+// ── Récupérer l'équipe d'un coureur depuis son inscription billetterie
+async function fetchEquipeCoureur(contactId) {
+  if (!contactId) return null;
+  try {
+    await sleep(OHME_DELAY_MS);
+    // Chercher le paiement de billetterie (type 3) de ce contact
+    const res = await fetch(
+      `${CONFIG.ohmeBase}/api/v1/payments?contact_id=${contactId}&payment_type_id=3&limit=10`,
+      { headers: { 'Accept': 'application/json', 'client-name': CONFIG.ohmeClientName, 'client-secret': CONFIG.ohmeClientSecret } }
+    );
+    if (!res.ok) return null;
+    const json = await res.json();
+    const items = json.data || [];
+    // Chercher un paiement Défi Enfance avec une équipe renseignée
+    for (const p of items) {
+      const eventName = (p.nom_de_levent || (p.custom_fields && p.custom_fields.nom_de_levent) || '').toUpperCase();
+      if (!eventName.includes('ENFANCE')) continue;
+      const cf = p.custom_fields || p;
+      const equipe = (cf.equipe || '').trim();
+      if (equipe) {
+        addLog(`🔍 Équipe du coureur trouvée : ${equipe}`, 'info');
+        return equipe;
+      }
+    }
+    return null;
+  } catch(e) {
+    addLog(`⚠️ Exception fetchEquipeCoureur : ${e.message}`, 'warn');
+    return null;
+  }
+}
 
 // ── Chercher une structure Ohme par nom (pour récupérer l'email référent)
 async function fetchOhmeStructureByName(name) {
@@ -950,8 +1020,11 @@ app.get('/api/dons-attente', (req, res) => {
 app.post('/api/dons-attente/:paiementId/valider', async (req, res) => {
   const { paiementId } = req.params;
 
-  const don = state.donsEnAttente.find(d => d.paiementId === paiementId);
-  if (!don) return res.status(404).json({ error: 'Don introuvable' });
+  const don = state.donsEnAttente.find(d => String(d.paiementId) === String(paiementId));
+  if (!don) {
+    addLog(`⚠️ Don introuvable : ${paiementId} — liste: ${state.donsEnAttente.map(d=>d.paiementId).join(', ')}`, 'warn');
+    return res.status(404).json({ error: `Don introuvable (ID: ${paiementId})` });
+  }
 
   // Relire le paiement dans Ohme pour avoir les données à jour
   let paiement = null;
@@ -1034,7 +1107,7 @@ app.post('/api/dons-attente/:paiementId/valider', async (req, res) => {
   }
 
   if (ok) {
-    state.donsEnAttente = state.donsEnAttente.filter(d => d.paiementId !== paiementId);
+    state.donsEnAttente = state.donsEnAttente.filter(d => String(d.paiementId) !== String(paiementId));
     saveDonsEnAttente();
   }
 
@@ -1044,7 +1117,7 @@ app.post('/api/dons-attente/:paiementId/valider', async (req, res) => {
 // Ignorer un don en attente
 app.post('/api/dons-attente/:paiementId/ignorer', (req, res) => {
   const { paiementId } = req.params;
-  state.donsEnAttente = state.donsEnAttente.filter(d => d.paiementId !== paiementId);
+  state.donsEnAttente = state.donsEnAttente.filter(d => String(d.paiementId) !== String(paiementId));
   saveDonsEnAttente();
   addLog(`🗑️ Don en attente ignoré : ${paiementId}`, 'info');
   res.json({ success: true });
