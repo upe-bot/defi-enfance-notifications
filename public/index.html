@@ -470,23 +470,33 @@ async function fetchDonsAttente() {
     }
     el.innerHTML = dons.map(d => {
       const date = new Date(d.date).toLocaleDateString('fr-FR');
+      const isValidation = d.modeValidation;
+      const titre = isValidation
+        ? `⏸️ ${d.typeLabel || 'Paiement'} — ${d.donateur} — <strong>${d.montant} €</strong>`
+        : `⏸️ Don non fléché — ${d.donateur} — <strong>${d.montant} €</strong>`;
+      const sousTitre = isValidation
+        ? `📅 ${date} · ✉️ ${d.emailDon || 'email inconnu'} · 📋 ${d.eventName || ''}`
+        : `📅 ${date} · ✉️ ${d.emailDon || 'email inconnu'}`;
       return `<div class="don-attente-card" id="don-${d.paiementId}">
         <div class="don-attente-header">
           <div>
-            <div class="don-attente-info">⏸️ ${d.donateur} — <strong>${d.montant} €</strong></div>
-            <div class="don-attente-sub">📅 ${date} · ✉️ ${d.emailDon || 'email inconnu'}</div>
+            <div class="don-attente-info">${titre}</div>
+            <div class="don-attente-sub">${sousTitre}</div>
             <div class="don-attente-sub" style="margin-top:6px;color:var(--warning)">
-              👉 Mettez à jour le paiement dans Ohme (coureur ou équipe parrainé), puis cliquez Valider.
+              ${isValidation
+                ? '👉 Vérifiez dans Ohme si ce paiement a déjà été notifié, puis validez ou ignorez.'
+                : '👉 Mettez à jour le paiement dans Ohme (coureur ou équipe parrainé), puis cliquez Valider.'
+              }
             </div>
           </div>
-          <span style="font-family:'Antonio',sans-serif;font-size:1.4rem;color:var(--warning)">${d.montant} €</span>
+          <span style="font-family:\'Antonio\',sans-serif;font-size:1.4rem;color:var(--warning)">${d.montant} €</span>
         </div>
         <div class="don-attente-actions">
           <button class="btn btn-sm btn-success" onclick="validerDon('${d.paiementId}')">
-            ✅ Valider — relire Ohme et envoyer l'email
+            ✅ Valider — envoyer l'email
           </button>
           <button class="btn btn-sm btn-danger" onclick="ignorerDon('${d.paiementId}')">
-            🗑️ Ignorer
+            🗑️ Ignorer — ne pas envoyer
           </button>
         </div>
         <div id="result-${d.paiementId}" style="font-size:.75rem;margin-top:8px;color:var(--text-muted)"></div>
