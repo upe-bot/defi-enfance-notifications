@@ -271,7 +271,7 @@ async function sendBrevo(to, subject, html) {
 // ══════════════════════════════════════════════════════
 
 // Version du serveur — incrémenter à chaque mise à jour de server.js
-const SERVER_VERSION = '43';
+const SERVER_VERSION = '44';
 const VERSION_FILE   = '/opt/render/project/src/defi-enfance-version.txt';
 
 function getLastVersion() {
@@ -354,13 +354,12 @@ async function processPayments(payments, ignoreDate = false) {
       state.stats.dons++;
       newCount++;
 
-      // Récupérer les infos du donateur via contact_id
-      const contactDonateur = await fetchOhmeContactById(p.contact_id);
-      const prenomDon = contactDonateur ? (contactDonateur.firstname || contactDonateur.first_name || '') : '';
-      const nomDon    = contactDonateur ? (contactDonateur.lastname  || contactDonateur.last_name  || '') : '';
-      const donateur  = `${prenomDon} ${nomDon}`.trim() || 'Donateur anonyme';
-      const emailDon  = contactDonateur ? (contactDonateur.email || '') : '';
-      const montant   = p.amount || '?';
+      // Récupérer les infos du donateur (particulier ou structure)
+      const infos    = await fetchInfosDonateur(p);
+      const donateur = infos.donateur;
+      const emailDon = infos.emailDon;
+      const prenomMerci = infos.prenomMerci;
+      const montant  = p.amount || '?';
 
       // Champs personnalisés Ohme
       const cf = p.custom_fields || p;
@@ -381,7 +380,7 @@ async function processPayments(payments, ignoreDate = false) {
             state.stats.sent++;
             addLog(`✅ Don ${montant}€ de ${donateur} → ${coureurParraine}`, 'ok');
             addEvent('❤️', `Don de ${montant} €`, `${donateur} → ${coureurParraine}`, 'don');
-            sendMerciDonateur({ email: emailDon, prenom: donateur.split(' ')[0], montant, donateur });
+            sendMerciDonateur({ email: emailDon, prenom: prenomMerci || donateur.split(' ')[0], montant, donateur });
           }
 
           // Notifier aussi le chef d'équipe si le coureur appartient à une équipe
@@ -418,7 +417,7 @@ async function processPayments(payments, ignoreDate = false) {
             state.stats.sent++;
             addLog(`✅ Don ${montant}€ de ${donateur} → équipe ${equipeParraine} (${chefPrenom})`, 'ok');
             addEvent('🏆', `Don de ${montant} € pour équipe`, `${donateur} → ${equipeParraine}`, 'don');
-            sendMerciDonateur({ email: emailDon, prenom: donateur.split(' ')[0], montant, donateur });
+            sendMerciDonateur({ email: emailDon, prenom: prenomMerci || donateur.split(' ')[0], montant, donateur });
           }
         } else {
           addLog(`⚠️ Don → équipe "${equipeParraine}" — email référent introuvable`, 'warn');
@@ -516,7 +515,56 @@ async function processPayments(payments, ignoreDate = false) {
   if (newCount === 0) addLog('Aucun nouveau paiement à traiter', 'info');
 }
 
-// ── Récupérer un contact Ohme par son ID (pour les infos du donateur)
+// ── Récupérer les infos du donateur (particulier ou structure)
+async function fetchInfosDonateur(p) {
+  const contact = await fetchOhmeContactById(p.contact_id);
+  const prenomContact = contact ? (contact.firstname || contact.first_name || '') : '';
+  const nomContact    = contact ? (contact.lastname  || contact.last_name  || '') : '';
+  const emailContact  = contact ? (contact.email || '') : '';
+
+  // Si don d'une structure → récupérer les infos du référent via structure_id
+  if (p.donator_nature === 'organization' && contact) {
+    // Chercher la structure liée au contact
+    const structureId = contact.structure_id || (contact.structures && contact.structures[0]);
+    if (structureId) {
+      try {
+        await sleep(OHME_DELAY_MS);
+        const r = await fetch(
+          `${CONFIG.ohmeBase}/api/v1/structures/${structureId}`,
+          { headers: { 'Accept': 'application/json', 'client-name': CONFIG.ohmeClientName, 'client-secret': CONFIG.ohmeClientSecret } }
+        );
+        if (r.ok) {
+          const json = await r.json();
+          const s  = json.data || json;
+          const cf = s.custom_fields || s;
+          const emailRef  = cf.email_referent_defi_enfance     || s.email_referent_defi_enfance     || emailContact;
+          const prenomRef = cf.prenom_du_referent_defi_enfance || s.prenom_du_referent_defi_enfance || prenomContact;
+          const nomRef    = cf.nom_du_referent_defi_enfance    || s.nom_du_referent_defi_enfance    || nomContact;
+          const nomStructure = s.name || `${prenomContact} ${nomContact}`.trim();
+          addLog(`🏢 Don structure : ${nomStructure} — référent: ${prenomRef} ${nomRef} (${emailRef})`, 'info');
+          return {
+            donateur: nomStructure,        // nom affiché dans les emails coureurs/équipes
+            emailDon: emailRef,            // email du référent pour le merci
+            prenomMerci: prenomRef,        // prénom pour "Bonjour X"
+            isStructure: true,
+            nomStructure,
+          };
+        }
+      } catch(e) {
+        addLog(`⚠️ Impossible de récupérer la structure du donateur : ${e.message}`, 'warn');
+      }
+    }
+  }
+
+  // Particulier → infos classiques
+  return {
+    donateur: `${prenomContact} ${nomContact}`.trim() || 'Donateur anonyme',
+    emailDon: emailContact,
+    prenomMerci: prenomContact,
+    isStructure: false,
+    nomStructure: null,
+  };
+}
 async function fetchOhmeContactById(contactId) {
   if (!contactId) return null;
   try {
