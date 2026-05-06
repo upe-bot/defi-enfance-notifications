@@ -285,7 +285,7 @@ async function sendBrevo(to, subject, html) {
 // ══════════════════════════════════════════════════════
 
 // Version du serveur — incrémenter à chaque mise à jour de server.js
-const SERVER_VERSION = '37';
+const SERVER_VERSION = '38';
 const VERSION_FILE   = '/opt/render/project/src/defi-enfance-version.txt';
 
 function getLastVersion() {
@@ -1112,6 +1112,18 @@ app.post('/api/dons-attente/:paiementId/valider', async (req, res) => {
   }
 
   res.json({ success: ok });
+});
+
+// Ignorer TOUS les dons en attente
+app.post('/api/dons-attente/ignorer-tous', (req, res) => {
+  const count = state.donsEnAttente.length;
+  // Marquer tous comme traités
+  state.donsEnAttente.forEach(d => state.processedIds.add(String(d.paiementId)));
+  state.donsEnAttente = [];
+  saveDonsEnAttente();
+  saveProcessedIds();
+  addLog(`🗑️ ${count} don(s) en attente ignorés en masse`, 'info');
+  res.json({ success: true, count });
 });
 
 // Ignorer un don en attente
