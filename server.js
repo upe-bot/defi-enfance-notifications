@@ -48,7 +48,7 @@ app.get('/login', (req, res) => {
 app.post('/login', express.urlencoded({ extended: false }), (req, res) => {
   const pwd = process.env.DASHBOARD_PASSWORD || '';
   if (req.body.password === pwd) {
-    res.setHeader('Set-Cookie', `dash_token=${pwd}; Path=/; HttpOnly; SameSite=Strict`);
+    res.setHeader('Set-Cookie', `dash_token=${pwd}; Path=/; SameSite=Strict`);
     return res.redirect('/');
   }
   res.redirect('/login?err=1');
@@ -323,7 +323,7 @@ async function sendBrevo(to, subject, html) {
 // ══════════════════════════════════════════════════════
 
 // Version du serveur — incrémenter à chaque mise à jour de server.js
-const SERVER_VERSION = '46';
+const SERVER_VERSION = '47';
 const VERSION_FILE   = '/opt/render/project/src/defi-enfance-version.txt';
 
 function getLastVersion() {
