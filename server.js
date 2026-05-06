@@ -102,41 +102,18 @@ function addDonEnAttente(don) {
 }
 
 // ══════════════════════════════════════════════════════
-//  FILE D'ATTENTE J+1 (email merci donateur)
+//  EMAIL MERCI DONATEUR (envoi immédiat)
 // ══════════════════════════════════════════════════════
-const pendingMerciEmails = [];
-
-function scheduleMerciDonateur({ email, prenom, montant, donateur }) {
+async function sendMerciDonateur({ email, prenom, montant, donateur }) {
   if (!email) return;
-  const now = new Date();
-  let sendAt = new Date(now.getTime() + 24 * 60 * 60 * 1000);
-  // Heure Paris (Frankfurt UTC+2) : envoyer entre 7h30 et 21h
-  const h = sendAt.getHours();
-  if (h < 7 || (h === 7 && sendAt.getMinutes() < 30)) {
-    sendAt.setHours(8, 0, 0, 0);
-  } else if (h >= 21) {
-    sendAt = new Date(sendAt.getTime() + 24 * 60 * 60 * 1000);
-    sendAt.setHours(8, 0, 0, 0);
-  }
-  pendingMerciEmails.push({ sendAt, email, prenom, montant, donateur });
-  addLog(`📅 Email merci J+1 programmé → ${prenom} (${email}) le ${sendAt.toLocaleString('fr-FR')}`, 'info');
-}
-
-async function processPendingMerci() {
-  const now = new Date();
-  const toSend = pendingMerciEmails.filter(m => m.sendAt <= now);
-  for (const m of toSend) {
-    pendingMerciEmails.splice(pendingMerciEmails.indexOf(m), 1);
-    const html = tplMerciDonateur({ prenomDonateur: m.prenom, montant: m.montant, donateur: m.donateur });
-    const ok = await sendBrevo(m.email, '🙏 Merci pour votre don au Défi Enfance !', html);
-    if (ok) {
-      state.stats.sent++;
-      addLog(`✅ Email merci J+1 envoyé à ${m.prenom} (${m.email})`, 'ok');
-      addEvent('🙏', `Merci J+1`, `${m.donateur}`, 'don');
-    }
+  const html = tplMerciDonateur({ prenomDonateur: prenom, montant, donateur });
+  const ok = await sendBrevo(email, '🙏 Merci pour votre don au Défi Enfance !', html);
+  if (ok) {
+    state.stats.sent++;
+    addLog(`✅ Email merci envoyé à ${prenom} (${email})`, 'ok');
+    addEvent('🙏', `Merci envoyé`, donateur, 'don');
   }
 }
-setInterval(processPendingMerci, 15 * 60 * 1000);
 
 // ══════════════════════════════════════════════════════
 //  CONSTANTES TEMPLATES
@@ -217,6 +194,15 @@ function tplInscriptionAsso({ nomAsso, coureur, email_coureur, ville, prenomRefe
   return `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Antonio:wght@700&display=swap" rel="stylesheet"><style>${CSS_COMMUN}</style></head><body><div class="outer"><div class="logo-header"><div class="logo-text">🤝 Défi Enfance</div><div class="logo-sub">Générateur de victoires pour l'enfance</div></div><div class="header mixed"><h1>🏃 Nouveau coureur pour votre cause !</h1><p>Générateur de victoires pour l'enfance</p></div><div class="body"><div class="greeting">Bonjour ${prenomReferent ? prenomReferent : ''} 👋</div><div class="intro">Bonne nouvelle ! Un coureur vient de <strong>choisir votre association ${nomAsso}</strong> pour courir lors du <strong>Défi Enfance${ville ? ' de ' + ville : ''}</strong>.</div><div class="don-box"><div class="don-amount" style="font-size:1.8rem">${coureur}</div><div class="don-label">Nouveau coureur inscrit !</div></div><div class="card"><h3>📋 Coordonnées du coureur</h3><div class="row"><span class="ic">👤</span><div><strong>Nom :</strong> ${coureur}</div></div><div class="row"><span class="ic">✉️</span><div><strong>Email :</strong> <a href="mailto:${email_coureur}" style="color:#fb0089">${email_coureur}</a></div></div></div><div class="note magenta">💌 <strong>Prenez contact avec ${coureur}</strong> pour le remercier de son choix et l'accueillir chaleureusement !</div><div class="note" style="background:#f5f0f3;border-left-color:#ff8533">💡 <strong>Conseil :</strong> Présentez vos actions et vos bénéficiaires. Plus le coureur est engagé, plus sa collecte sera importante !</div><div class="divider"></div><div style="font-size:.75rem;color:#888;text-align:center">Association bénéficiaire : <strong>${nomAsso}</strong><br>Email envoyé automatiquement dans les 10 minutes suivant l'inscription.</div></div><div class="footer"><div style="font-family:Arial,sans-serif;font-size:1.1rem;font-weight:700;color:#fb0089;letter-spacing:.08em;margin-bottom:6px">DÉFI ENFANCE</div><div class="footer-sub">Générateur de victoires pour l'enfance<br>contact@defienfance.fr</div></div></div></body></html>`;
 }
 
+function tplInscriptionCoureur({ prenom, nomComplet }) {
+  return `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Antonio:wght@700&display=swap" rel="stylesheet"><style>${CSS_COMMUN}</style></head><body><div class="outer"><div class="logo-header"><div class="logo-text">🤝 Défi Enfance</div><div class="logo-sub">Générateur de victoires pour l'enfance</div></div><div class="header mixed"><h1>🚀 Bienvenue au<br>Défi Enfance !</h1><p>Générateur de victoires pour l'enfance</p></div><div class="body"><div class="greeting">Bonjour ${prenom} 👋</div><div class="intro">🚀 Vous pouvez désormais aider l'Association que vous avez choisie en invitant vos réseaux pro et perso à faire un don !</div><div class="cta-box"><p>Partagez le lien de don à vos contacts — en choisissant votre nom dans le formulaire, ils soutiennent votre collecte pour votre Association et le Plaidoyer du Défi Enfance.</p><a href="${URL_DON}" class="cta-btn">❤️ Page de don Défi Enfance</a></div><div class="note magenta">💡 Leur don est éligible à un <strong>reçu fiscal</strong> : 66% de crédit d'impôts sur leur IR ou 60% sur leur IS s'ils donnent au nom de leur société.</div><div class="note" style="background:#f5f0f3;border-left-color:#ff8533">📊 Suivez vos dons sur votre page enregistrée au <a href="${URL_COUREURS}" style="color:#ef6135;font-weight:600">classement général des donateurs</a> (coureurs et équipes) du <a href="${URL_COUREURS}" style="color:#ef6135;font-weight:600">Défi Enfance</a>.</div><div class="divider"></div><div style="font-size:.86rem;color:#3d1830;text-align:center;font-style:italic;margin-bottom:8px">Ensemble, on va soulever les énergies pour l'enfance.<br>Merci pour votre engagement !</div><div style="font-size:.82rem;color:#fb0089;font-weight:600;text-align:center">— Team Défi Enfance</div></div><div class="footer"><div style="font-family:Arial,sans-serif;font-size:1.1rem;font-weight:700;color:#fb0089;letter-spacing:.08em;margin-bottom:6px">DÉFI ENFANCE</div><div class="footer-sub">Générateur de victoires pour l'enfance<br>contact@defienfance.fr</div></div></div></body></html>`;
+}
+
+function tplInscriptionSupporter({ prenom }) {
+  const URL_ASSOS = 'https://defienfance.fr/suivre-la-collecte-defi-enfance/?de_view=associations&de_event=all';
+  return `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Antonio:wght@700&display=swap" rel="stylesheet"><style>${CSS_COMMUN}</style></head><body><div class="outer"><div class="logo-header"><div class="logo-text">🤝 Défi Enfance</div><div class="logo-sub">Générateur de victoires pour l'enfance</div></div><div class="header"><h1>🚀 Bienvenue au<br>Défi Enfance !</h1><p>Générateur de victoires pour l'enfance</p></div><div class="body"><div class="greeting">Bonjour ${prenom} 👋</div><div class="intro">🚀 En tant que supporter, vous avez un rôle privilégié pour soutenir les coureurs engagés pour le Défi Enfance ! Dès maintenant, faites des dons et faites faire des dons pour les Associations choisies par les coureurs.</div><div class="card"><h3>💪 Comment agir dès maintenant ?</h3><div class="row"><span class="ic">🏃</span><div>Découvrez <a href="${URL_ASSOS}" style="color:#fb0089;font-weight:600">la liste des associations ici</a></div></div><div class="row"><span class="ic">❤️</span><div>Parrainez un coureur ou une équipe par un don</div></div><div class="row"><span class="ic">📢</span><div>Partagez la <a href="${URL_DON}" style="color:#fb0089;font-weight:600">page Faire un don</a></div></div></div><div class="note magenta">💡 Les dons soutiennent à <strong>50% les Associations</strong> parrainées par les coureurs et à <strong>50% le Plaidoyer du Défi Enfance</strong>. Tous les dons sont éligibles à un <strong>reçu fiscal</strong> : 66% de crédit d'impôts sur leur IR ou 60% sur leur IS s'ils donnent au nom de leur société.</div><div class="note" style="background:#f5f0f3;border-left-color:#ff8533">💬 Laissez un mot d'encouragement au coureur ou à l'équipe soutenue sur le formulaire de dons.<br><br>📊 Suivez ensuite l'évolution des dons sur le <a href="${URL_COUREURS}" style="color:#ef6135;font-weight:600">classement général des donateurs</a> (coureurs et équipes) du <a href="${URL_COUREURS}" style="color:#ef6135;font-weight:600">Défi Enfance</a>.</div><div class="divider"></div><div style="font-size:.86rem;color:#3d1830;text-align:center;font-style:italic;margin-bottom:8px">Ensemble, nous allons soulever les énergies pour l'enfance.<br>Merci du fond du cœur pour votre engagement !</div><div style="font-size:.82rem;color:#fb0089;font-weight:600;text-align:center">— Team Défi Enfance</div></div><div class="footer"><div style="font-family:Arial,sans-serif;font-size:1.1rem;font-weight:700;color:#fb0089;letter-spacing:.08em;margin-bottom:6px">DÉFI ENFANCE</div><div class="footer-sub">Générateur de victoires pour l'enfance<br>contact@defienfance.fr</div></div></div></body></html>`;
+}
+
 function tplMerciDonateur({ prenomDonateur, montant, donateur }) {
   return `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Antonio:wght@700&display=swap" rel="stylesheet"><style>${CSS_COMMUN}</style></head><body><div class="outer"><div class="logo-header"><div class="logo-text">🤝 Défi Enfance</div><div class="logo-sub">Générateur de victoires pour l'enfance</div></div><div class="header"><h1>🙏 Merci pour votre générosité !</h1><p>Générateur de victoires pour l'enfance</p></div><div class="body"><div class="greeting">Bonjour ${prenomDonateur} 👋</div><div class="intro">Votre don de <strong>${montant} €</strong> au Défi Enfance fait une vraie différence dans la vie de milliers d'enfants. Merci du fond du cœur !</div><div style="text-align:center;background:linear-gradient(135deg,#fff0f8,#fff5ef);border-radius:14px;padding:22px;margin-bottom:24px"><div style="margin-bottom:12px;font-size:.78rem;font-weight:700;color:#fb0089;text-transform:uppercase;letter-spacing:.08em">L'impact de votre don</div><div style="display:flex;justify-content:center;gap:24px;flex-wrap:wrap"><div class="impact-stat"><span class="num">+20 000</span><span class="lbl">enfants accompagnés</span></div><div class="impact-stat"><span class="num">+40</span><span class="lbl">associations soutenues</span></div></div></div><div style="font-size:.9rem;font-weight:600;color:#1a0a12;margin-bottom:14px">Ces enfants ont besoin de vous :</div><div class="temoignage"><strong>"Ce sont les enfants de tout le monde. Ce sont les enfants de chacun."</strong><br><br>Jérôme Aucordier accompagne des enfants au quotidien dans un lieu de vie qui place chaque enfant au cœur de ses propres décisions. Pour lui, ces enfants ne sont pas des cas à gérer — ce sont un capital pour notre société.</div><div class="temoignage"><strong>"Défi Enfance, c'est un moyen que les jeunes soient entendus."</strong><br><br>Anne Loriot, éducatrice spécialisée en foyer, accueille des jeunes jour et nuit. Un jour, une jeune lui a dit : <em>"Est-ce que tu vas rester ?"</em> — une phrase qui dit tout. Ces enfants ne demandent pas grand-chose. Juste de la stabilité. Juste quelqu'un qui ne part pas.</div><div style="font-size:.86rem;color:#3d1830;line-height:1.7;background:#fff0f8;border-radius:12px;padding:18px 20px;margin-bottom:24px">Chaque enfant a le droit à son enfance. Nous avons comme belle mission de société de proposer à chacun, quelles que soient ses difficultés, de recevoir un accueil aimant, familial et sécurisant pour lui permettre d'éclore à sa vie d'adulte.<br><br><strong>Nous croyons que les enfants sont le plus grand capital de notre société.</strong></div><div style="text-align:center;margin-bottom:20px"><div style="font-size:.82rem;font-weight:600;color:#3d1830;margin-bottom:12px">Découvrez leurs témoignages :</div><div class="social-bar"><a href="${URL_LINKEDIN}" class="social-btn li">LinkedIn</a><a href="${URL_FACEBOOK}" class="social-btn fb">Facebook</a><a href="${URL_INSTAGRAM}" class="social-btn ig">Instagram</a></div></div><div class="cta-box"><p>✨ <strong>Envie d'aller encore plus loin ?</strong><br>Partagez le Défi Enfance autour de vous !</p><a href="${URL_DON}" class="cta-btn">❤️ Faire un don</a></div><div class="divider"></div><div style="font-size:.75rem;color:#888;text-align:center">Cet email vous a été envoyé en remerciement de votre don de ${montant} €.<br>contact@defienfance.fr — defienfance.fr</div></div><div class="footer"><div style="font-family:Arial,sans-serif;font-size:1.1rem;font-weight:700;color:#fb0089;letter-spacing:.08em;margin-bottom:6px">DÉFI ENFANCE</div><div class="footer-sub">Générateur de victoires pour l'enfance<br>contact@defienfance.fr</div></div></div></body></html>`;
 }
@@ -285,7 +271,7 @@ async function sendBrevo(to, subject, html) {
 // ══════════════════════════════════════════════════════
 
 // Version du serveur — incrémenter à chaque mise à jour de server.js
-const SERVER_VERSION = '41';
+const SERVER_VERSION = '43';
 const VERSION_FILE   = '/opt/render/project/src/defi-enfance-version.txt';
 
 function getLastVersion() {
@@ -395,7 +381,7 @@ async function processPayments(payments, ignoreDate = false) {
             state.stats.sent++;
             addLog(`✅ Don ${montant}€ de ${donateur} → ${coureurParraine}`, 'ok');
             addEvent('❤️', `Don de ${montant} €`, `${donateur} → ${coureurParraine}`, 'don');
-            scheduleMerciDonateur({ email: emailDon, prenom: donateur.split(' ')[0], montant, donateur });
+            sendMerciDonateur({ email: emailDon, prenom: donateur.split(' ')[0], montant, donateur });
           }
 
           // Notifier aussi le chef d'équipe si le coureur appartient à une équipe
@@ -432,7 +418,7 @@ async function processPayments(payments, ignoreDate = false) {
             state.stats.sent++;
             addLog(`✅ Don ${montant}€ de ${donateur} → équipe ${equipeParraine} (${chefPrenom})`, 'ok');
             addEvent('🏆', `Don de ${montant} € pour équipe`, `${donateur} → ${equipeParraine}`, 'don');
-            scheduleMerciDonateur({ email: emailDon, prenom: donateur.split(' ')[0], montant, donateur });
+            sendMerciDonateur({ email: emailDon, prenom: donateur.split(' ')[0], montant, donateur });
           }
         } else {
           addLog(`⚠️ Don → équipe "${equipeParraine}" — email référent introuvable`, 'warn');
@@ -468,24 +454,56 @@ async function processPayments(payments, ignoreDate = false) {
       const nomAsso      = (cf.asso_soutenue || '').trim();
       const ville        = eventName.replace(/défi\s*enfance?\s*/gi, '').replace(/\d{4}/g, '').trim();
 
-      if (nomAsso) {
-        const structure      = await fetchOhmeStructureByName(nomAsso);
-        const emailAsso      = structure ? (structure.email_referent_defi_enfance     || '') : '';
-        const prenomReferent = structure ? (structure.prenom_du_referent_defi_enfance || '') : '';
+      const isSupporter = eventName.toUpperCase().includes('#SUPPORTERS');
 
-        if (emailAsso) {
-          const html = tplInscriptionAsso({ nomAsso, coureur, email_coureur: emailCoureur, ville, prenomReferent });
-          const ok = await sendBrevo(emailAsso, '🏃 Nouveau coureur pour votre cause — Défi Enfance !', html);
+      if (isSupporter) {
+        // ── SUPPORTER → email de bienvenue au supporter
+        if (emailCoureur) {
+          const html = tplInscriptionSupporter({ prenom: prenomC || coureur });
+          const ok = await sendBrevo(emailCoureur, `${prenomC || coureur} : Heureux de votre inscription au Défi Enfance !`, html);
           if (ok) {
             state.stats.sent++;
-            addLog(`✅ Inscription ${coureur} → asso ${nomAsso}`, 'ok');
-            addEvent('🏃', `Inscription de ${coureur}`, `Association : ${nomAsso}`, 'bill');
+            addLog(`✅ Email bienvenue supporter → ${coureur} (${emailCoureur})`, 'ok');
+            addEvent('🚀', `Bienvenue supporter`, coureur, 'bill');
           }
         } else {
-          addLog(`⚠️ Inscription ${coureur} — email référent asso "${nomAsso}" introuvable`, 'warn');
+          addLog(`⚠️ Supporter ${coureur} — email introuvable`, 'warn');
         }
+
       } else {
-        addLog(`⚠️ Inscription ${coureur} — champ asso_soutenue vide`, 'warn');
+        // ── COUREUR → email de bienvenue au coureur + email à l'association
+        if (emailCoureur) {
+          const html = tplInscriptionCoureur({ prenom: prenomC || coureur, nomComplet: coureur });
+          const ok = await sendBrevo(emailCoureur, `${prenomC || coureur} : Heureux de votre inscription au Défi Enfance !`, html);
+          if (ok) {
+            state.stats.sent++;
+            addLog(`✅ Email bienvenue coureur → ${coureur} (${emailCoureur})`, 'ok');
+            addEvent('🚀', `Bienvenue coureur`, coureur, 'bill');
+          }
+        } else {
+          addLog(`⚠️ Coureur ${coureur} — email introuvable`, 'warn');
+        }
+
+        // Email à l'association soutenue
+        if (nomAsso) {
+          const structure      = await fetchOhmeStructureByName(nomAsso);
+          const emailAsso      = structure ? (structure.email_referent_defi_enfance     || '') : '';
+          const prenomReferent = structure ? (structure.prenom_du_referent_defi_enfance || '') : '';
+
+          if (emailAsso) {
+            const html = tplInscriptionAsso({ nomAsso, coureur, email_coureur: emailCoureur, ville, prenomReferent });
+            const ok = await sendBrevo(emailAsso, '🏃 Nouveau coureur pour votre cause — Défi Enfance !', html);
+            if (ok) {
+              state.stats.sent++;
+              addLog(`✅ Inscription ${coureur} → asso ${nomAsso}`, 'ok');
+              addEvent('🏃', `Inscription de ${coureur}`, `Association : ${nomAsso}`, 'bill');
+            }
+          } else {
+            addLog(`⚠️ Inscription ${coureur} — email référent asso "${nomAsso}" introuvable`, 'warn');
+          }
+        } else {
+          addLog(`⚠️ Inscription ${coureur} — champ asso_soutenue vide`, 'warn');
+        }
       }
     }
 
@@ -939,6 +957,14 @@ app.post('/api/test-email', async (req, res) => {
       subject: '🧪 Test — 🏃 Nouveau coureur pour votre cause !',
       html: tplInscriptionAsso({ nomAsso: 'Espoir Enfants', coureur: 'Lucas Moreau', email_coureur: 'l.moreau@test.fr', ville: 'Angers', prenomReferent: 'Sophie' })
     },
+    inscription_coureur: {
+      subject: '🧪 Test — 🚀 Bienvenue coureur Défi Enfance !',
+      html: tplInscriptionCoureur({ prenom: 'Lucas', nomComplet: 'Lucas Moreau' })
+    },
+    inscription_supporter: {
+      subject: '🧪 Test — 🚀 Bienvenue supporter Défi Enfance !',
+      html: tplInscriptionSupporter({ prenom: 'Marie' })
+    },
     merci_donateur: {
       subject: '🧪 Test — 🙏 Merci pour votre don au Défi Enfance !',
       html: tplMerciDonateur({ prenomDonateur: 'Jean-Claude', montant: '20', donateur: 'Jean-Claude Martin' })
@@ -1102,7 +1128,7 @@ app.post('/api/dons-attente/:paiementId/valider', async (req, res) => {
         addLog(`✅ Don validé → coureur ${coureurParraine} (${montant}€)`, 'ok');
         addEvent('❤️', `Don validé ${montant}€`, `${donateur} → ${coureurParraine}`, 'don');
         // 2. Email merci J+1 au donateur
-        scheduleMerciDonateur({ email: emailDon, prenom: donateur.split(' ')[0], montant, donateur });
+        sendMerciDonateur({ email: emailDon, prenom: donateur.split(' ')[0], montant, donateur });
       }
       // 3. Email au chef d'équipe si le coureur appartient à une équipe
       const equipe = await fetchEquipeCoureur(contact ? contact.id : null);
@@ -1134,7 +1160,7 @@ app.post('/api/dons-attente/:paiementId/valider', async (req, res) => {
       if (ok) {
         state.stats.sent++;
         // Email merci J+1 au donateur
-        scheduleMerciDonateur({ email: emailDon, prenom: donateur.split(' ')[0], montant, donateur });
+        sendMerciDonateur({ email: emailDon, prenom: donateur.split(' ')[0], montant, donateur });
         addLog(`✅ Don validé → équipe ${equipeParraine} (${montant}€)`, 'ok');
         addEvent('🏆', `Don validé ${montant}€`, `${donateur} → ${equipeParraine}`, 'don');
       }
@@ -1152,7 +1178,7 @@ app.post('/api/dons-attente/:paiementId/valider', async (req, res) => {
       ok = await sendBrevo(chefEmail, '❤️ Nouveau don non fléché pour le Défi Enfance !', html);
       if (ok) {
         state.stats.sent++;
-        scheduleMerciDonateur({ email: emailDon, prenom: donateur.split(' ')[0], montant, donateur });
+        sendMerciDonateur({ email: emailDon, prenom: donateur.split(' ')[0], montant, donateur });
         addLog(`✅ Don non fléché confirmé → Défi Enfance (${montant}€)`, 'ok');
         addEvent('❤️', `Don non fléché ${montant}€`, donateur, 'don');
       }
