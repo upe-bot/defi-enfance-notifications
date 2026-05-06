@@ -29,7 +29,8 @@ const CONFIG = {
 //  PERSISTANCE DES IDs TRAITÉS
 // ══════════════════════════════════════════════════════
 const fs   = require('fs');
-const PROCESSED_IDS_FILE = '/tmp/defi-enfance-processed-ids.json';
+const PROCESSED_IDS_FILE = '/opt/render/project/src/defi-enfance-processed-ids.json';
+const ATTENTE_FILE        = '/opt/render/project/src/defi-enfance-dons-attente.json';
 
 function loadProcessedIds() {
   try {
@@ -81,8 +82,6 @@ function addEvent(icon, title, sub, type) {
 // ══════════════════════════════════════════════════════
 //  FILE D'ATTENTE — DONS NON FLÉCHÉS
 // ══════════════════════════════════════════════════════
-const ATTENTE_FILE = '/tmp/defi-enfance-dons-attente.json';
-
 function loadDonsEnAttente() {
   try {
     if (fs.existsSync(ATTENTE_FILE)) return JSON.parse(fs.readFileSync(ATTENTE_FILE, 'utf8'));
@@ -281,11 +280,21 @@ async function sendBrevo(to, subject, html) {
 // ══════════════════════════════════════════════════════
 //  TRAITEMENT DES PAIEMENTS
 // ══════════════════════════════════════════════════════
+// Date plancher : ignorer tous les paiements antérieurs au 06/05/2026 14h11 heure française (12h11 UTC)
+const DATE_PLANCHER = new Date('2026-05-06T12:11:00.000Z');
+
 async function processPayments(payments) {
   let newCount = 0;
 
   for (const p of payments) {
     if (state.processedIds.has(p.id)) continue;
+
+    // Ignorer les paiements antérieurs à la date plancher
+    const datePaiement = new Date(p.date || p.created_at || 0);
+    if (datePaiement < DATE_PLANCHER) {
+      state.processedIds.add(p.id);
+      continue;
+    }
 
     // Seuls les paiements Défi Enfance ont nom_de_levent renseigné
     // Les champs personnalisés sont dans p.custom_fields ou directement dans p
