@@ -285,7 +285,7 @@ async function sendBrevo(to, subject, html) {
 // ══════════════════════════════════════════════════════
 
 // Version du serveur — incrémenter à chaque mise à jour de server.js
-const SERVER_VERSION = '38';
+const SERVER_VERSION = '39';
 const VERSION_FILE   = '/opt/render/project/src/defi-enfance-version.txt';
 
 function getLastVersion() {
@@ -349,8 +349,10 @@ async function processPayments(payments, ignoreDate = false) {
         date,
         eventName,
         typeLabel,
-        modeValidation: true, // flag pour distinguer des dons non fléchés
+        modeValidation: true,
       });
+      // Marquer comme traité immédiatement pour éviter retraitement au poll suivant
+      state.processedIds.add(String(p.id));
       addLog(`⏸️ [Démarrage] ${typeLabel} ${montant}€ de ${donateur} — en attente de validation`, 'warn');
       newCount++;
       continue;
@@ -877,6 +879,7 @@ async function poll() {
   // Désactiver le mode premier poll après le premier cycle
   if (premierPoll) {
     premierPoll = false;
+    saveProcessedIds(); // ← sauvegarder immédiatement tous les IDs mis en attente
     addLog('✅ Mode validation manuelle terminé — surveillance automatique active', 'ok');
   }
 }
