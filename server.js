@@ -7,6 +7,54 @@ const app  = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
+
+// ── Protection par mot de passe du dashboard
+app.use((req, res, next) => {
+  const pwd = process.env.DASHBOARD_PASSWORD || '';
+  if (!pwd) return next(); // pas de mot de passe configuré → accès libre
+
+  // Les routes API sont protégées par le header Authorization
+  if (req.path.startsWith('/api/')) {
+    const auth = req.headers['x-dashboard-password'] || '';
+    if (auth !== pwd) return res.status(401).json({ error: 'Non autorisé' });
+    return next();
+  }
+
+  // Pour le dashboard HTML : vérifier le cookie de session
+  const cookie = req.headers.cookie || '';
+  const token  = cookie.split(';').find(c => c.trim().startsWith('dash_token='));
+  const val    = token ? token.split('=')[1]?.trim() : '';
+  if (val === pwd) return next();
+
+  // Page de login si pas authentifié
+  if (req.path === '/login' && req.method === 'GET') return next();
+  return res.redirect('/login');
+});
+
+// Page de login
+app.get('/login', (req, res) => {
+  res.send(`<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Défi Enfance — Connexion</title>
+  <style>*{margin:0;padding:0;box-sizing:border-box}body{background:#0d0007;font-family:'Poppins',sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh}.box{background:#1a0a12;border:1px solid rgba(251,0,137,0.2);border-radius:18px;padding:40px;width:340px;text-align:center}.logo{font-size:1.6rem;font-weight:700;color:#fb0089;letter-spacing:.08em;margin-bottom:6px}.sub{font-size:.78rem;color:rgba(255,255,255,0.4);margin-bottom:32px}input{width:100%;padding:12px 16px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:#fff;font-size:.9rem;outline:none;margin-bottom:16px}input:focus{border-color:#fb0089}button{width:100%;padding:13px;background:linear-gradient(135deg,#fb0089,#ef6135);color:#fff;border:none;border-radius:10px;font-size:.9rem;font-weight:700;cursor:pointer}.err{color:#ff4d4d;font-size:.8rem;margin-top:12px}</style></head>
+  <body><div class="box"><div class="logo">🤝 DÉFI ENFANCE</div><div class="sub">Dashboard — Accès sécurisé</div>
+  <form method="POST" action="/login"><input type="password" name="password" placeholder="Mot de passe" autofocus>
+  <button type="submit">Se connecter</button></form>
+  ${req.query.err ? '<div class="err">Mot de passe incorrect</div>' : ''}</div></body></html>`);
+});
+
+app.post('/login', express.urlencoded({ extended: false }), (req, res) => {
+  const pwd = process.env.DASHBOARD_PASSWORD || '';
+  if (req.body.password === pwd) {
+    res.setHeader('Set-Cookie', `dash_token=${pwd}; Path=/; HttpOnly; SameSite=Strict`);
+    return res.redirect('/');
+  }
+  res.redirect('/login?err=1');
+});
+
+app.get('/logout', (req, res) => {
+  res.setHeader('Set-Cookie', 'dash_token=; Path=/; Max-Age=0');
+  res.redirect('/login');
+});
+
 app.use(express.static(path.join(__dirname, 'public')));
 
 // ══════════════════════════════════════════════════════
@@ -271,7 +319,7 @@ async function sendBrevo(to, subject, html) {
 // ══════════════════════════════════════════════════════
 
 // Version du serveur — incrémenter à chaque mise à jour de server.js
-const SERVER_VERSION = '44';
+const SERVER_VERSION = '45';
 const VERSION_FILE   = '/opt/render/project/src/defi-enfance-version.txt';
 
 function getLastVersion() {
