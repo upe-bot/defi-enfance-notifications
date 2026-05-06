@@ -189,6 +189,9 @@
     <div id="donsAttenteList">
       <div class="empty-state"><div class="big">✅</div>Aucun don en attente.</div>
     </div>
+    <div id="ignorerTousWrap" style="display:none;margin-top:14px;text-align:right">
+      <button class="btn btn-sm btn-danger" onclick="ignorerTous()">🗑️ Ignorer tous les paiements restants</button>
+    </div>
   </div>
 
   <!-- RATTRAPAGE HISTORIQUE -->
@@ -459,6 +462,16 @@ async function forcerPaiement() {
 }
 
 // ── DONS EN ATTENTE ──────────────────────────────────
+async function ignorerTous() {
+  if (!confirm(`Ignorer tous les paiements en attente ? Aucun email ne sera envoyé pour ces paiements.`)) return;
+  const r = await fetch('/api/dons-attente/ignorer-tous', { method: 'POST' });
+  const d = await r.json();
+  if (d.success) {
+    showToast('🗑️ Ignorés !', `${d.count} paiement(s) ignorés`);
+    fetchDonsAttente();
+  }
+}
+
 async function fetchDonsAttente() {
   try {
     const r = await fetch('/api/dons-attente');
@@ -466,8 +479,10 @@ async function fetchDonsAttente() {
     const el = document.getElementById('donsAttenteList');
     if (!dons.length) {
       el.innerHTML = '<div class="empty-state"><div class="big">✅</div>Aucun don en attente.</div>';
+      document.getElementById('ignorerTousWrap').style.display = 'none';
       return;
     }
+    document.getElementById('ignorerTousWrap').style.display = 'block';
     el.innerHTML = dons.map(d => {
       const date = new Date(d.date).toLocaleDateString('fr-FR');
       const isValidation = d.modeValidation;
