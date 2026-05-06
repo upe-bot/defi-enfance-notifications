@@ -164,6 +164,22 @@
     </div>
   </div>
 
+  <!-- ENVOI FORCÉ PAR ID -->
+  <div class="section-title" style="margin-top:8px">🔧 Forcer l'envoi pour un paiement spécifique</div>
+  <div class="card">
+    <div style="font-size:.84rem;color:var(--text-muted);margin-bottom:16px;line-height:1.6">
+      Saisissez l'ID du paiement Ohme pour forcer l'envoi de l'email correspondant, même si le paiement est antérieur à la date plancher.
+    </div>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end">
+      <div class="field" style="flex:1;margin-bottom:0">
+        <label>ID du paiement Ohme</label>
+        <input type="text" id="forcerPaiementId" placeholder="ex: 1125899906842626">
+      </div>
+      <button class="btn btn-primary" onclick="forcerPaiement()">🔧 Forcer l'envoi</button>
+    </div>
+    <div id="forcerResult" style="font-size:.8rem;margin-top:12px;color:var(--text-muted)"></div>
+  </div>
+
   <!-- DONS EN ATTENTE -->
   <div class="section-title" style="margin-top:8px">⏸️ Dons non fléchés — en attente de validation</div>
   <div class="card">
@@ -412,6 +428,34 @@ async function startRattrapage() {
       }
     } catch(e) {}
   }, 3000);
+}
+
+// ── FORCER PAIEMENT ──────────────────────────────────
+async function forcerPaiement() {
+  const id = document.getElementById('forcerPaiementId').value.trim();
+  const resultEl = document.getElementById('forcerResult');
+  if (!id) { showToast('⚠️ Attention', 'Saisissez un ID de paiement'); return; }
+
+  resultEl.style.color = 'var(--text-muted)';
+  resultEl.textContent = '⏳ Traitement en cours…';
+
+  const r = await fetch('/api/forcer-paiement', {
+    method: 'POST', headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({ paiementId: id })
+  });
+  const d = await r.json();
+
+  if (d.success) {
+    resultEl.style.color = 'var(--success)';
+    resultEl.textContent = `✅ ${d.message}`;
+    showToast('✅ Succès !', `Email envoyé pour le paiement ${id}`);
+    document.getElementById('forcerPaiementId').value = '';
+    setTimeout(() => { fetchStatus(); fetchLogs(); fetchEvents(); }, 2000);
+  } else {
+    resultEl.style.color = 'var(--error)';
+    resultEl.textContent = `❌ ${d.error}`;
+    showToast('❌ Erreur', d.error);
+  }
 }
 
 // ── DONS EN ATTENTE ──────────────────────────────────
