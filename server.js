@@ -835,6 +835,38 @@ app.post('/api/test-email', async (req, res) => {
   res.json({ success: ok });
 });
 
+// Forcer l'envoi pour un paiement spécifique par son ID Ohme
+app.post('/api/forcer-paiement', async (req, res) => {
+  const { paiementId } = req.body;
+  if (!paiementId) return res.status(400).json({ error: 'ID paiement requis' });
+
+  addLog(`🔧 Envoi forcé pour paiement ID: ${paiementId}`, 'info');
+
+  try {
+    await sleep(OHME_DELAY_MS);
+    const r = await fetch(
+      `${CONFIG.ohmeBase}/api/v1/payments/${paiementId}`,
+      { headers: { 'Accept': 'application/json', 'client-name': CONFIG.ohmeClientName, 'client-secret': CONFIG.ohmeClientSecret } }
+    );
+    if (!r.ok) return res.json({ success: false, error: `Paiement ${paiementId} introuvable dans Ohme (HTTP ${r.status})` });
+
+    const json = await r.json();
+    const p    = json.data || json;
+
+    // Retirer de processedIds pour forcer le retraitement
+    state.processedIds.delete(paiementId);
+
+    // Traiter ce paiement unique
+    await processPayments([p]);
+    saveProcessedIds();
+
+    res.json({ success: true, message: `Paiement ${paiementId} traité` });
+  } catch(e) {
+    addLog(`❌ Erreur forcer-paiement : ${e.message}`, 'error');
+    res.json({ success: false, error: e.message });
+  }
+});
+
 // Poll manuel depuis le dashboard
 app.post('/api/poll-now', async (req, res) => {
   await poll();
