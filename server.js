@@ -756,6 +756,14 @@ async function lancerRattrapage() {
   return { started: true };
 }
 
+// Version sans filtre date plancher pour les envois forcés
+async function processPaymentsForced(payments) {
+  const savedPlancher = new Date(DATE_PLANCHER.getTime());
+  DATE_PLANCHER.setTime(0); // Remonter au 1er janvier 1970
+  await processPayments(payments);
+  DATE_PLANCHER.setTime(savedPlancher.getTime()); // Remettre la date plancher
+}
+
 // ══════════════════════════════════════════════════════
 //  POLLING
 // ══════════════════════════════════════════════════════
@@ -835,32 +843,54 @@ app.post('/api/test-email', async (req, res) => {
   res.json({ success: ok });
 });
 
-// Forcer l'envoi pour un paiement spécifique par son ID Ohme
+// Forcer l'envoi pour un paiement spécifique par son ID Ohme ou external_id (GiveWP)
 app.post('/api/forcer-paiement', async (req, res) => {
   const { paiementId } = req.body;
   if (!paiementId) return res.status(400).json({ error: 'ID paiement requis' });
 
-  addLog(`🔧 Envoi forcé pour paiement ID: ${paiementId}`, 'info');
+  addLog(`🔧 Envoi forcé pour paiement : ${paiementId}`, 'info');
 
   try {
-    await sleep(OHME_DELAY_MS);
-    const r = await fetch(
-      `${CONFIG.ohmeBase}/api/v1/payments/${paiementId}`,
-      { headers: { 'Accept': 'application/json', 'client-name': CONFIG.ohmeClientName, 'client-secret': CONFIG.ohmeClientSecret } }
-    );
-    if (!r.ok) return res.json({ success: false, error: `Paiement ${paiementId} introuvable dans Ohme (HTTP ${r.status})` });
+    let p = null;
 
-    const json = await r.json();
-    const p    = json.data || json;
+    // Détecter si c'est un external_id (GiveWP-xxxxx) ou un ID Ohme numérique
+    const isExternalId = isNaN(paiementId.replace(/[^0-9]/g, '')) || paiementId.includes('-') || paiementId.includes('GiveWP');
 
-    // Retirer de processedIds pour forcer le retraitement
-    state.processedIds.delete(paiementId);
+    if (isExternalId) {
+      // Chercher par external_id dans Ohme
+      await sleep(OHME_DELAY_MS);
+      const r = await fetch(
+        `${CONFIG.ohmeBase}/api/v1/payments?external_id=${encodeURIComponent(paiementId)}&limit=5`,
+        { headers: { 'Accept': 'application/json', 'client-name': CONFIG.ohmeClientName, 'client-secret': CONFIG.ohmeClientSecret } }
+      );
+      if (!r.ok) return res.json({ success: false, error: `Erreur API Ohme HTTP ${r.status}` });
+      const json = await r.json();
+      const items = json.data || [];
+      if (items.length === 0) return res.json({ success: false, error: `Paiement "${paiementId}" introuvable dans Ohme` });
+      p = items[0];
+    } else {
+      // Chercher par ID Ohme direct
+      await sleep(OHME_DELAY_MS);
+      const r = await fetch(
+        `${CONFIG.ohmeBase}/api/v1/payments/${paiementId}`,
+        { headers: { 'Accept': 'application/json', 'client-name': CONFIG.ohmeClientName, 'client-secret': CONFIG.ohmeClientSecret } }
+      );
+      if (!r.ok) return res.json({ success: false, error: `Paiement ${paiementId} introuvable (HTTP ${r.status})` });
+      const json = await r.json();
+      p = json.data || json;
+    }
 
-    // Traiter ce paiement unique
-    await processPayments([p]);
+    if (!p) return res.json({ success: false, error: 'Paiement introuvable' });
+
+    addLog(`🔧 Paiement trouvé : ID ${p.id} — external_id: ${p.external_id || 'N/A'}`, 'info');
+
+    // Traiter ce paiement unique sans filtre date plancher
+    // On retire temporairement l'ID pour forcer le retraitement
+    state.processedIds.delete(String(p.id));
+    await processPaymentsForced([p]);
     saveProcessedIds();
 
-    res.json({ success: true, message: `Paiement ${paiementId} traité` });
+    res.json({ success: true, message: `Paiement ${p.external_id || p.id} traité avec succès` });
   } catch(e) {
     addLog(`❌ Erreur forcer-paiement : ${e.message}`, 'error');
     res.json({ success: false, error: e.message });
