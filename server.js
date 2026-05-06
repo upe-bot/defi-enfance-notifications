@@ -285,7 +285,7 @@ async function sendBrevo(to, subject, html) {
 // ══════════════════════════════════════════════════════
 
 // Version du serveur — incrémenter à chaque mise à jour de server.js
-const SERVER_VERSION = '39';
+const SERVER_VERSION = '41';
 const VERSION_FILE   = '/opt/render/project/src/defi-enfance-version.txt';
 
 function getLastVersion() {
@@ -1047,26 +1047,77 @@ app.post('/api/dons-attente/:paiementId/valider', async (req, res) => {
 
   if (!paiement) return res.json({ success: false, error: 'Impossible de relire le paiement dans Ohme' });
 
-  const cf             = paiement.custom_fields || paiement;
+  const cf              = paiement.custom_fields || paiement;
+  const typeId          = paiement.payment_type_id;
   const coureurParraine = (cf.coureur_parraine || '').trim();
   const equipeParraine  = (cf.equipe_parraine  || '').trim();
   const { donateur, emailDon, montant } = don;
   let ok = false;
 
-  if (coureurParraine) {
+  // ── CAS BILLETTERIE (inscription coureur) → notifier l'association ──
+  if (typeId === 3) {
+    const nomAsso = (cf.asso_soutenue || '').trim();
+    const eventNom = (cf.nom_de_levent || paiement.nom_de_levent || '');
+    const ville = eventNom.replace(/défi\s*enfance?\s*/gi, '').replace(/\d{4}/g, '').trim();
+
+    // Récupérer les infos du coureur
+    const contactCoureur = await fetchOhmeContactById(paiement.contact_id);
+    const prenomC  = contactCoureur ? (contactCoureur.firstname || contactCoureur.first_name || '') : '';
+    const nomC     = contactCoureur ? (contactCoureur.lastname  || contactCoureur.last_name  || '') : '';
+    const coureur  = `${prenomC} ${nomC}`.trim() || donateur;
+    const emailCoureur = contactCoureur ? (contactCoureur.email || '') : '';
+
+    if (nomAsso) {
+      const structure      = await fetchOhmeStructureByName(nomAsso);
+      const emailAsso      = structure ? (structure.email_referent_defi_enfance     || '') : '';
+      const prenomReferent = structure ? (structure.prenom_du_referent_defi_enfance || '') : '';
+      if (emailAsso) {
+        const html = tplInscriptionAsso({ nomAsso, coureur, email_coureur: emailCoureur, ville, prenomReferent });
+        ok = await sendBrevo(emailAsso, '🏃 Nouveau coureur pour votre cause — Défi Enfance !', html);
+        if (ok) {
+          state.stats.sent++;
+          addLog(`✅ Inscription validée → asso ${nomAsso} (${coureur})`, 'ok');
+          addEvent('🏃', `Inscription validée`, `${coureur} → ${nomAsso}`, 'bill');
+        }
+      } else {
+        return res.json({ success: false, error: `Association "${nomAsso}" — email référent introuvable` });
+      }
+    } else {
+      return res.json({ success: false, error: 'Champ asso_soutenue vide dans Ohme' });
+    }
+
+  // ── CAS DON → coureur ou équipe ──
+  } else if (coureurParraine) {
     // Fléché vers un coureur
     const contact      = await fetchOhmeContactByName(coureurParraine);
     const emailCoureur = contact ? (contact.email || '') : '';
     const coureurPrenom = coureurParraine.split(' ')[0];
     const assoSoutenue  = (cf.asso_soutenue || '').trim();
     if (emailCoureur) {
+      // 1. Email au coureur
       const html = tplDonCoureur({ coureurPrenom, donateur, montant, email_donateur: emailDon, association: assoSoutenue });
       ok = await sendBrevo(emailCoureur, '❤️ Nouveau don pour ton Défi Enfance !', html);
       if (ok) {
         state.stats.sent++;
-        scheduleMerciDonateur({ email: emailDon, prenom: donateur.split(' ')[0], montant, donateur });
         addLog(`✅ Don validé → coureur ${coureurParraine} (${montant}€)`, 'ok');
         addEvent('❤️', `Don validé ${montant}€`, `${donateur} → ${coureurParraine}`, 'don');
+        // 2. Email merci J+1 au donateur
+        scheduleMerciDonateur({ email: emailDon, prenom: donateur.split(' ')[0], montant, donateur });
+      }
+      // 3. Email au chef d'équipe si le coureur appartient à une équipe
+      const equipe = await fetchEquipeCoureur(contact ? contact.id : null);
+      if (equipe) {
+        const structure  = await fetchOhmeStructureByName(equipe);
+        const chefEmail  = structure ? (structure.email_referent_defi_enfance || '') : '';
+        const chefPrenom = structure ? (structure.prenom_du_referent_defi_enfance || 'Bonjour') : 'Bonjour';
+        if (chefEmail) {
+          const htmlEquipe = tplDonEquipe({ chefPrenom, nomEquipe: equipe, donateur, montant, email_donateur: emailDon });
+          const okEquipe = await sendBrevo(chefEmail, '❤️ Nouveau don pour votre équipe au Défi Enfance !', htmlEquipe);
+          if (okEquipe) {
+            state.stats.sent++;
+            addLog(`✅ Don validé → chef équipe ${equipe} notifié`, 'ok');
+          }
+        }
       }
     } else {
       return res.json({ success: false, error: `Coureur "${coureurParraine}" introuvable dans Ohme — vérifiez l'orthographe` });
@@ -1082,6 +1133,7 @@ app.post('/api/dons-attente/:paiementId/valider', async (req, res) => {
       ok = await sendBrevo(chefEmail, '❤️ Nouveau don pour votre équipe au Défi Enfance !', html);
       if (ok) {
         state.stats.sent++;
+        // Email merci J+1 au donateur
         scheduleMerciDonateur({ email: emailDon, prenom: donateur.split(' ')[0], montant, donateur });
         addLog(`✅ Don validé → équipe ${equipeParraine} (${montant}€)`, 'ok');
         addEvent('🏆', `Don validé ${montant}€`, `${donateur} → ${equipeParraine}`, 'don');
