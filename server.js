@@ -226,7 +226,12 @@ async function fetchOhmePayments() {
     return [];
   }
   try {
-    const res = await fetch(`${CONFIG.ohmeBase}/api/v1/payments?limit=200`, {
+    // Récupérer les paiements des 2 derniers jours — suffisant pour ne rien rater
+    const twoDaysAgo = new Date(Date.now() - 2 * 24 * 60 * 60 * 1000);
+    const sinceDate  = twoDaysAgo.toISOString().substring(0, 10);
+    const url = `${CONFIG.ohmeBase}/api/v1/payments?limit=500&since_date=${sinceDate}`;
+
+    const res = await fetch(url, {
       headers: {
         'Accept':        'application/json',
         'client-name':   CONFIG.ohmeClientName,
@@ -280,49 +285,52 @@ async function sendBrevo(to, subject, html) {
 // ══════════════════════════════════════════════════════
 //  TRAITEMENT DES PAIEMENTS
 // ══════════════════════════════════════════════════════
-// Date plancher depuis variable d'environnement Render
-// Format attendu : YYYY-MM-DDTHH:MM (heure française, ex: 2026-05-06T14:11)
-// Le serveur convertit automatiquement en UTC (France = UTC+2 en été)
-function getDatePlancher() {
-  const raw = process.env.PROCESS_SINCE || '';
-  if (!raw) return null;
-  try {
-    // Ajouter +02:00 (heure française été) pour convertir en UTC
-    const d = new Date(raw.includes('Z') || raw.includes('+') ? raw : raw + '+02:00');
-    if (isNaN(d.getTime())) throw new Error('Date invalide');
-    addLog(`📅 Date plancher : ${d.toLocaleString('fr-FR', { timeZone: 'Europe/Paris' })} (heure française)`, 'info');
-    return d;
-  } catch(e) {
-    console.log(`[WARN] PROCESS_SINCE invalide : ${raw}`);
-    return null;
-  }
-}
+
+// Premier poll après redémarrage = mode validation manuelle
+let premierPoll = true;
 
 async function processPayments(payments, ignoreDate = false) {
-  const datePlancher = ignoreDate ? null : getDatePlancher();
   let newCount = 0;
 
   for (const p of payments) {
-    if (state.processedIds.has(p.id)) continue;
-
-    // Filtrer sur la date plancher si définie
-    if (datePlancher) {
-      const datePaiement = new Date(p.date || p.created_at || 0);
-      if (datePaiement < datePlancher) {
-        state.processedIds.add(p.id);
-        continue;
-      }
-    }
+    if (state.processedIds.has(String(p.id))) continue;
 
     // Seuls les paiements Défi Enfance ont nom_de_levent renseigné
-    // Les champs personnalisés sont dans p.custom_fields ou directement dans p
     const eventName = (
       p.nom_de_levent ||
       (p.custom_fields && p.custom_fields.nom_de_levent) ||
       ''
     ).trim();
     if (!eventName) {
-      state.processedIds.add(p.id);
+      state.processedIds.add(String(p.id));
+      continue;
+    }
+
+    // ── MODE PREMIER POLL : mise en attente pour validation manuelle ──
+    if (premierPoll && !ignoreDate) {
+      // Récupérer les infos du donateur/coureur pour afficher dans le dashboard
+      const contactDon = await fetchOhmeContactById(p.contact_id);
+      const prenom = contactDon ? (contactDon.firstname || contactDon.first_name || '') : '';
+      const nom    = contactDon ? (contactDon.lastname  || contactDon.last_name  || '') : '';
+      const donateur = `${prenom} ${nom}`.trim() || 'Inconnu';
+      const emailDon = contactDon ? (contactDon.email || '') : '';
+      const typeId   = p.payment_type_id;
+      const typeLabel = typeId === 1 ? 'Don' : typeId === 3 ? 'Inscription' : 'Autre';
+      const montant  = p.amount || '?';
+      const date     = p.date || new Date().toISOString();
+
+      addDonEnAttente({
+        paiementId: String(p.id),
+        donateur,
+        emailDon,
+        montant,
+        date,
+        eventName,
+        typeLabel,
+        modeValidation: true, // flag pour distinguer des dons non fléchés
+      });
+      addLog(`⏸️ [Démarrage] ${typeLabel} ${montant}€ de ${donateur} — en attente de validation`, 'warn');
+      newCount++;
       continue;
     }
 
@@ -440,7 +448,7 @@ async function processPayments(payments, ignoreDate = false) {
       }
     }
 
-    state.processedIds.add(p.id);
+    state.processedIds.add(String(p.id));
   }
 
   // Sauvegarder les IDs traités sur disque après chaque poll
@@ -789,7 +797,18 @@ async function poll() {
 
   const payments = await fetchOhmePayments();
   addLog(`📦 ${payments.length} paiement(s) récupéré(s)`, 'info');
+
+  if (premierPoll) {
+    addLog('⚠️ Premier poll après redémarrage — paiements récents mis en attente de validation', 'warn');
+  }
+
   await processPayments(payments);
+
+  // Désactiver le mode premier poll après le premier cycle
+  if (premierPoll) {
+    premierPoll = false;
+    addLog('✅ Mode validation manuelle terminé — surveillance automatique active', 'ok');
+  }
 }
 
 function startPolling() {
@@ -899,9 +918,12 @@ app.post('/api/forcer-paiement', async (req, res) => {
 
     addLog(`🔧 Paiement trouvé : ID ${p.id} — external_id: ${p.external_id || 'N/A'}`, 'info');
 
-    // Traiter ce paiement unique sans filtre date plancher
-    // On retire temporairement l'ID pour forcer le retraitement
+    // Retirer l'ID sous toutes ses formes pour forcer le retraitement
     state.processedIds.delete(String(p.id));
+    state.processedIds.delete(Number(p.id));
+    state.processedIds.delete(p.id);
+
+    addLog(`🔧 ID ${p.id} retiré des traités — lancement du traitement forcé…`, 'info');
     await processPaymentsForced([p]);
     saveProcessedIds();
 
@@ -1068,6 +1090,4 @@ app.listen(PORT, () => {
   console.log(`   Ohme client-name : ${CONFIG.ohmeClientName ? '✅ présent' : '⚠️ manquant'}`);
   console.log(`   Brevo : ${CONFIG.brevoKey ? '✅ clé présente' : '⚠️ clé manquante'}`);
   console.log(`   IDs déjà traités chargés : ${state.processedIds.size}`);
-  const dp = process.env.PROCESS_SINCE;
-  console.log(`   Date plancher : ${dp ? dp + ' (heure française)' : '⚠️ non définie — tous les paiements seront traités'}`);
 });
