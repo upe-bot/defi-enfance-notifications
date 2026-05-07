@@ -311,7 +311,7 @@ async function fetchOhmePayments() {
   }
   try {
     // Récupérer tous les paiements depuis le 1er avril 2026
-    const url = `${CONFIG.ohmeBase}/api/v1/payments?limit=500&since_date=2026-04-01`;
+    const url = `${CONFIG.ohmeBase}/api/v1/payments?limit=500&since_date=2026-03-01`;
 
     const res = await fetch(url, {
       headers: {
@@ -369,7 +369,7 @@ async function sendBrevo(to, subject, html) {
 // ══════════════════════════════════════════════════════
 
 // Version du serveur — incrémenter à chaque mise à jour de server.js
-const SERVER_VERSION = '52';
+const SERVER_VERSION = '54';
 const VERSION_FILE   = '/opt/render/project/src/defi-enfance-version.txt';
 
 function getLastVersion() {
@@ -552,6 +552,15 @@ async function processPayments(payments, ignoreDate = false) {
 
       const isSupporter = eventName.toUpperCase().includes('#SUPPORTERS');
 
+      // Règle : si équipe ET asso soutenue sont tous les deux vides → pas d'email
+      const cfC = p.custom_fields || p;
+      const equipeC = (cfC.equipe || '').trim();
+      if (!equipeC && !nomAsso) {
+        addLog(`⏭️ Billet ${coureur} — équipe et asso vides → pas d'email`, 'info');
+        state.processedIds.add(String(p.id));
+        continue;
+      }
+
       if (isSupporter) {
         // ── SUPPORTER → email de bienvenue au supporter
         if (emailCoureur) {
@@ -568,16 +577,6 @@ async function processPayments(payments, ignoreDate = false) {
 
       } else {
         // ── COUREUR → email de bienvenue au coureur + email à l'association
-
-        // Règle 2 : ignorer si pas d'email ET pas d'équipe ET pas d'asso
-        const cfC = p.custom_fields || p;
-        const equipeC = (cfC.equipe || '').trim();
-        if (!emailCoureur && !equipeC && !nomAsso) {
-          addLog(`⏭️ Inscription ${coureur} — pas d'email, pas d'équipe, pas d'asso → ignoré`, 'info');
-          state.processedIds.add(String(p.id));
-          continue;
-        }
-
         if (emailCoureur) {
           const html = tplInscriptionCoureur({ prenom: prenomC || coureur, nomComplet: coureur });
           const ok = await sendBrevo(emailCoureur, `${prenomC || coureur} : Heureux de votre inscription au Défi Enfance !`, html);
@@ -591,7 +590,7 @@ async function processPayments(payments, ignoreDate = false) {
         }
 
         // Email à l'association soutenue
-        // Règle 1 : ne pas envoyer si asso = équipe du coureur
+        // Règle : ne pas envoyer si asso = équipe du coureur
         if (nomAsso && nomAsso.toLowerCase() === equipeC.toLowerCase()) {
           addLog(`⏭️ Inscription ${coureur} — asso "${nomAsso}" = équipe → email asso ignoré`, 'info');
         } else if (nomAsso) {
