@@ -505,12 +505,7 @@ async function ignorerDon(paiementId) {
 
 // ── AUTH HELPER ──────────────────────────────────────
 function getPassword() {
-  // Essayer localStorage d'abord, puis cookie
-  try {
-    const ls = localStorage.getItem('dash_pwd');
-    if (ls) return ls;
-  } catch(e) {}
-  return document.cookie.split(';').find(c => c.trim().startsWith('dash_token='))?.split('=').slice(1).join('=').trim() || '';
+  return window.__DASH_PWD__ || '';
 }
 function apiFetch(url, options = {}) {
   const headers = { 'Content-Type': 'application/json', 'x-dashboard-password': getPassword(), ...(options.headers || {}) };
