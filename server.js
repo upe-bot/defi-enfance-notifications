@@ -49,14 +49,25 @@ app.post('/login', express.urlencoded({ extended: false }), (req, res) => {
   const pwd = process.env.DASHBOARD_PASSWORD || '';
   if (req.body.password === pwd) {
     res.setHeader('Set-Cookie', `dash_token=${pwd}; Path=/; SameSite=Strict`);
-    return res.redirect('/');
+    // Page intermédiaire qui sauvegarde dans localStorage puis redirige
+    return res.send(`<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body>
+    <script>
+      try { localStorage.setItem('dash_pwd', ${JSON.stringify(pwd)}); } catch(e) {}
+      window.location.href = '/';
+    </script>
+    </body></html>`);
   }
   res.redirect('/login?err=1');
 });
 
 app.get('/logout', (req, res) => {
   res.setHeader('Set-Cookie', 'dash_token=; Path=/; Max-Age=0');
-  res.redirect('/login');
+  return res.send(`<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body>
+  <script>
+    try { localStorage.removeItem('dash_pwd'); } catch(e) {}
+    window.location.href = '/login';
+  </script>
+  </body></html>`);
 });
 
 app.use(express.static(path.join(__dirname, 'public')));
@@ -323,7 +334,7 @@ async function sendBrevo(to, subject, html) {
 // ══════════════════════════════════════════════════════
 
 // Version du serveur — incrémenter à chaque mise à jour de server.js
-const SERVER_VERSION = '47';
+const SERVER_VERSION = '49';
 const VERSION_FILE   = '/opt/render/project/src/defi-enfance-version.txt';
 
 function getLastVersion() {
@@ -427,7 +438,7 @@ async function processPayments(payments, ignoreDate = false) {
 
         if (emailCoureur) {
           const html = tplDonCoureur({ coureurPrenom, donateur, montant, email_donateur: emailDon, association: assoSoutenue });
-          const ok = await sendBrevo(emailCoureur, '❤️ Nouveau don pour ton Défi Enfance !', html);
+          const ok = await sendBrevo(emailCoureur, `❤️ [live] ${prenomMerci || donateur.split(' ')[0]} a fait un don pour vous !`, html);
           if (ok) {
             state.stats.sent++;
             addLog(`✅ Don ${montant}€ de ${donateur} → ${coureurParraine}`, 'ok');
@@ -443,7 +454,7 @@ async function processPayments(payments, ignoreDate = false) {
             const chefPrenom = structure ? (structure.prenom_du_referent_defi_enfance || 'Bonjour') : 'Bonjour';
             if (chefEmail) {
               const htmlEquipe = tplDonEquipe({ chefPrenom, nomEquipe: equipe, donateur, montant, email_donateur: emailDon });
-              const okEquipe = await sendBrevo(chefEmail, '❤️ Nouveau don pour votre équipe au Défi Enfance !', htmlEquipe);
+              const okEquipe = await sendBrevo(chefEmail, `❤️ [live] ${prenomMerci || donateur.split(' ')[0]} a fait un don pour votre équipe !`, htmlEquipe);
               if (okEquipe) {
                 state.stats.sent++;
                 addLog(`✅ Don ${montant}€ → chef équipe ${equipe} (${chefPrenom}) notifié`, 'ok');
@@ -464,7 +475,7 @@ async function processPayments(payments, ignoreDate = false) {
 
         if (chefEmail) {
           const html = tplDonEquipe({ chefPrenom, nomEquipe: equipeParraine, donateur, montant, email_donateur: emailDon });
-          const ok = await sendBrevo(chefEmail, '❤️ Nouveau don pour votre équipe au Défi Enfance !', html);
+          const ok = await sendBrevo(chefEmail, `❤️ [live] ${prenomMerci || donateur.split(' ')[0]} a fait un don pour votre équipe !`, html);
           if (ok) {
             state.stats.sent++;
             addLog(`✅ Don ${montant}€ de ${donateur} → équipe ${equipeParraine} (${chefPrenom})`, 'ok');
@@ -523,6 +534,16 @@ async function processPayments(payments, ignoreDate = false) {
 
       } else {
         // ── COUREUR → email de bienvenue au coureur + email à l'association
+
+        // Règle 2 : ignorer si pas d'email ET pas d'équipe ET pas d'asso
+        const cfC = p.custom_fields || p;
+        const equipeC = (cfC.equipe || '').trim();
+        if (!emailCoureur && !equipeC && !nomAsso) {
+          addLog(`⏭️ Inscription ${coureur} — pas d'email, pas d'équipe, pas d'asso → ignoré`, 'info');
+          state.processedIds.add(String(p.id));
+          continue;
+        }
+
         if (emailCoureur) {
           const html = tplInscriptionCoureur({ prenom: prenomC || coureur, nomComplet: coureur });
           const ok = await sendBrevo(emailCoureur, `${prenomC || coureur} : Heureux de votre inscription au Défi Enfance !`, html);
@@ -536,14 +557,17 @@ async function processPayments(payments, ignoreDate = false) {
         }
 
         // Email à l'association soutenue
-        if (nomAsso) {
+        // Règle 1 : ne pas envoyer si asso = équipe du coureur
+        if (nomAsso && nomAsso.toLowerCase() === equipeC.toLowerCase()) {
+          addLog(`⏭️ Inscription ${coureur} — asso "${nomAsso}" = équipe → email asso ignoré`, 'info');
+        } else if (nomAsso) {
           const structure      = await fetchOhmeStructureByName(nomAsso);
           const emailAsso      = structure ? (structure.email_referent_defi_enfance     || '') : '';
           const prenomReferent = structure ? (structure.prenom_du_referent_defi_enfance || '') : '';
 
           if (emailAsso) {
             const html = tplInscriptionAsso({ nomAsso, coureur, email_coureur: emailCoureur, ville, prenomReferent });
-            const ok = await sendBrevo(emailAsso, '🏃 Nouveau coureur pour votre cause — Défi Enfance !', html);
+            const ok = await sendBrevo(emailAsso, `🏃 [live] ${prenomC || coureur} court pour vous !`, html);
             if (ok) {
               state.stats.sent++;
               addLog(`✅ Inscription ${coureur} → asso ${nomAsso}`, 'ok');
