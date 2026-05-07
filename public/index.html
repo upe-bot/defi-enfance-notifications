@@ -195,57 +195,6 @@
     </div>
   </div>
 
-  <!-- RATTRAPAGE HISTORIQUE -->
-  <div class="section-title" style="margin-top:8px">🕐 Rattrapage historique</div>
-  <div class="card">
-    <div style="font-size:.85rem; color:var(--text-muted); margin-bottom:18px; line-height:1.6">
-      Envoie les notifications pour les paiements passés non encore notifiés.<br>
-      <strong style="color:var(--orange-clair)">Dons</strong> : à partir du <strong style="color:#fff">1er mai 2025</strong> &nbsp;·&nbsp;
-      <strong style="color:var(--orange-clair)">Inscriptions</strong> : à partir du <strong style="color:#fff">1er avril 2025</strong>
-      (coureurs dont l'asso = équipe exclus automatiquement)
-    </div>
-
-    <!-- Barre de progression rattrapage -->
-    <div id="rattrapageProgress" style="display:none; margin-bottom:20px">
-      <div style="display:flex; justify-content:space-between; font-size:.78rem; color:var(--text-muted); margin-bottom:6px">
-        <span>Progression</span>
-        <span id="rattrapageProgressLabel">0 / 0</span>
-      </div>
-      <div class="progress-bar-track" style="height:8px; margin-bottom:12px">
-        <div class="progress-bar-fill" id="rattrapageProgressFill" style="transition:width .5s"></div>
-      </div>
-      <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-bottom:14px">
-        <div class="stat-card" style="padding:12px">
-          <div class="stat-label">Envoyés</div>
-          <div class="stat-value" id="rSent" style="font-size:1.4rem">0</div>
-        </div>
-        <div class="stat-card" style="padding:12px">
-          <div class="stat-label">Ignorés</div>
-          <div class="stat-value" id="rSkipped" style="font-size:1.4rem">0</div>
-        </div>
-        <div class="stat-card" style="padding:12px">
-          <div class="stat-label">Erreurs</div>
-          <div class="stat-value" id="rErrors" style="font-size:1.4rem; color:var(--error)">0</div>
-        </div>
-        <div class="stat-card" style="padding:12px">
-          <div class="stat-label">Restants</div>
-          <div class="stat-value" id="rRemaining" style="font-size:1.4rem">—</div>
-        </div>
-      </div>
-      <div class="log-wrap" id="rattrapageLog" style="max-height:220px">
-        <div class="log-empty">En attente…</div>
-      </div>
-    </div>
-
-    <div class="actions" id="rattrapageActions">
-      <button class="btn btn-primary" id="btnRattrapage" onclick="startRattrapage()">
-        🕐 Lancer le rattrapage historique
-      </button>
-      <div style="font-size:.75rem; color:var(--text-muted); max-width:360px">
-        ⚠️ Un email sera envoyé par paiement éligible, avec 2 secondes entre chaque. Vérifiez bien votre configuration Brevo avant de lancer.
-      </div>
-    </div>
-  </div>
 
   <!-- TEST EMAIL -->
   <div id="testModal" style="display:none">
@@ -556,7 +505,12 @@ async function ignorerDon(paiementId) {
 
 // ── AUTH HELPER ──────────────────────────────────────
 function getPassword() {
-  return document.cookie.split(';').find(c => c.trim().startsWith('dash_token='))?.split('=')[1]?.trim() || '';
+  // Essayer localStorage d'abord, puis cookie
+  try {
+    const ls = localStorage.getItem('dash_pwd');
+    if (ls) return ls;
+  } catch(e) {}
+  return document.cookie.split(';').find(c => c.trim().startsWith('dash_token='))?.split('=').slice(1).join('=').trim() || '';
 }
 function apiFetch(url, options = {}) {
   const headers = { 'Content-Type': 'application/json', 'x-dashboard-password': getPassword(), ...(options.headers || {}) };
