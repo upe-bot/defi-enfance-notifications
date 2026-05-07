@@ -504,12 +504,12 @@ async function ignorerDon(paiementId) {
 }
 
 // ── AUTH HELPER ──────────────────────────────────────
-function getPassword() {
-  return window.__DASH_PWD__ || '';
-}
 function apiFetch(url, options = {}) {
-  const headers = { 'Content-Type': 'application/json', 'x-dashboard-password': getPassword(), ...(options.headers || {}) };
-  return fetch(url, { ...options, headers });
+  return fetch(url, {
+    ...options,
+    credentials: 'include', // envoie le cookie automatiquement
+    headers: { 'Content-Type': 'application/json', ...(options.headers || {}) }
+  });
 }
 
 // ── REFRESH ──────────────────────────────────────────
