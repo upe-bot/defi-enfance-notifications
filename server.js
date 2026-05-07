@@ -11,10 +11,11 @@ app.use(express.json());
 // ── Protection par mot de passe du dashboard
 app.use((req, res, next) => {
   const pwd = process.env.DASHBOARD_PASSWORD || '';
-  if (!pwd) return next(); // pas de mot de passe configuré → accès libre
+  if (!pwd) return next();
 
-  // Toujours autoriser la page et l'action de login
-  if (req.path === '/login') return next();
+  // Toujours autoriser login et fichiers statiques
+  if (req.path === '/login' || req.path === '/logout') return next();
+  if (req.path.match(/\.(js|css|png|jpg|ico|svg|woff|woff2)$/)) return next();
 
   // Routes API : vérifier le header x-dashboard-password
   if (req.path.startsWith('/api/')) {
@@ -23,14 +24,13 @@ app.use((req, res, next) => {
     return next();
   }
 
-  // Fichiers statiques publics (JS, CSS, images) : toujours autoriser
-  if (req.path.match(/\.(js|css|png|jpg|ico|svg|woff|woff2)$/)) return next();
+  // Route / : gérée séparément avec injection du mot de passe
+  if (req.path === '/') return next();
 
-  // Dashboard HTML : vérifier le cookie
+  // Autres routes : vérifier le cookie
   const cookie = req.headers.cookie || '';
-  const token  = cookie.split(';').find(c => c.trim().startsWith('dash_token='));
-  const val    = token ? token.trim().split('=').slice(1).join('=').trim() : '';
-
+  const token = cookie.split(';').find(c => c.trim().startsWith('dash_token='));
+  const val = token ? token.trim().split('=').slice(1).join('=').trim() : '';
   if (val === pwd) return next();
   return res.redirect('/login');
 });
@@ -68,6 +68,22 @@ app.get('/logout', (req, res) => {
     window.location.href = '/login';
   </script>
   </body></html>`);
+});
+
+// Route principale — injecte le mot de passe dans le HTML
+app.get('/', (req, res) => {
+  const pwd = process.env.DASHBOARD_PASSWORD || '';
+  if (pwd) {
+    const cookie = req.headers.cookie || '';
+    const token = cookie.split(';').find(c => c.trim().startsWith('dash_token='));
+    const val = token ? token.trim().split('=').slice(1).join('=').trim() : '';
+    if (val !== pwd) return res.redirect('/login');
+  }
+  const fs2 = require('fs');
+  const indexPath = path.join(__dirname, 'public', 'index.html');
+  let html = fs2.readFileSync(indexPath, 'utf8');
+  html = html.replace('</head>', `<script>window.__DASH_PWD__ = ${JSON.stringify(pwd)};</script></head>`);
+  res.send(html);
 });
 
 app.use(express.static(path.join(__dirname, 'public')));
@@ -334,7 +350,7 @@ async function sendBrevo(to, subject, html) {
 // ══════════════════════════════════════════════════════
 
 // Version du serveur — incrémenter à chaque mise à jour de server.js
-const SERVER_VERSION = '49';
+const SERVER_VERSION = '50';
 const VERSION_FILE   = '/opt/render/project/src/defi-enfance-version.txt';
 
 function getLastVersion() {
@@ -1157,7 +1173,21 @@ app.post('/api/forcer-paiement', async (req, res) => {
   }
 });
 
-// Poll manuel depuis le dashboard
+app.get('/', (req, res) => {
+  const pwd = process.env.DASHBOARD_PASSWORD || '';
+  if (pwd) {
+    const cookie = req.headers.cookie || '';
+    const token = cookie.split(';').find(c => c.trim().startsWith('dash_token='));
+    const val = token ? token.trim().split('=').slice(1).join('=').trim() : '';
+    if (val !== pwd) return res.redirect('/login');
+  }
+  // Lire index.html et injecter le mot de passe comme variable globale
+  const fs2 = require('fs');
+  const indexPath = path.join(__dirname, 'public', 'index.html');
+  let html = fs2.readFileSync(indexPath, 'utf8');
+  html = html.replace('</head>', `<script>window.__DASH_PWD__ = ${JSON.stringify(pwd)};</script></head>`);
+  res.send(html);
+});
 app.post('/api/poll-now', async (req, res) => {
   await poll();
   res.json({ success: true, stats: state.stats });
