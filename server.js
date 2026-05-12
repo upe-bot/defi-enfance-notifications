@@ -405,7 +405,7 @@ async function sendBrevo(to, subject, html) {
 // ══════════════════════════════════════════════════════
 
 // Version du serveur — incrémenter à chaque mise à jour de server.js
-const SERVER_VERSION = '60';
+const SERVER_VERSION = '61';
 const VERSION_FILE   = '/opt/render/project/src/defi-enfance-version.txt';
 
 function getLastVersion() {
@@ -680,33 +680,31 @@ async function fetchInfosDonateur(p) {
 
   addLog(`🔍 fetchInfosDonateur — donator_nature: "${p.donator_nature}", collector_type: "${p.collector_type}", collector_id: "${p.collector_id}", contact_id: "${p.contact_id}"`, 'info');
 
-  // Don d'une structure → directement via collector_id
-  if (p.donator_nature === 'organization' && p.collector_type === 'structure' && p.collector_id) {
-    try {
-      await sleep(OHME_DELAY_MS);
-      const r = await fetch(
-        `${CONFIG.ohmeBase}/api/v1/structures/${p.collector_id}`,
-        { headers: { 'Accept': 'application/json', 'client-name': CONFIG.ohmeClientName, 'client-secret': CONFIG.ohmeClientSecret } }
-      );
-      if (r.ok) {
-        const json = await r.json();
-        const s  = json.data || json;
-        const cf = s.custom_fields || s;
-        const emailRef     = cf.email_referent_defi_enfance     || s.email_referent_defi_enfance     || s.email || emailContact;
-        const prenomRef    = cf.prenom_du_referent_defi_enfance || s.prenom_du_referent_defi_enfance || '';
-        const nomStructure = s.name || `${prenomContact} ${nomContact}`.trim();
-        addLog(`🏢 Don structure : ${nomStructure} — référent: ${prenomRef} (${emailRef})`, 'info');
-        return {
-          donateur:     nomStructure,
-          emailDon:     emailRef,
-          prenomMerci:  prenomRef,
-          isStructure:  true,
-          nomStructure,
-        };
+  // Don d'une entreprise/organisation → chercher la structure via le contact
+  const isCompany = p.donator_nature === 'company' || p.donator_nature === 'organization';
+
+  if (isCompany && contact) {
+    // Chercher la structure liée à ce contact par son nom dans Ohme
+    const nomStructure = contact.structure || (contact.structures && contact.structures[0]) || '';
+    if (nomStructure) {
+      try {
+        const structure = await fetchOhmeStructureByName(nomStructure);
+        if (structure) {
+          const cf       = structure.custom_fields || structure;
+          const emailRef  = cf.email_referent_defi_enfance     || structure.email_referent_defi_enfance     || emailContact;
+          const prenomRef = cf.prenom_du_referent_defi_enfance || structure.prenom_du_referent_defi_enfance || prenomContact;
+          const nom       = structure.name || nomStructure;
+          addLog(`🏢 Don company : ${nom} — référent: ${prenomRef} (${emailRef})`, 'info');
+          return { donateur: nom, emailDon: emailRef, prenomMerci: prenomRef, isStructure: true, nomStructure: nom };
+        }
+      } catch(e) {
+        addLog(`⚠️ fetchInfosDonateur structure : ${e.message}`, 'warn');
       }
-    } catch(e) {
-      addLog(`⚠️ Impossible de récupérer la structure du donateur : ${e.message}`, 'warn');
     }
+    // Fallback : utiliser le nom du contact comme nom de structure
+    const nomFallback = `${prenomContact} ${nomContact}`.trim() || 'Entreprise';
+    addLog(`🏢 Don company (fallback contact) : ${nomFallback} (${emailContact})`, 'info');
+    return { donateur: nomFallback, emailDon: emailContact, prenomMerci: prenomContact, isStructure: true, nomStructure: nomFallback };
   }
 
   // Particulier → infos classiques
