@@ -405,7 +405,7 @@ async function sendBrevo(to, subject, html) {
 // ══════════════════════════════════════════════════════
 
 // Version du serveur — incrémenter à chaque mise à jour de server.js
-const SERVER_VERSION = '61';
+const SERVER_VERSION = '62';
 const VERSION_FILE   = '/opt/render/project/src/defi-enfance-version.txt';
 
 function getLastVersion() {
@@ -682,6 +682,12 @@ async function fetchInfosDonateur(p) {
 
   // Don d'une entreprise/organisation → chercher la structure via le contact
   const isCompany = p.donator_nature === 'company' || p.donator_nature === 'organization';
+
+  if (isCompany && !p.contact_id) {
+    // Log tous les champs pour diagnostiquer
+    addLog(`🔍 Paiement company sans contact_id — champs: ${JSON.stringify(Object.keys(p))} — cf: ${JSON.stringify(Object.keys(p.custom_fields || {}))}`, 'info');
+    addLog(`🔍 Valeurs: beneficiary_contact_id=${p.beneficiary_contact_id}, beneficiary_structure_id=${p.beneficiary_structure_id}, structure_id=${p.structure_id}, donator_name=${p.donator_name}`, 'info');
+  }
 
   if (isCompany && contact) {
     // Chercher la structure liée à ce contact par son nom dans Ohme
