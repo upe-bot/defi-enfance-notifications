@@ -405,7 +405,7 @@ async function sendBrevo(to, subject, html) {
 // ══════════════════════════════════════════════════════
 
 // Version du serveur — incrémenter à chaque mise à jour de server.js
-const SERVER_VERSION = '62';
+const SERVER_VERSION = '63';
 const VERSION_FILE   = '/opt/render/project/src/defi-enfance-version.txt';
 
 function getLastVersion() {
@@ -683,33 +683,48 @@ async function fetchInfosDonateur(p) {
   // Don d'une entreprise/organisation → chercher la structure via le contact
   const isCompany = p.donator_nature === 'company' || p.donator_nature === 'organization';
 
-  if (isCompany && !p.contact_id) {
-    // Log tous les champs pour diagnostiquer
-    addLog(`🔍 Paiement company sans contact_id — champs: ${JSON.stringify(Object.keys(p))} — cf: ${JSON.stringify(Object.keys(p.custom_fields || {}))}`, 'info');
-    addLog(`🔍 Valeurs: beneficiary_contact_id=${p.beneficiary_contact_id}, beneficiary_structure_id=${p.beneficiary_structure_id}, structure_id=${p.structure_id}, donator_name=${p.donator_name}`, 'info');
-  }
-
-  if (isCompany && contact) {
-    // Chercher la structure liée à ce contact par son nom dans Ohme
-    const nomStructure = contact.structure || (contact.structures && contact.structures[0]) || '';
-    if (nomStructure) {
+  if (isCompany) {
+    // Cas 1 : contact_id présent → chercher via le contact
+    if (contact && (contact.structure || (contact.structures && contact.structures[0]))) {
+      const nomStructure = contact.structure || contact.structures[0];
       try {
         const structure = await fetchOhmeStructureByName(nomStructure);
         if (structure) {
-          const cf       = structure.custom_fields || structure;
+          const cf        = structure.custom_fields || structure;
           const emailRef  = cf.email_referent_defi_enfance     || structure.email_referent_defi_enfance     || emailContact;
           const prenomRef = cf.prenom_du_referent_defi_enfance || structure.prenom_du_referent_defi_enfance || prenomContact;
           const nom       = structure.name || nomStructure;
-          addLog(`🏢 Don company : ${nom} — référent: ${prenomRef} (${emailRef})`, 'info');
+          addLog(`🏢 Don company (via contact) : ${nom} — référent: ${prenomRef} (${emailRef})`, 'info');
           return { donateur: nom, emailDon: emailRef, prenomMerci: prenomRef, isStructure: true, nomStructure: nom };
         }
       } catch(e) {
-        addLog(`⚠️ fetchInfosDonateur structure : ${e.message}`, 'warn');
+        addLog(`⚠️ fetchInfosDonateur structure via contact : ${e.message}`, 'warn');
       }
     }
-    // Fallback : utiliser le nom du contact comme nom de structure
+
+    // Cas 2 : structure_name dans le paiement → chercher par nom
+    const structureName = p.structure_name || '';
+    if (structureName) {
+      try {
+        const structure = await fetchOhmeStructureByName(structureName);
+        if (structure) {
+          const cf        = structure.custom_fields || structure;
+          const emailRef  = cf.email_referent_defi_enfance     || structure.email_referent_defi_enfance     || emailContact;
+          const prenomRef = cf.prenom_du_referent_defi_enfance || structure.prenom_du_referent_defi_enfance || '';
+          const nom       = structure.name || structureName;
+          addLog(`🏢 Don company (via structure_name) : ${nom} — référent: ${prenomRef} (${emailRef})`, 'info');
+          return { donateur: nom, emailDon: emailRef, prenomMerci: prenomRef, isStructure: true, nomStructure: nom };
+        }
+      } catch(e) {
+        addLog(`⚠️ fetchInfosDonateur structure via structure_name : ${e.message}`, 'warn');
+      }
+      // Fallback : utiliser structure_name sans chercher les champs personnalisés
+      addLog(`🏢 Don company (fallback structure_name) : ${structureName}`, 'info');
+      return { donateur: structureName, emailDon: emailContact, prenomMerci: '', isStructure: true, nomStructure: structureName };
+    }
+
+    // Fallback final : nom du contact
     const nomFallback = `${prenomContact} ${nomContact}`.trim() || 'Entreprise';
-    addLog(`🏢 Don company (fallback contact) : ${nomFallback} (${emailContact})`, 'info');
     return { donateur: nomFallback, emailDon: emailContact, prenomMerci: prenomContact, isStructure: true, nomStructure: nomFallback };
   }
 
