@@ -405,7 +405,7 @@ async function sendBrevo(to, subject, html) {
 // ══════════════════════════════════════════════════════
 
 // Version du serveur — incrémenter à chaque mise à jour de server.js
-const SERVER_VERSION = '59';
+const SERVER_VERSION = '60';
 const VERSION_FILE   = '/opt/render/project/src/defi-enfance-version.txt';
 
 function getLastVersion() {
@@ -677,6 +677,8 @@ async function fetchInfosDonateur(p) {
   const prenomContact = contact ? (contact.firstname || contact.first_name || '') : '';
   const nomContact    = contact ? (contact.lastname  || contact.last_name  || '') : '';
   const emailContact  = contact ? (contact.email || '') : '';
+
+  addLog(`🔍 fetchInfosDonateur — donator_nature: "${p.donator_nature}", collector_type: "${p.collector_type}", collector_id: "${p.collector_id}", contact_id: "${p.contact_id}"`, 'info');
 
   // Don d'une structure → directement via collector_id
   if (p.donator_nature === 'organization' && p.collector_type === 'structure' && p.collector_id) {
