@@ -369,7 +369,7 @@ async function sendBrevo(to, subject, html) {
 // ══════════════════════════════════════════════════════
 
 // Version du serveur — incrémenter à chaque mise à jour de server.js
-const SERVER_VERSION = '54';
+const SERVER_VERSION = '55';
 const VERSION_FILE   = '/opt/render/project/src/defi-enfance-version.txt';
 
 function getLastVersion() {
@@ -631,33 +631,47 @@ async function fetchInfosDonateur(p) {
   const nomContact    = contact ? (contact.lastname  || contact.last_name  || '') : '';
   const emailContact  = contact ? (contact.email || '') : '';
 
-  // Si don d'une structure → récupérer les infos du référent via structure_id
+  // Si don d'une structure → récupérer les infos du référent via structure_ohme_ids
   if (p.donator_nature === 'organization' && contact) {
-    // Chercher la structure liée au contact
-    const structureId = contact.structure_id || (contact.structures && contact.structures[0]);
-    if (structureId) {
+    const structureOhmeIds = contact.structure_ohme_ids || [];
+    const structureOhmeId  = structureOhmeIds.length > 0 ? structureOhmeIds[0] : null;
+
+    if (structureOhmeId) {
       try {
+        // Étape 1 : trouver la structure par ohme_id
         await sleep(OHME_DELAY_MS);
         const r = await fetch(
-          `${CONFIG.ohmeBase}/api/v1/structures/${structureId}`,
+          `${CONFIG.ohmeBase}/api/v1/structures?ohme_id=${structureOhmeId}&limit=1`,
           { headers: { 'Accept': 'application/json', 'client-name': CONFIG.ohmeClientName, 'client-secret': CONFIG.ohmeClientSecret } }
         );
         if (r.ok) {
           const json = await r.json();
-          const s  = json.data || json;
-          const cf = s.custom_fields || s;
-          const emailRef  = cf.email_referent_defi_enfance     || s.email_referent_defi_enfance     || emailContact;
-          const prenomRef = cf.prenom_du_referent_defi_enfance || s.prenom_du_referent_defi_enfance || prenomContact;
-          const nomRef    = cf.nom_du_referent_defi_enfance    || s.nom_du_referent_defi_enfance    || nomContact;
-          const nomStructure = s.name || `${prenomContact} ${nomContact}`.trim();
-          addLog(`🏢 Don structure : ${nomStructure} — référent: ${prenomRef} ${nomRef} (${emailRef})`, 'info');
-          return {
-            donateur: nomStructure,        // nom affiché dans les emails coureurs/équipes
-            emailDon: emailRef,            // email du référent pour le merci
-            prenomMerci: prenomRef,        // prénom pour "Bonjour X"
-            isStructure: true,
-            nomStructure,
-          };
+          const items = json.data || [];
+          if (items.length > 0) {
+            const sItem = items[0];
+            // Étape 2 : récupérer la fiche individuelle pour les champs personnalisés
+            await sleep(OHME_DELAY_MS);
+            const r2 = await fetch(
+              `${CONFIG.ohmeBase}/api/v1/structures/${sItem.id}`,
+              { headers: { 'Accept': 'application/json', 'client-name': CONFIG.ohmeClientName, 'client-secret': CONFIG.ohmeClientSecret } }
+            );
+            if (r2.ok) {
+              const json2 = await r2.json();
+              const s  = json2.data || json2;
+              const cf = s.custom_fields || s;
+              const emailRef     = cf.email_referent_defi_enfance     || s.email_referent_defi_enfance     || emailContact;
+              const prenomRef    = cf.prenom_du_referent_defi_enfance || s.prenom_du_referent_defi_enfance || prenomContact;
+              const nomStructure = s.name || sItem.name || `${prenomContact} ${nomContact}`.trim();
+              addLog(`🏢 Don structure : ${nomStructure} — référent: ${prenomRef} (${emailRef})`, 'info');
+              return {
+                donateur:     nomStructure,
+                emailDon:     emailRef,
+                prenomMerci:  prenomRef,
+                isStructure:  true,
+                nomStructure,
+              };
+            }
+          }
         }
       } catch(e) {
         addLog(`⚠️ Impossible de récupérer la structure du donateur : ${e.message}`, 'warn');
@@ -667,8 +681,8 @@ async function fetchInfosDonateur(p) {
 
   // Particulier → infos classiques
   return {
-    donateur: `${prenomContact} ${nomContact}`.trim() || 'Donateur anonyme',
-    emailDon: emailContact,
+    donateur:    `${prenomContact} ${nomContact}`.trim() || 'Donateur anonyme',
+    emailDon:    emailContact,
     prenomMerci: prenomContact,
     isStructure: false,
     nomStructure: null,
