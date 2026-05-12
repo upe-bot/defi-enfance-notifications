@@ -405,7 +405,7 @@ async function sendBrevo(to, subject, html) {
 // ══════════════════════════════════════════════════════
 
 // Version du serveur — incrémenter à chaque mise à jour de server.js
-const SERVER_VERSION = '58';
+const SERVER_VERSION = '59';
 const VERSION_FILE   = '/opt/render/project/src/defi-enfance-version.txt';
 
 function getLastVersion() {
@@ -451,15 +451,27 @@ async function processPayments(payments, ignoreDate = false) {
     // ── MODE PREMIER POLL : mise en attente pour validation manuelle ──
     if (premierPoll && !ignoreDate) {
       // Récupérer les infos du donateur/coureur pour afficher dans le dashboard
-      const contactDon = await fetchOhmeContactById(p.contact_id);
-      const prenom = contactDon ? (contactDon.firstname || contactDon.first_name || '') : '';
-      const nom    = contactDon ? (contactDon.lastname  || contactDon.last_name  || '') : '';
-      const donateur = `${prenom} ${nom}`.trim() || 'Inconnu';
-      const emailDon = contactDon ? (contactDon.email || '') : '';
-      const typeId   = p.payment_type_id;
+      const typeId    = p.payment_type_id;
       const typeLabel = typeId === 1 ? 'Don' : typeId === 3 ? 'Inscription' : 'Autre';
-      const montant  = p.amount || '?';
-      const date     = p.date || new Date().toISOString();
+      const montant   = p.amount || '?';
+      const date      = p.date || new Date().toISOString();
+
+      let donateur = 'Inconnu';
+      let emailDon = '';
+
+      if (typeId === 1) {
+        // Pour les dons, utiliser fetchInfosDonateur pour gérer structures et particuliers
+        const infos = await fetchInfosDonateur(p);
+        donateur = infos.donateur;
+        emailDon = infos.emailDon;
+      } else {
+        // Pour les inscriptions, récupérer via contact_id
+        const contact = await fetchOhmeContactById(p.contact_id);
+        const prenom  = contact ? (contact.firstname || contact.first_name || '') : '';
+        const nom     = contact ? (contact.lastname  || contact.last_name  || '') : '';
+        donateur = `${prenom} ${nom}`.trim() || 'Inconnu';
+        emailDon = contact ? (contact.email || '') : '';
+      }
 
       addDonEnAttente({
         paiementId: String(p.id),
@@ -471,7 +483,6 @@ async function processPayments(payments, ignoreDate = false) {
         typeLabel,
         modeValidation: true,
       });
-      // Marquer comme traité immédiatement pour éviter retraitement au poll suivant
       state.processedIds.add(String(p.id));
       addLog(`⏸️ [Démarrage] ${typeLabel} ${montant}€ de ${donateur} — en attente de validation`, 'warn');
       newCount++;
