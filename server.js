@@ -154,7 +154,7 @@ async function saveCurrentVersion() {
 // ══════════════════════════════════════════════════════
 //  VERSION
 // ══════════════════════════════════════════════════════
-const SERVER_VERSION = '78';
+const SERVER_VERSION = '80';
 
 // ══════════════════════════════════════════════════════
 //  ÉTAT SERVEUR
@@ -459,9 +459,9 @@ function tplGroupeJ10Angers({ prenom }) {
     .programme-time{font-weight:700;color:#fb0089;min-width:48px;flex-shrink:0}
     .liste-item{display:flex;align-items:flex-start;gap:10px;padding:7px 0;border-bottom:1px solid #f5e5d5;font-size:.84rem;color:#3d1830}
     .liste-item:last-child{border-bottom:none}
-  </style></head><body><div class="outer"><div class="logo-header"><div class="logo-text">🤝 Défi Enfance</div><div class="logo-sub">Générateur de victoires pour l'enfance</div></div><div class="header mixed"><h1>🎽 Dans 9 jours,<br>on court pour l'enfance !</h1><p>Défi Enfance · Angers · 22 mai 2026</p></div><div class="body">
+  </style></head><body><div class="outer"><div class="logo-header"><div class="logo-text">🤝 Défi Enfance</div><div class="logo-sub">Générateur de victoires pour l'enfance</div></div><div class="header mixed"><h1>🎽 Dans 8 jours,<br>on court pour l'enfance !</h1><p>Défi Enfance · Angers · 22 mai 2026</p></div><div class="body">
 <div class="greeting">Bonjour ${prenom} 👋</div>
-<div class="intro">Dans 10 jours, c'est le grand jour ! 🎉 Nous sommes vraiment impatients de vous retrouver au <strong>Parc Saint-Serge</strong> pour cette deuxième édition du Défi Enfance à Angers. Vous faites partie d'une belle aventure — voici tout ce qu'il faut savoir pour arriver prêt(e) et serein(e) ! 💪</div>
+<div class="intro">Dans 8 jours, c'est le grand jour ! 🎉 Nous sommes vraiment impatients de vous retrouver au <strong>Parc Saint-Serge</strong> pour cette deuxième édition du Défi Enfance à Angers. Vous faites partie d'une belle aventure — voici tout ce qu'il faut savoir pour arriver prêt(e) et serein(e) ! 💪</div>
 
 <div class="card" style="margin-bottom:22px"><h3>🤲 Pourquoi est-ce qu'on court ?</h3>
 <div style="font-size:.86rem;color:#3d1830;line-height:1.7">Le Défi Enfance, c'est bien plus qu'une course — c'est un élan collectif pour soutenir tout le secteur de l'aide à l'enfance. Chaque kilomètre parcouru, chaque don collecté va compter.<br><br>Dès maintenant, faites décoller votre collecte ! <strong>50% des dons</strong> vont directement aux associations choisies, <strong>50%</strong> soutiennent le plaidoyer pour les enfants en France. 🙏<br><br><strong>Nouveauté exclusive :</strong> faites et faites faire des <strong>promesses de dons au km</strong> — une manière percutante de challenger vos proches pour la cause de l'enfance !</div>
@@ -501,7 +501,7 @@ function tplGroupeJ10Angers({ prenom }) {
 <div class="note magenta">🎽 <strong>Votre dossard</strong><br>Vous recevrez un email le <strong>jeudi 21 mai</strong> avec votre numéro de dossard. Il ne vous restera plus qu'à le récupérer sur place dès 8h30 et à enfiler vos baskets ! 👟</div>
 
 <div class="divider"></div>
-<div style="font-size:.84rem;color:#3d1830;text-align:center;line-height:1.8">Pour toute question : <a href="mailto:contact@defienfance.fr" style="color:#fb0089;font-weight:600">contact@defienfance.fr</a> 📩<br><br><strong>On vous attend avec impatience — allez, plus que 9 jours ! 🏁</strong></div>
+<div style="font-size:.84rem;color:#3d1830;text-align:center;line-height:1.8">Pour toute question : <a href="mailto:contact@defienfance.fr" style="color:#fb0089;font-weight:600">contact@defienfance.fr</a> 📩<br><br><strong>On vous attend avec impatience — allez, plus que 8 jours ! 🏁</strong></div>
 <div style="margin-top:16px;font-size:.82rem;color:#fb0089;font-weight:600;text-align:center">— L'équipe du Défi Enfance 🤲</div>
 
 </div><div class="footer"><div style="font-family:Arial,sans-serif;font-size:1.1rem;font-weight:700;color:#fb0089;letter-spacing:.08em;margin-bottom:6px">DÉFI ENFANCE</div><div class="footer-sub">Générateur de victoires pour l'enfance<br>contact@defienfance.fr — defienfance.fr</div></div></div></body></html>`;
@@ -735,13 +735,19 @@ async function fetchTotalPromessesEquipe(nomEquipe) {
 // ══════════════════════════════════════════════════════
 async function sendBrevo(to, subject, html) {
   if (!CONFIG.brevoKey) { addLog('Clé Brevo manquante', 'warn'); return false; }
+  // Nettoyer l'email : trim + suppression caractères invisibles
+  const toClean = (to || '').trim().replace(/[\u200B-\u200D\uFEFF]/g, '');
+  if (!toClean || !toClean.includes('@')) {
+    addLog(`⚠️ Brevo — email invalide ou vide : "${toClean}" (original: "${to}")`, 'warn');
+    return false;
+  }
   try {
     const res = await fetch('https://api.brevo.com/v3/smtp/email', {
       method: 'POST',
       headers: { 'accept': 'application/json', 'api-key': CONFIG.brevoKey, 'content-type': 'application/json' },
-      body: JSON.stringify({ sender: { name: CONFIG.senderName, email: CONFIG.senderEmail }, to: [{ email: to }], subject, htmlContent: html }),
+      body: JSON.stringify({ sender: { name: CONFIG.senderName, email: CONFIG.senderEmail }, to: [{ email: toClean }], subject, htmlContent: html }),
     });
-    if (!res.ok) { const err = await res.json().catch(() => ({})); addLog(`Brevo erreur ${res.status} : ${err.message || ''}`, 'error'); state.stats.errors++; return false; }
+    if (!res.ok) { const err = await res.json().catch(() => ({})); addLog(`Brevo erreur ${res.status} : ${err.message || ''} — email: "${toClean}"`, 'error'); state.stats.errors++; return false; }
     return true;
   } catch (e) { addLog(`Brevo exception : ${e.message}`, 'error'); state.stats.errors++; return false; }
 }
@@ -1050,7 +1056,7 @@ app.post('/api/test-email', async (req, res) => {
     merci_donateur_fidele: { subject: '🧪 Test — 🏅 Super Badge Donateur !',                      html: tplMerciDonateurFidele({ prenomDonateur: 'Jean-Claude', montant: '50' }) },
     merci_structure:       { subject: '🧪 Test — ❤️ Merci pour le don de votre entreprise !',     html: tplMerciDonateurStructure({ prenomDonateur: 'Sophie', montant: '200', nomStructure: 'Entreprise XYZ', coureurPrenom: 'Pierre', coureurNom: 'Martin', association: 'Les Enfants du Soleil' }) },
     // ── ENVOIS GROUPÉS — renvoie le vrai template si disponible, sinon placeholder
-    groupe_angers_j10_coureurs:  { subject: '🧪 Test — 🎽 J-10 Angers Coureurs',        html: tplGroupeJ10Angers({ prenom: 'Sophie' }) },
+    groupe_angers_j10_coureurs:  { subject: '🧪 Test — 🎽 J-8 Angers Coureurs',        html: tplGroupeJ10Angers({ prenom: 'Sophie' }) },
     groupe_angers_j4_coureurs:   { subject: '🧪 Test — 📢 J-4 Angers Coureurs',          html: tplGroupePlaceholder({ prenom: 'Sophie', nomTemplate: 'J-4 Coureurs Angers' }) },
     groupe_angers_j4_supporters: { subject: '🧪 Test — 📢 J-4 Angers Supporters',        html: tplGroupePlaceholder({ prenom: 'Sophie', nomTemplate: 'J-4 Supporters Angers' }) },
     groupe_angers_j1_coureurs:   { subject: '🧪 Test — 📢 J-1 Angers Coureurs',          html: tplGroupePlaceholder({ prenom: 'Sophie', nomTemplate: 'J-1 Coureurs Angers' }) },
@@ -1274,7 +1280,7 @@ const CAMPAGNES = {
     label: 'J-10 Angers — Coureurs',
     event: 'Défi Enfance #Course #Angers2026',
     destinataires: ['coureur'],
-    sujet: '🎽 Dans 9 jours, on court pour l\'enfance à Angers — tout ce qu\'il faut savoir !',
+    sujet: '🎽 Dans 8 jours, on court pour l\'enfance à Angers — tout ce qu\'il faut savoir !',
     template: (prenom) => tplGroupeJ10Angers({ prenom }),
   },
   'angers_j1_supporters': {
