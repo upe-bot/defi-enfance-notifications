@@ -113,7 +113,12 @@ async function redisSet(key, value) {
 async function loadProcessedIds() {
   try {
     const raw = await redisGet(REDIS_KEY_IDS);
-    if (raw) { const arr = JSON.parse(raw); console.log(`[REDIS] ${arr.length} IDs chargés`); return new Set(arr); }
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      const arr = Array.isArray(parsed) ? parsed : [];
+      console.log(`[REDIS] ${arr.length} IDs chargés`);
+      return new Set(arr);
+    }
   } catch (e) { console.log(`[REDIS] Erreur chargement IDs : ${e.message}`); }
   return new Set();
 }
@@ -123,7 +128,14 @@ async function saveProcessedIds() {
 }
 
 async function loadDonsEnAttente() {
-  try { const raw = await redisGet(REDIS_KEY_ATTENTE); if (raw) return JSON.parse(raw); } catch (e) {}
+  try {
+    const raw = await redisGet(REDIS_KEY_ATTENTE);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      // Garantir que c'est toujours un tableau
+      return Array.isArray(parsed) ? parsed : [];
+    }
+  } catch (e) { console.log(`[REDIS] Erreur loadDonsEnAttente : ${e.message}`); }
   return [];
 }
 
@@ -142,7 +154,7 @@ async function saveCurrentVersion() {
 // ══════════════════════════════════════════════════════
 //  VERSION
 // ══════════════════════════════════════════════════════
-const SERVER_VERSION = '68';
+const SERVER_VERSION = '68b';
 
 // ══════════════════════════════════════════════════════
 //  ÉTAT SERVEUR
