@@ -320,6 +320,26 @@
             <option value="merci_donateur_fidele">🏅 Merci donateur fidèle (2ème don+)</option>
             <option value="merci_structure">🏢 Merci don entreprise/structure</option>
           </optgroup>
+          <optgroup label="── ENVOIS GROUPÉS ANGERS ────────────">
+            <option value="groupe_angers_j10_coureurs">📢 J-10 Angers — Coureurs</option>
+            <option value="groupe_angers_j4_coureurs">📢 J-4 Angers — Coureurs</option>
+            <option value="groupe_angers_j4_supporters">📢 J-4 Angers — Supporters</option>
+            <option value="groupe_angers_j1_coureurs">📢 J-1 Angers — Coureurs</option>
+            <option value="groupe_angers_j1_supporters">📢 J-1 Angers — Supporters</option>
+            <option value="groupe_angers_jourj_coureurs">📢 Jour J Angers — Coureurs</option>
+            <option value="groupe_angers_jp1_coureurs">📢 J+1 Angers — Coureurs</option>
+            <option value="groupe_angers_jp10_coureurs">📢 J+10 Angers — Coureurs</option>
+          </optgroup>
+          <optgroup label="── ENVOIS GROUPÉS JOUÉ ──────────────">
+            <option value="groupe_joue_j10_coureurs">📢 J-10 Joué — Coureurs</option>
+            <option value="groupe_joue_j4_coureurs">📢 J-4 Joué — Coureurs</option>
+            <option value="groupe_joue_j4_supporters">📢 J-4 Joué — Supporters</option>
+            <option value="groupe_joue_j1_coureurs">📢 J-1 Joué — Coureurs</option>
+            <option value="groupe_joue_j1_supporters">📢 J-1 Joué — Supporters</option>
+            <option value="groupe_joue_jourj_coureurs">📢 Jour J Joué — Coureurs</option>
+            <option value="groupe_joue_jp1_coureurs">📢 J+1 Joué — Coureurs</option>
+            <option value="groupe_joue_jp10_coureurs">📢 J+10 Joué — Coureurs</option>
+          </optgroup>
         </select>
       </div>
       <div class="actions">
@@ -593,6 +613,9 @@ async function loadCampagnes() {
           <div style="font-size:.7rem;color:var(--text-muted);margin-bottom:10px;line-height:1.4">${c.sujet}</div>
           <div style="display:flex;gap:8px;flex-wrap:wrap">
             ${!isPlaceholder ? `
+            <button class="btn btn-sm btn-secondary" onclick="testerCampagne('${c.id}','${c.label.replace(/'/g,"\\'")}') " style="font-size:.72rem;padding:5px 12px">
+              🧪 Tester
+            </button>
             <button class="btn btn-sm btn-secondary" onclick="previewCampagne('${c.id}','${c.label.replace(/'/g,"\\'")}',${c.destinataires.length})" style="font-size:.72rem;padding:5px 12px">
               👁️ Compter
             </button>
@@ -607,6 +630,16 @@ async function loadCampagnes() {
   } catch(e) {
     document.getElementById('campagnesGrid').innerHTML = '<div style="color:var(--error);font-size:.8rem;grid-column:1/-1">Erreur chargement campagnes</div>';
   }
+}
+
+async function testerCampagne(id, label) {
+  showToast('🧪 Envoi test…', `"${label}" → Victor`);
+  try {
+    const r = await apiFetch(`/api/campagnes/${id}/test`, { method: 'POST' });
+    const d = await r.json();
+    if (d.success) showToast('✅ Test envoyé !', `Vérifiez v.vieilfault@unionpourlenfance.com`);
+    else showToast('❌ Erreur', d.error || 'Échec envoi');
+  } catch(e) { showToast('❌ Erreur', e.message); }
 }
 
 async function previewCampagne(id, label, nbTypes) {
