@@ -154,7 +154,7 @@ async function saveCurrentVersion() {
 // ══════════════════════════════════════════════════════
 //  VERSION
 // ══════════════════════════════════════════════════════
-const SERVER_VERSION = '71b';
+const SERVER_VERSION = '73';
 
 // ══════════════════════════════════════════════════════
 //  ÉTAT SERVEUR
@@ -743,7 +743,13 @@ async function processPayments(payments, ignoreDate = false) {
       const date      = p.date || new Date().toISOString();
       let donateur = 'Inconnu', emailDon = '';
       if (typeId === 1) { const infos = await fetchInfosDonateur(p); donateur = infos.donateur; emailDon = infos.emailDon; }
-      else { const contact = await fetchOhmeContactById(p.contact_id); donateur = `${contact?.firstname||contact?.first_name||''} ${contact?.lastname||contact?.last_name||''}`.trim() || 'Inconnu'; emailDon = contact?.email || ''; }
+      else {
+        const contact = await fetchOhmeContactById(p.contact_id);
+        const prenomC = contact?.firstname || contact?.first_name || '';
+        const nomC    = contact?.lastname  || contact?.last_name  || '';
+        donateur = `${prenomC} ${nomC}`.trim() || `Participant (ID ${p.contact_id || '?'})`;
+        emailDon = contact?.email || '';
+      }
       addDonEnAttente({ paiementId: String(p.id), donateur, emailDon, montant, date, eventName, typeLabel, modeValidation: true });
       state.processedIds.add(String(p.id));
       addLog(`⏸️ [Démarrage] ${typeLabel} ${montant} de ${donateur} — en attente`, 'warn');
@@ -1151,6 +1157,23 @@ app.post('/api/test-email', async (req, res) => {
     merci_donateur_global: { subject: '🧪 Test — ❤️ Merci pour votre don !',                      html: tplMerciDonateurGlobal({ prenomDonateur: 'Jean-Claude', montant: '30' }) },
     merci_donateur_fidele: { subject: '🧪 Test — 🏅 Super Badge Donateur !',                      html: tplMerciDonateurFidele({ prenomDonateur: 'Jean-Claude', montant: '50' }) },
     merci_structure:       { subject: '🧪 Test — ❤️ Merci pour le don de votre entreprise !',     html: tplMerciDonateurStructure({ prenomDonateur: 'Sophie', montant: '200', nomStructure: 'Entreprise XYZ', coureurPrenom: 'Pierre', coureurNom: 'Martin', association: 'Les Enfants du Soleil' }) },
+    // ── ENVOIS GROUPÉS — renvoie le vrai template si disponible, sinon placeholder
+    groupe_angers_j10_coureurs:  { subject: '🧪 Test — 🎽 J-10 Angers Coureurs',        html: tplGroupeJ10Angers({ prenom: 'Sophie' }) },
+    groupe_angers_j4_coureurs:   { subject: '🧪 Test — 📢 J-4 Angers Coureurs',          html: tplGroupePlaceholder({ prenom: 'Sophie', nomTemplate: 'J-4 Coureurs Angers' }) },
+    groupe_angers_j4_supporters: { subject: '🧪 Test — 📢 J-4 Angers Supporters',        html: tplGroupePlaceholder({ prenom: 'Sophie', nomTemplate: 'J-4 Supporters Angers' }) },
+    groupe_angers_j1_coureurs:   { subject: '🧪 Test — 📢 J-1 Angers Coureurs',          html: tplGroupePlaceholder({ prenom: 'Sophie', nomTemplate: 'J-1 Coureurs Angers' }) },
+    groupe_angers_j1_supporters: { subject: '🧪 Test — 📢 J-1 Angers Supporters',        html: tplGroupePlaceholder({ prenom: 'Sophie', nomTemplate: 'J-1 Supporters Angers' }) },
+    groupe_angers_jourj_coureurs:{ subject: '🧪 Test — 📢 Jour J Angers Coureurs',        html: tplGroupePlaceholder({ prenom: 'Sophie', nomTemplate: 'Jour J Coureurs Angers' }) },
+    groupe_angers_jp1_coureurs:  { subject: '🧪 Test — 📢 J+1 Angers Coureurs',          html: tplGroupePlaceholder({ prenom: 'Sophie', nomTemplate: 'J+1 Coureurs Angers' }) },
+    groupe_angers_jp10_coureurs: { subject: '🧪 Test — 📢 J+10 Angers Coureurs',         html: tplGroupePlaceholder({ prenom: 'Sophie', nomTemplate: 'J+10 Coureurs Angers' }) },
+    groupe_joue_j10_coureurs:    { subject: '🧪 Test — 🎽 J-10 Joué Coureurs',           html: tplGroupePlaceholder({ prenom: 'Sophie', nomTemplate: 'J-10 Coureurs Joué' }) },
+    groupe_joue_j4_coureurs:     { subject: '🧪 Test — 📢 J-4 Joué Coureurs',            html: tplGroupePlaceholder({ prenom: 'Sophie', nomTemplate: 'J-4 Coureurs Joué' }) },
+    groupe_joue_j4_supporters:   { subject: '🧪 Test — 📢 J-4 Joué Supporters',          html: tplGroupePlaceholder({ prenom: 'Sophie', nomTemplate: 'J-4 Supporters Joué' }) },
+    groupe_joue_j1_coureurs:     { subject: '🧪 Test — 📢 J-1 Joué Coureurs',            html: tplGroupePlaceholder({ prenom: 'Sophie', nomTemplate: 'J-1 Coureurs Joué' }) },
+    groupe_joue_j1_supporters:   { subject: '🧪 Test — 📢 J-1 Joué Supporters',          html: tplGroupePlaceholder({ prenom: 'Sophie', nomTemplate: 'J-1 Supporters Joué' }) },
+    groupe_joue_jourj_coureurs:  { subject: '🧪 Test — 📢 Jour J Joué Coureurs',          html: tplGroupePlaceholder({ prenom: 'Sophie', nomTemplate: 'Jour J Coureurs Joué' }) },
+    groupe_joue_jp1_coureurs:    { subject: '🧪 Test — 📢 J+1 Joué Coureurs',            html: tplGroupePlaceholder({ prenom: 'Sophie', nomTemplate: 'J+1 Coureurs Joué' }) },
+    groupe_joue_jp10_coureurs:   { subject: '🧪 Test — 📢 J+10 Joué Coureurs',           html: tplGroupePlaceholder({ prenom: 'Sophie', nomTemplate: 'J+10 Coureurs Joué' }) },
   };
 
   const tpl = TEMPLATES[template] || TEMPLATES['don_coureur'];
@@ -1342,6 +1365,8 @@ app.get('/api/rattrapage/status', (req, res) => {
 
 // Délai entre chaque email pour 800 emails en 30 min = 2250ms
 const ENVOI_GROUPE_DELAY_MS = 2250;
+const EMAIL_TEST_VICTOR = 'v.vieilfault@unionpourlenfance.com';
+
 
 // Définition de toutes les campagnes disponibles
 const CAMPAGNES = {
@@ -1355,7 +1380,7 @@ const CAMPAGNES = {
   },
   'angers_j1_supporters': {
     label: 'J-1 Angers — Supporters',
-    event: 'Défi Enfance #Course #Angers2026',
+    event: 'Défi Enfance #Supporters #Angers2026',
     destinataires: ['supporter'],
     sujet: '🎽 Dans 1 jour, soutenez les coureurs du Défi Enfance à Angers !',
     template: (prenom) => tplGroupePlaceholder({ prenom, nomTemplate: 'J-1 Supporters Angers' }),
@@ -1369,7 +1394,7 @@ const CAMPAGNES = {
   },
   'angers_j4_supporters': {
     label: 'J-4 Angers — Supporters',
-    event: 'Défi Enfance #Course #Angers2026',
+    event: 'Défi Enfance #Supporters #Angers2026',
     destinataires: ['supporter'],
     sujet: '🏃 Plus que 4 jours — soutenez le Défi Enfance Angers !',
     template: (prenom) => tplGroupePlaceholder({ prenom, nomTemplate: 'J-4 Supporters Angers' }),
@@ -1405,56 +1430,56 @@ const CAMPAGNES = {
   // ── JOUÉ-LÈS-TOURS
   'joue_j10_coureurs': {
     label: 'J-10 Joué — Coureurs',
-    event: 'Défi Enfance #Course #Joué2026',
+    event: 'Défi Enfance #Course #Joué-lès-Tours2026',
     destinataires: ['coureur'],
     sujet: '🎽 Dans 9 jours, on court pour l\'enfance à Joué-lès-Tours !',
     template: (prenom) => tplGroupePlaceholder({ prenom, nomTemplate: 'J-10 Coureurs Joué' }),
   },
   'joue_j1_supporters': {
     label: 'J-1 Joué — Supporters',
-    event: 'Défi Enfance #Course #Joué2026',
+    event: 'Défi Enfance #Supporters #Joué-lès-Tours2026',
     destinataires: ['supporter'],
     sujet: '🎽 Dans 1 jour, soutenez les coureurs du Défi Enfance à Joué !',
     template: (prenom) => tplGroupePlaceholder({ prenom, nomTemplate: 'J-1 Supporters Joué' }),
   },
   'joue_j4_coureurs': {
     label: 'J-4 Joué — Coureurs',
-    event: 'Défi Enfance #Course #Joué2026',
+    event: 'Défi Enfance #Course #Joué-lès-Tours2026',
     destinataires: ['coureur'],
     sujet: '🏃 Plus que 4 jours — Défi Enfance Joué-lès-Tours !',
     template: (prenom) => tplGroupePlaceholder({ prenom, nomTemplate: 'J-4 Coureurs Joué' }),
   },
   'joue_j4_supporters': {
     label: 'J-4 Joué — Supporters',
-    event: 'Défi Enfance #Course #Joué2026',
+    event: 'Défi Enfance #Supporters #Joué-lès-Tours2026',
     destinataires: ['supporter'],
     sujet: '🏃 Plus que 4 jours — soutenez le Défi Enfance Joué !',
     template: (prenom) => tplGroupePlaceholder({ prenom, nomTemplate: 'J-4 Supporters Joué' }),
   },
   'joue_j1_coureurs': {
     label: 'J-1 Joué — Coureurs',
-    event: 'Défi Enfance #Course #Joué2026',
+    event: 'Défi Enfance #Course #Joué-lès-Tours2026',
     destinataires: ['coureur'],
     sujet: '🌟 Demain, c\'est le jour J — Défi Enfance Joué !',
     template: (prenom) => tplGroupePlaceholder({ prenom, nomTemplate: 'J-1 Coureurs Joué' }),
   },
   'joue_jourj_coureurs': {
     label: 'Jour J Joué — Coureurs',
-    event: 'Défi Enfance #Course #Joué2026',
+    event: 'Défi Enfance #Course #Joué-lès-Tours2026',
     destinataires: ['coureur'],
     sujet: '🏁 C\'est aujourd\'hui ! Défi Enfance Joué — on vous attend !',
     template: (prenom) => tplGroupePlaceholder({ prenom, nomTemplate: 'Jour J Coureurs Joué' }),
   },
   'joue_jp1_coureurs': {
     label: 'J+1 Joué — Coureurs',
-    event: 'Défi Enfance #Course #Joué2026',
+    event: 'Défi Enfance #Course #Joué-lès-Tours2026',
     destinataires: ['coureur'],
     sujet: '🙏 Merci pour votre engagement — Défi Enfance Joué !',
     template: (prenom) => tplGroupePlaceholder({ prenom, nomTemplate: 'J+1 Coureurs Joué' }),
   },
   'joue_jp10_coureurs': {
     label: 'J+10 Joué — Coureurs',
-    event: 'Défi Enfance #Course #Joué2026',
+    event: 'Défi Enfance #Course #Joué-lès-Tours2026',
     destinataires: ['coureur'],
     sujet: '💌 10 jours après le Défi Enfance Joué…',
     template: (prenom) => tplGroupePlaceholder({ prenom, nomTemplate: 'J+10 Coureurs Joué' }),
@@ -1636,6 +1661,24 @@ app.post('/api/campagnes/:id/preview', async (req, res) => {
     res.json({ count: participants.length, label: campagne.label, event: campagne.event });
   } catch(e) {
     res.json({ error: e.message });
+  }
+});
+
+app.post('/api/campagnes/:id/test', async (req, res) => {
+  const campagne = CAMPAGNES[req.params.id];
+  if (!campagne) return res.status(404).json({ error: 'Campagne introuvable' });
+  if (envoiGroupe.running) return res.json({ error: 'Un envoi est déjà en cours' });
+  try {
+    const html = campagne.template('Victor');
+    const ok = await sendBrevo(EMAIL_TEST_VICTOR, `[TEST] ${campagne.sujet}`, html);
+    if (ok) {
+      addLog(`🧪 Email test "${campagne.label}" envoyé à Victor`, 'ok');
+      res.json({ success: true, message: `Email test envoyé à ${EMAIL_TEST_VICTOR}` });
+    } else {
+      res.json({ success: false, error: 'Échec envoi Brevo' });
+    }
+  } catch(e) {
+    res.json({ success: false, error: e.message });
   }
 });
 
