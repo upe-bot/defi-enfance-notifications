@@ -220,6 +220,46 @@
     </div>
   </div>
 
+
+  <!-- ENVOIS GROUPÉS -->
+  <div class="section-title" style="margin-top:8px">📢 Envois groupés</div>
+  <div class="card">
+    <div style="font-size:.84rem;color:var(--text-muted);margin-bottom:20px;line-height:1.6">
+      Envoyez un email à tous les participants d'une course. Comptez les destinataires avant de lancer, puis confirmez. L'envoi est espacé pour tenir dans 30 minutes maximum.
+    </div>
+
+    <!-- Grille des campagnes -->
+    <div id="campagnesGrid" style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:20px">
+      <div style="text-align:center;padding:20px;color:var(--text-muted);font-size:.82rem;grid-column:1/-1">⏳ Chargement des campagnes…</div>
+    </div>
+
+    <!-- Zone de confirmation -->
+    <div id="confirmEnvoi" style="display:none;background:rgba(255,214,0,0.06);border:1px solid rgba(255,214,0,0.25);border-radius:12px;padding:18px 20px;margin-bottom:16px">
+      <div style="font-size:.88rem;font-weight:600;color:var(--warning);margin-bottom:8px">⚠️ Confirmation d'envoi</div>
+      <div id="confirmTexte" style="font-size:.84rem;color:var(--text-muted);margin-bottom:14px;line-height:1.6"></div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <button class="btn btn-sm btn-success" id="btnConfirmLancer" onclick="confirmerEnvoi()">🚀 Lancer l'envoi</button>
+        <button class="btn btn-sm btn-secondary" onclick="annulerConfirm()">Annuler</button>
+      </div>
+    </div>
+
+    <!-- Progression -->
+    <div id="envoiGroupeProgress" style="display:none">
+      <div style="font-size:.84rem;font-weight:600;color:var(--text);margin-bottom:12px" id="envoiGroupeLabel">—</div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px">
+        <div class="r-stat"><div class="r-stat-val" id="egSent"  style="color:var(--success)">0</div><div class="r-stat-lbl">Envoyés</div></div>
+        <div class="r-stat"><div class="r-stat-val" id="egErrors" style="color:var(--error)">0</div><div class="r-stat-lbl">Erreurs</div></div>
+        <div class="r-stat"><div class="r-stat-val" id="egDone"  style="color:var(--orange-clair)">0</div><div class="r-stat-lbl">Traités</div></div>
+        <div class="r-stat"><div class="r-stat-val" id="egTotal" style="color:var(--text-muted)">0</div><div class="r-stat-lbl">Total</div></div>
+      </div>
+      <div class="progress-bar-wrap" style="margin-bottom:14px">
+        <div class="progress-bar-label"><span id="egProgressLabel">0 / 0</span><span id="egETA"></span></div>
+        <div class="progress-bar-track"><div class="progress-bar-fill" id="egProgressFill"></div></div>
+      </div>
+      <div class="log-wrap" id="envoiGroupeLog" style="max-height:260px"><div class="log-empty">En attente…</div></div>
+    </div>
+  </div>
+
   <!-- RATTRAPAGE -->
   <div class="section-title" style="margin-top:8px">🕐 Rattrapage historique</div>
   <div class="card">
@@ -524,10 +564,122 @@ async function ignorerDon(paiementId) {
   fetchDonsAttente();
 }
 
+
+// ── ENVOIS GROUPÉS
+let campagnePendingId = null;
+let envoiGroupeTimer = null;
+
+async function loadCampagnes() {
+  try {
+    const r = await apiFetch('/api/campagnes');
+    const campagnes = await r.json();
+    const grid = document.getElementById('campagnesGrid');
+
+    // Grouper par course
+    const groupes = {
+      'Angers 2026': campagnes.filter(c => c.id.startsWith('angers_')),
+      'Joué-lès-Tours 2026': campagnes.filter(c => c.id.startsWith('joue_')),
+    };
+
+    let html = '';
+    for (const [nomGroupe, liste] of Object.entries(groupes)) {
+      html += `<div style="grid-column:1/-1;font-size:.72rem;font-weight:700;color:var(--magenta);text-transform:uppercase;letter-spacing:.08em;margin-top:8px;margin-bottom:4px">📍 ${nomGroupe}</div>`;
+      for (const c of liste) {
+        const isPlaceholder = c.placeholder;
+        const opacity = isPlaceholder ? '0.45' : '1';
+        const cursor  = isPlaceholder ? 'not-allowed' : 'pointer';
+        html += `<div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,${isPlaceholder ? '0.05' : '0.12'});border-radius:10px;padding:14px 16px;opacity:${opacity}">
+          <div style="font-size:.8rem;font-weight:600;color:${isPlaceholder ? 'var(--text-muted)' : 'var(--text)'};margin-bottom:6px">${c.label}</div>
+          <div style="font-size:.7rem;color:var(--text-muted);margin-bottom:10px;line-height:1.4">${c.sujet}</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            ${!isPlaceholder ? `
+            <button class="btn btn-sm btn-secondary" onclick="previewCampagne('${c.id}','${c.label.replace(/'/g,"\\'")}',${c.destinataires.length})" style="font-size:.72rem;padding:5px 12px">
+              👁️ Compter
+            </button>
+            <button class="btn btn-sm btn-primary" onclick="previewCampagne('${c.id}','${c.label.replace(/'/g,"\\'")}',${c.destinataires.length})" style="font-size:.72rem;padding:5px 12px;cursor:${cursor}">
+              🚀 Lancer
+            </button>` : `<span style="font-size:.7rem;color:var(--text-muted);font-style:italic">Template à venir</span>`}
+          </div>
+        </div>`;
+      }
+    }
+    grid.innerHTML = html;
+  } catch(e) {
+    document.getElementById('campagnesGrid').innerHTML = '<div style="color:var(--error);font-size:.8rem;grid-column:1/-1">Erreur chargement campagnes</div>';
+  }
+}
+
+async function previewCampagne(id, label, nbTypes) {
+  showToast('🔍 Comptage…', `Recherche des destinataires pour "${label}"`);
+  document.getElementById('confirmEnvoi').style.display = 'none';
+  try {
+    const r = await apiFetch(`/api/campagnes/${id}/preview`, { method: 'POST' });
+    const d = await r.json();
+    if (d.error) { showToast('❌ Erreur', d.error); return; }
+    campagnePendingId = id;
+    document.getElementById('confirmTexte').innerHTML =
+      `Campagne : <strong>${label}</strong><br>` +
+      `Événement : <strong>${d.event}</strong><br>` +
+      `Destinataires trouvés : <strong style="color:var(--success)">${d.count} personnes</strong><br><br>` +
+      `⏱️ Durée estimée : <strong>~${Math.ceil(d.count * 2.25 / 60)} minutes</strong><br>` +
+      `<span style="color:var(--warning);font-size:.8rem">⚠️ Cette action enverra ${d.count} emails. Confirmez uniquement si vous êtes sûr(e).</span>`;
+    document.getElementById('confirmEnvoi').style.display = 'block';
+    document.getElementById('confirmEnvoi').scrollIntoView({ behavior: 'smooth' });
+  } catch(e) {
+    showToast('❌ Erreur', e.message);
+  }
+}
+
+function annulerConfirm() {
+  campagnePendingId = null;
+  document.getElementById('confirmEnvoi').style.display = 'none';
+}
+
+async function confirmerEnvoi() {
+  if (!campagnePendingId) return;
+  document.getElementById('confirmEnvoi').style.display = 'none';
+  document.getElementById('envoiGroupeProgress').style.display = 'block';
+  document.getElementById('envoiGroupeProgress').scrollIntoView({ behavior: 'smooth' });
+
+  const r = await apiFetch(`/api/campagnes/${campagnePendingId}/start`, { method: 'POST' });
+  const d = await r.json();
+  if (d.error) { showToast('❌ Erreur', d.error); return; }
+
+  showToast('🚀 Envoi lancé !', d.label);
+  campagnePendingId = null;
+
+  envoiGroupeTimer = setInterval(async () => {
+    try {
+      const r = await apiFetch('/api/campagnes/status');
+      const d = await r.json();
+      document.getElementById('envoiGroupeLabel').textContent  = `📢 ${d.label} — en cours…`;
+      document.getElementById('egSent').textContent   = d.sent;
+      document.getElementById('egErrors').textContent = d.errors;
+      document.getElementById('egDone').textContent   = d.done;
+      document.getElementById('egTotal').textContent  = d.total;
+      const pct = d.total > 0 ? Math.round((d.done / d.total) * 100) : 0;
+      document.getElementById('egProgressFill').style.width = pct + '%';
+      document.getElementById('egProgressLabel').textContent = `${d.done} / ${d.total}`;
+      const restant = d.total - d.done;
+      const etaSec  = Math.ceil(restant * 2.25);
+      document.getElementById('egETA').textContent = etaSec > 0 ? `~${Math.ceil(etaSec/60)} min restantes` : '';
+      const lb = document.getElementById('envoiGroupeLog');
+      if (d.log && d.log.length) lb.innerHTML = d.log.map(l => `<div class="log-line"><span class="log-time">${new Date(l.ts).toLocaleTimeString('fr-FR')}</span><span class="log-msg ${l.type}">${l.msg}</span></div>`).join('');
+      if (!d.running && d.finishedAt) {
+        clearInterval(envoiGroupeTimer);
+        document.getElementById('envoiGroupeLabel').textContent = `✅ ${d.label} — terminé`;
+        showToast('🎉 Envoi terminé !', `${d.sent} email(s) · ${d.errors} erreur(s)`);
+        fetchStatus();
+      }
+    } catch(e) {}
+  }, 3000);
+}
+
 // ── REFRESH
 function refresh() { fetchStatus(); fetchLogs(); fetchEvents(); fetchDonsAttente(); }
 refresh();
 setInterval(refresh, 30000);
+loadCampagnes();
 </script>
 </body>
 </html>
