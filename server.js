@@ -328,6 +328,13 @@ function tplInscriptionSupporter({ prenom }) {
 }
 
 // ── Template merci donateur → coureur
+// ── Template billets en gros (organisation)
+function tplBilletsEnGros({ prenomRef, nomStructure, nomEquipe, montant, date }) {
+  const salutation = prenomRef ? `Bonjour ${prenomRef} 👋` : `Bonjour 👋`;
+  const equipeLabel = nomEquipe || nomStructure;
+  return `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Antonio:wght@700&display=swap" rel="stylesheet"><style>${CSS_COMMUN}</style></head><body><div class="outer"><div class="logo-header"><div class="logo-text">🤝 Défi Enfance</div><div class="logo-sub">Générateur de victoires pour l'enfance</div></div><div class="header mixed"><h1>🎉 Merci pour votre<br>règlement groupé !</h1><p>Générateur de victoires pour l'enfance</p></div><div class="body"><div class="greeting">${salutation}</div><div style="margin-bottom:16px;text-align:center"><span class="badge">🏃 Équipe ${equipeLabel}</span></div><div class="intro">La Team Défi Enfance est <strong>fière et heureuse</strong> de savoir l'équipe <strong>${equipeLabel}</strong> embarquée dans l'aventure ! Ensemble, vous allez faire une vraie différence pour les enfants accompagnés par vos associations — et nous sommes impatients de vous voir relever ce défi !</div><div class="don-box"><div class="don-amount" style="font-size:2.2rem">${montant} €</div><div class="don-label">Règlement groupé reçu</div><div style="font-size:.8rem;color:#888;margin-top:6px">📅 Le ${date}</div></div><div class="note magenta">🙏 Merci pour votre confiance et votre engagement au service de l'enfance. Ce règlement groupé représente bien plus qu'un simple paiement — c'est le signal de départ d'une belle aventure collective !</div><div class="divider"></div><div class="cta-box"><p>🚀 <strong>Faites décoller la collecte de votre équipe !</strong><br>Votre équipe dispose d'une page personnalisée sur le site du Défi Enfance, où vos donateurs apparaissent avec leur prénom et leurs encouragements.<br><br>Partagez-la à vos réseaux, invitez vos proches et vos collègues à soutenir votre équipe — chaque don compte et s'affiche en temps réel !</p><a href="${URL_EQUIPES}" class="cta-btn">🏆 Voir la page de notre équipe</a></div><div style="text-align:center;background:linear-gradient(135deg,#fff0f8,#fff5ef);border-radius:14px;padding:22px;margin-bottom:24px"><div style="margin-bottom:12px;font-size:.78rem;font-weight:700;color:#fb0089;text-transform:uppercase;letter-spacing:.08em">L'impact de votre engagement</div><div style="display:flex;justify-content:center;gap:24px;flex-wrap:wrap"><div class="impact-stat"><span class="num">+20 000</span><span class="lbl">enfants accompagnés</span></div><div class="impact-stat"><span class="num">+40</span><span class="lbl">associations soutenues</span></div></div></div>${BLOC_TEMOIGNAGES}${BLOC_SOCIAUX}<div class="divider"></div><div style="font-size:.75rem;color:#888;text-align:center">Email envoyé automatiquement suite à votre règlement groupé.<br>contact@defienfance.fr — defienfance.fr</div></div><div class="footer"><div style="font-family:Arial,sans-serif;font-size:1.1rem;font-weight:700;color:#fb0089;letter-spacing:.08em;margin-bottom:6px">DÉFI ENFANCE</div><div class="footer-sub">Générateur de victoires pour l'enfance<br>contact@defienfance.fr</div></div></div></body></html>`;
+}
+
 function tplMerciDonateur({ prenomDonateur, montant, donateur, coureurPrenom, coureurNom, association }) {
   const URL_ASSOS = 'https://defienfance.fr/suivre-la-collecte-defi-enfance/?de_view=associations&de_event=all';
   return `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Antonio:wght@700&display=swap" rel="stylesheet"><style>${CSS_COMMUN}</style></head><body><div class="outer"><div class="logo-header"><div class="logo-text">🤝 Défi Enfance</div><div class="logo-sub">Générateur de victoires pour l'enfance</div></div><div class="header"><h1>❤️ Merci pour votre don<br>à ${coureurPrenom} !</h1><p>Générateur de victoires pour l'enfance</p></div><div class="body"><div class="greeting">Bonjour ${prenomDonateur} 👋</div><div class="intro">Votre don de <strong>${montant} €</strong> pour <strong>${coureurPrenom} ${coureurNom}</strong> fait une vraie différence ! En soutenant ${coureurPrenom}, vous contribuez directement à la collecte de l'<strong>Association ${association}</strong> (50% du montant de votre don) et au Plaidoyer du Défi Enfance (50% du montant de votre don).</div><div style="text-align:center;background:linear-gradient(135deg,#fff0f8,#fff5ef);border-radius:14px;padding:22px;margin-bottom:24px"><div style="margin-bottom:12px;font-size:.78rem;font-weight:700;color:#fb0089;text-transform:uppercase;letter-spacing:.08em">L'impact de votre don</div><div style="display:flex;justify-content:center;gap:24px;flex-wrap:wrap"><div class="impact-stat"><span class="num">+20 000</span><span class="lbl">enfants accompagnés</span></div><div class="impact-stat"><span class="num">+40</span><span class="lbl">associations soutenues</span></div></div></div><div style="font-size:.9rem;font-weight:600;color:#1a0a12;margin-bottom:14px">Ces enfants ont besoin de vous :</div><div class="temoignage"><strong>"Ce sont les enfants de tout le monde. Ce sont les enfants de chacun."</strong><br><br>Jérôme Aucordier accompagne des enfants au quotidien dans un lieu de vie qui place chaque enfant au cœur de ses propres décisions. Pour lui, ces enfants ne sont pas des cas à gérer — ce sont un capital pour notre société.</div><div class="temoignage"><strong>"Défi Enfance, c'est un moyen que les jeunes soient entendus."</strong><br><br>Anne Loriot, éducatrice spécialisée en foyer, accueille des jeunes jour et nuit. Un jour, une jeune lui a dit : <em>"Est-ce que tu vas rester ?"</em> — une phrase qui dit tout. Ces enfants ne demandent pas grand-chose. Juste de la stabilité. Juste quelqu'un qui ne part pas.</div><div style="font-size:.86rem;color:#3d1830;line-height:1.7;background:#fff0f8;border-radius:12px;padding:18px 20px;margin-bottom:24px">Chaque enfant a le droit à son enfance. Nous avons comme belle mission de société de proposer à chacun, quelles que soient ses difficultés, de recevoir un accueil aimant, familial et sécurisant.<br><br><strong>Nous croyons que les enfants sont le plus grand capital de notre société.</strong></div><div style="text-align:center;margin-bottom:20px"><div style="font-size:.82rem;font-weight:600;color:#3d1830;margin-bottom:12px">Découvrez leurs témoignages :</div><div class="social-bar"><a href="${URL_LINKEDIN}" class="social-btn li">LinkedIn</a><a href="${URL_FACEBOOK}" class="social-btn fb">Facebook</a><a href="${URL_INSTAGRAM}" class="social-btn ig">Instagram</a></div></div><div class="cta-box"><p>✨ <strong>Envie d'aller encore plus loin ?</strong><br>Partagez le Défi Enfance autour de vous !</p><a href="${URL_DON}" class="cta-btn">❤️ Faire un don</a></div><div class="divider"></div><div style="font-size:.75rem;color:#888;text-align:center">Cet email vous a été envoyé en remerciement de votre don de ${montant} €.<br>contact@defienfance.fr — defienfance.fr</div></div><div class="footer"><div style="font-family:Arial,sans-serif;font-size:1.1rem;font-weight:700;color:#fb0089;letter-spacing:.08em;margin-bottom:6px">DÉFI ENFANCE</div><div class="footer-sub">Générateur de victoires pour l'enfance<br>contact@defienfance.fr</div></div></div></body></html>`;
@@ -407,7 +414,7 @@ async function sendBrevo(to, subject, html) {
 // ══════════════════════════════════════════════════════
 
 // Version du serveur — incrémenter à chaque mise à jour de server.js
-const SERVER_VERSION = '65';
+const SERVER_VERSION = '66';
 const VERSION_FILE   = '/opt/render/project/src/defi-enfance-version.txt';
 
 function getLastVersion() {
@@ -599,6 +606,32 @@ async function processPayments(payments, ignoreDate = false) {
       const cf           = p.custom_fields || p;
       const nomAsso      = (cf.asso_soutenue || '').trim();
       const ville        = eventName.replace(/défi\s*enfance?\s*/gi, '').replace(/\d{4}/g, '').trim();
+      const achatEnGros  = (cf.achat_billets_en_gros || '').toLowerCase() === 'oui';
+
+      // ── CAS ACHAT BILLETS EN GROS (organisation) ──────────────────
+      if (achatEnGros) {
+        const infosOrg  = await fetchInfosDonateur(p);
+        const emailOrg  = infosOrg.emailDon;
+        const prenomOrg = infosOrg.prenomMerci;
+        const nomOrg    = infosOrg.nomStructure || infosOrg.donateur;
+        const equipeOrg = (cf.equipe || '').trim();
+        const montantOrg = p.amount || '?';
+        const dateOrg    = p.date ? new Date(p.date).toLocaleDateString('fr-FR') : '';
+
+        if (emailOrg) {
+          const html = tplBilletsEnGros({ prenomRef: prenomOrg, nomStructure: nomOrg, nomEquipe: equipeOrg, montant: montantOrg, date: dateOrg });
+          const ok = await sendBrevo(emailOrg, `🎉 Merci pour votre règlement groupé — Équipe ${equipeOrg || nomOrg} !`, html);
+          if (ok) {
+            state.stats.sent++;
+            addLog(`✅ Email billets en gros → ${nomOrg} (${emailOrg})`, 'ok');
+            addEvent('🎉', `Billets en gros`, `${nomOrg} — ${montantOrg}€`, 'bill');
+          }
+        } else {
+          addLog(`⚠️ Billets en gros — email introuvable pour ${nomOrg}`, 'warn');
+        }
+        state.processedIds.add(String(p.id));
+        continue;
+      }
 
       const isSupporter = eventName.toUpperCase().includes('#SUPPORTERS');
 
