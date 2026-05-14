@@ -154,7 +154,7 @@ async function saveCurrentVersion() {
 // ══════════════════════════════════════════════════════
 //  VERSION
 // ══════════════════════════════════════════════════════
-const SERVER_VERSION = '84';
+const SERVER_VERSION = '84b';
 
 // ══════════════════════════════════════════════════════
 //  ÉTAT SERVEUR
@@ -948,8 +948,8 @@ async function processPayments(payments, ignoreDate = false) {
       // En cours de validation → mettre en attente sans marquer comme traité
       // Il sera retraité automatiquement au prochain poll si le statut change
       const statutLabel = {
-        'pending_customer_approval': 'En attente d'autorisation',
-        'pending_submission':        'En attente d'envoi',
+        'pending_customer_approval': "En attente d'autorisation",
+        'pending_submission':        "En attente d'envoi",
         'submitted':                 'En attente de traitement',
       }[paymentStatus] || paymentStatus;
 
