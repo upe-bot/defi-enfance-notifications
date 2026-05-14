@@ -154,7 +154,7 @@ async function saveCurrentVersion() {
 // ══════════════════════════════════════════════════════
 //  VERSION
 // ══════════════════════════════════════════════════════
-const SERVER_VERSION = '84b';
+const SERVER_VERSION = '85';
 
 // ══════════════════════════════════════════════════════
 //  ÉTAT SERVEUR
@@ -929,6 +929,17 @@ async function processPayments(payments, ignoreDate = false) {
 
     const eventName = (p.nom_de_levent || (p.custom_fields && p.custom_fields.nom_de_levent) || '').trim();
     if (!eventName) { state.processedIds.add(String(p.id)); continue; }
+
+    // Ignorer les dons "attendus" — pas d'email, juste comptabilisé
+    const qualiteParticipant = (
+      (p.custom_fields && p.custom_fields.qualite_du_participant) ||
+      p.qualite_du_participant || ''
+    ).toLowerCase().trim();
+    if (qualiteParticipant === 'don attendu') {
+      addLog(`⏭️ Paiement ${p.id} ignoré — "don attendu" (pas d'email)`, 'info');
+      state.processedIds.add(String(p.id));
+      continue;
+    }
 
     // Bloquer les paiements non effectués — mis en attente (pas dans processedIds)
     // → au prochain poll, si le statut a changé, le paiement sera retraité automatiquement
