@@ -287,6 +287,7 @@
             <option value="inscription_asso">🏃 Inscription → Association</option>
             <option value="inscription_coureur">🚀 Inscription → Coureur (bienvenue)</option>
             <option value="inscription_supporter">🚀 Inscription → Supporter (bienvenue)</option>
+            <option value="nouveau_coureur_equipe">🏅 Nouveau coureur équipe → Promettants</option>
             <option value="billets_en_gros">🎉 Règlement groupé → Organisation</option>
           </optgroup>
           <optgroup label="── MERCI DONATEURS ──────────────────">
@@ -351,8 +352,9 @@ async function fetchStatus() {
     document.getElementById('statusLabel').textContent   = d.isRunning ? 'Actif' : 'Arrêté';
     document.getElementById('versionBadge').textContent  = 'v' + (d.version || '?');
     const rb = document.getElementById('redisBadge');
-    if (d.redisOk) { rb.textContent = '✅ Redis'; rb.className = 'redis-badge redis-ok'; }
-    else           { rb.textContent = '⚠️ Redis absent'; rb.className = 'redis-badge redis-warn'; }
+    if (d.redisBlocked) { rb.textContent = '⛔ Redis bloqué — envois suspendus'; rb.className = 'redis-badge redis-warn'; }
+    else if (d.redisOk)  { rb.textContent = '✅ Redis'; rb.className = 'redis-badge redis-ok'; }
+    else                 { rb.textContent = '⚠️ Redis absent'; rb.className = 'redis-badge redis-warn'; }
     if (d.lastPoll) document.getElementById('lastPoll').textContent = new Date(d.lastPoll).toLocaleTimeString('fr-FR');
     if (d.nextPoll) { nextPollTime = new Date(d.nextPoll).getTime(); updateProgress(d.pollInterval); }
   } catch(e) {
