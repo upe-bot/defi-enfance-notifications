@@ -233,6 +233,16 @@
       <div style="text-align:center;padding:20px;color:var(--text-muted);font-size:.82rem;grid-column:1/-1">⏳ Chargement des campagnes…</div>
     </div>
 
+    <!-- Filtre date optionnel -->
+    <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:14px 18px;margin-bottom:16px">
+      <div style="font-size:.75rem;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">🗓️ Filtre optionnel — inscrits depuis (UTC)</div>
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+        <input type="datetime-local" id="filtreDepuisUtc" style="flex:1;max-width:280px;padding:8px 12px;background:rgba(0,0,0,0.35);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:#fff;font-size:.82rem">
+        <button class="btn btn-sm btn-secondary" onclick="document.getElementById('filtreDepuisUtc').value=''">✕ Effacer</button>
+      </div>
+      <div style="font-size:.7rem;color:var(--text-muted);margin-top:6px">⚠️ Les heures sont en <strong>UTC</strong>. France = UTC+2 en été (ex: mercredi 23h France = mercredi 21h UTC)</div>
+    </div>
+
     <!-- Zone de confirmation -->
     <div id="confirmEnvoi" style="display:none;background:rgba(255,214,0,0.06);border:1px solid rgba(255,214,0,0.25);border-radius:12px;padding:18px 20px;margin-bottom:16px">
       <div style="font-size:.88rem;font-weight:600;color:var(--warning);margin-bottom:8px">⚠️ Confirmation d'envoi</div>
@@ -535,6 +545,7 @@ async function ignorerDon(paiementId) {
 
 // ── ENVOIS GROUPÉS
 let campagnePendingId = null;
+let campagnePendingDepuisUtc = null;
 let envoiGroupeTimer = null;
 
 async function loadCampagnes() {
@@ -593,15 +604,20 @@ async function testerCampagne(id, label) {
 async function previewCampagne(id, label, nbTypes) {
   showToast('🔍 Comptage…', `Recherche des destinataires pour "${label}"`);
   document.getElementById('confirmEnvoi').style.display = 'none';
+  const depuisRaw = document.getElementById('filtreDepuisUtc').value;
+  const depuisUtc = depuisRaw ? new Date(depuisRaw).toISOString() : null;
   try {
-    const r = await apiFetch(`/api/campagnes/${id}/preview`, { method: 'POST' });
+    const r = await apiFetch(`/api/campagnes/${id}/preview`, { method: 'POST', body: JSON.stringify({ depuisUtc }) });
     const d = await r.json();
     if (d.error) { showToast('❌ Erreur', d.error); return; }
     campagnePendingId = id;
+    campagnePendingDepuisUtc = depuisUtc;
+    const filtreInfo = depuisUtc ? `<br>🗓️ Filtre : inscrits depuis <strong>${depuisRaw} UTC</strong>` : '';
+    const dejaInfo = d.dejaEnvoyes > 0 ? `<br>📋 Déjà envoyés (Redis) : <strong>${d.dejaEnvoyes}</strong> exclus` : '';
     document.getElementById('confirmTexte').innerHTML =
       `Campagne : <strong>${label}</strong><br>` +
-      `Événement : <strong>${d.event}</strong><br>` +
-      `Destinataires trouvés : <strong style="color:var(--success)">${d.count} personnes</strong><br><br>` +
+      `Événement : <strong>${d.event}</strong>${filtreInfo}${dejaInfo}<br>` +
+      `Destinataires à envoyer : <strong style="color:var(--success)">${d.count} personnes</strong><br><br>` +
       `⏱️ Durée estimée : <strong>~${Math.ceil(d.count * 2.25 / 60)} minutes</strong><br>` +
       `<span style="color:var(--warning);font-size:.8rem">⚠️ Cette action enverra ${d.count} emails. Confirmez uniquement si vous êtes sûr(e).</span>`;
     document.getElementById('confirmEnvoi').style.display = 'block';
@@ -613,6 +629,7 @@ async function previewCampagne(id, label, nbTypes) {
 
 function annulerConfirm() {
   campagnePendingId = null;
+  campagnePendingDepuisUtc = null;
   document.getElementById('confirmEnvoi').style.display = 'none';
 }
 
@@ -622,7 +639,7 @@ async function confirmerEnvoi() {
   document.getElementById('envoiGroupeProgress').style.display = 'block';
   document.getElementById('envoiGroupeProgress').scrollIntoView({ behavior: 'smooth' });
 
-  const r = await apiFetch(`/api/campagnes/${campagnePendingId}/start`, { method: 'POST' });
+  const r = await apiFetch(`/api/campagnes/${campagnePendingId}/start`, { method: 'POST', body: JSON.stringify({ depuisUtc: campagnePendingDepuisUtc }) });
   const d = await r.json();
   if (d.error) { showToast('❌ Erreur', d.error); return; }
 
