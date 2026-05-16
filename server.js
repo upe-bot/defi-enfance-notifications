@@ -154,7 +154,7 @@ async function saveCurrentVersion() {
 // ══════════════════════════════════════════════════════
 //  VERSION
 // ══════════════════════════════════════════════════════
-const SERVER_VERSION = '88';
+const SERVER_VERSION = '89';
 
 // ══════════════════════════════════════════════════════
 //  ÉTAT SERVEUR
@@ -945,7 +945,29 @@ async function fetchInfosDonateur(p) {
   const nomContact    = contact ? (contact.lastname  || contact.last_name  || '') : '';
   const emailContact  = contact ? (contact.email || '') : '';
   const isCompany = p.donator_nature === 'company' || p.donator_nature === 'organization';
+
   if (isCompany) {
+    // Priorité 1 : structure_id direct sur le paiement → le plus fiable
+    if (p.structure_id) {
+      try {
+        await sleep(OHME_DELAY_MS);
+        const resS = await fetch(`${CONFIG.ohmeBase}/api/v1/structures/${p.structure_id}`, {
+          headers: { 'Accept': 'application/json', 'client-name': CONFIG.ohmeClientName, 'client-secret': CONFIG.ohmeClientSecret }
+        });
+        if (resS.ok) {
+          const jsonS = await resS.json();
+          const s  = jsonS.data || jsonS;
+          const cf = s.custom_fields || s;
+          const emailRef  = cf.email_referent_defi_enfance     || s.email_referent_defi_enfance     || emailContact;
+          const prenomRef = cf.prenom_du_referent_defi_enfance || s.prenom_du_referent_defi_enfance || prenomContact;
+          const nomS = s.name || '';
+          addLog(`🏢 Don structure (via structure_id ${p.structure_id}) : ${nomS} — email: ${emailRef || 'VIDE'}`, 'info');
+          if (nomS || emailRef) return { donateur: nomS, emailDon: emailRef, prenomMerci: prenomRef, isStructure: true, nomStructure: nomS };
+        }
+      } catch(e) { addLog(`⚠️ fetchInfosDonateur structure_id ${p.structure_id} : ${e.message}`, 'warn'); }
+    }
+
+    // Priorité 2 : contact lié à une structure (contact.structure)
     if (contact && (contact.structure || (contact.structures && contact.structures[0]))) {
       const nomStructure = contact.structure || contact.structures[0];
       try {
@@ -956,14 +978,22 @@ async function fetchInfosDonateur(p) {
         }
       } catch(e) {}
     }
+
+    // Priorité 3 : structure_name sur le paiement
     if (p.structure_name) {
       const structure = await fetchOhmeStructureByName(p.structure_name).catch(() => null);
-      if (structure) { const cf = structure.custom_fields || structure; return { donateur: structure.name || p.structure_name, emailDon: cf.email_referent_defi_enfance || emailContact, prenomMerci: cf.prenom_du_referent_defi_enfance || '', isStructure: true, nomStructure: structure.name || p.structure_name }; }
+      if (structure) {
+        const cf = structure.custom_fields || structure;
+        return { donateur: structure.name || p.structure_name, emailDon: cf.email_referent_defi_enfance || emailContact, prenomMerci: cf.prenom_du_referent_defi_enfance || '', isStructure: true, nomStructure: structure.name || p.structure_name };
+      }
       return { donateur: p.structure_name, emailDon: emailContact, prenomMerci: '', isStructure: true, nomStructure: p.structure_name };
     }
+
+    // Fallback : infos du contact
     const nom = `${prenomContact} ${nomContact}`.trim() || 'Entreprise';
     return { donateur: nom, emailDon: emailContact, prenomMerci: prenomContact, isStructure: true, nomStructure: nom };
   }
+
   return { donateur: `${prenomContact} ${nomContact}`.trim() || 'Donateur anonyme', emailDon: emailContact, prenomMerci: prenomContact, isStructure: false, nomStructure: null };
 }
 
@@ -1294,18 +1324,57 @@ async function processPayments(payments, ignoreDate = false) {
       const ville    = eventName.replace(/défi\s*enfance?\s*/gi, '').replace(/\d{4}/g, '').trim();
       // Champ Oui/Non Ohme → peut être booléen true/false ou string "oui"/"non"
       const achatEnGrosRaw = cf.achat_billets_en_gros;
-      const achatEnGros = achatEnGrosRaw === true || achatEnGrosRaw === 'true' ||
-                          (typeof achatEnGrosRaw === 'string' && achatEnGrosRaw.toLowerCase() === 'oui');
+      // Log pour diagnostiquer la valeur exacte retournée par Ohme
+      addLog(`🔍 achat_billets_en_gros brut : ${JSON.stringify(achatEnGrosRaw)} (type: ${typeof achatEnGrosRaw})`, 'info');
+      const achatEnGros = achatEnGrosRaw === true
+        || achatEnGrosRaw === 'true'
+        || achatEnGrosRaw === 1
+        || achatEnGrosRaw === '1'
+        || (typeof achatEnGrosRaw === 'string' && achatEnGrosRaw.toLowerCase() === 'oui')
+        || (typeof achatEnGrosRaw === 'string' && achatEnGrosRaw.toLowerCase() === 'yes');
 
       if (achatEnGros) {
-        const infosOrg = await fetchInfosDonateur(p);
-        const equipeOrg = (cf.equipe || '').trim();
+        const equipeOrg  = (cf.equipe || '').trim();
         const montantOrg = p.amount || '?';
-        const dateOrg = p.date ? new Date(p.date).toLocaleDateString('fr-FR') : '';
-        if (infosOrg.emailDon) {
-          const html = tplBilletsEnGros({ prenomRef: infosOrg.prenomMerci, nomStructure: infosOrg.nomStructure || infosOrg.donateur, nomEquipe: equipeOrg, montant: montantOrg, date: dateOrg });
-          const ok = await sendBrevo(infosOrg.emailDon, `🎉 Merci pour votre règlement groupé — Équipe ${equipeOrg || infosOrg.donateur} !`, html);
-          if (ok) { state.stats.sent++; addLog(`✅ Billets en gros → ${infosOrg.donateur}`, 'ok'); }
+        const dateOrg    = p.date ? new Date(p.date).toLocaleDateString('fr-FR') : '';
+
+        let emailOrg = '', prenomOrg = '', nomOrg = '';
+
+        // Cas 1 : paiement lié à une structure directement (structure_id)
+        if (p.structure_id) {
+          addLog(`🏢 Achat en gros via structure_id : ${p.structure_id}`, 'info');
+          await sleep(OHME_DELAY_MS);
+          try {
+            const resS = await fetch(`${CONFIG.ohmeBase}/api/v1/structures/${p.structure_id}`, {
+              headers: { 'Accept': 'application/json', 'client-name': CONFIG.ohmeClientName, 'client-secret': CONFIG.ohmeClientSecret }
+            });
+            if (resS.ok) {
+              const jsonS = await resS.json();
+              const s  = jsonS.data || jsonS;
+              const cf2 = s.custom_fields || s;
+              emailOrg  = cf2.email_referent_defi_enfance  || s.email_referent_defi_enfance  || '';
+              prenomOrg = cf2.prenom_du_referent_defi_enfance || s.prenom_du_referent_defi_enfance || '';
+              nomOrg    = s.name || '';
+              addLog(`🏢 Structure trouvée : ${nomOrg} — email: ${emailOrg || 'VIDE'}`, 'info');
+            }
+          } catch(e) { addLog(`⚠️ Erreur récupération structure ${p.structure_id} : ${e.message}`, 'warn'); }
+        }
+
+        // Cas 2 : paiement lié à un contact (contact_id) → fallback via fetchInfosDonateur
+        if (!emailOrg && p.contact_id) {
+          addLog(`👤 Achat en gros via contact_id : ${p.contact_id}`, 'info');
+          const infosOrg = await fetchInfosDonateur(p);
+          emailOrg  = infosOrg.emailDon   || '';
+          prenomOrg = infosOrg.prenomMerci || '';
+          nomOrg    = infosOrg.nomStructure || infosOrg.donateur || '';
+        }
+
+        if (emailOrg) {
+          const html = tplBilletsEnGros({ prenomRef: prenomOrg, nomStructure: nomOrg, nomEquipe: equipeOrg, montant: montantOrg, date: dateOrg });
+          const ok = await sendBrevo(emailOrg, `🎉 Merci pour votre règlement groupé — Équipe ${equipeOrg || nomOrg} !`, html);
+          if (ok) { state.stats.sent++; addLog(`✅ Billets en gros → ${nomOrg} (${emailOrg})`, 'ok'); addEvent('🎉', `Billets en gros`, `${nomOrg} — ${montantOrg}€`, 'bill'); }
+        } else {
+          addLog(`⚠️ Achat en gros — aucun email trouvé (structure_id: ${p.structure_id || 'N/A'}, contact_id: ${p.contact_id || 'N/A'})`, 'warn');
         }
         state.processedIds.add(String(p.id)); continue;
       }
@@ -1814,8 +1883,12 @@ function envoiGroupeLog(msg, type = 'info') {
 }
 
 // ── Récupérer tous les participants d'un événement Ohme
-async function fetchParticipantsEvenement(nomEvent, typesDestinaires) {
+async function fetchParticipantsEvenement(nomEvent, typesDestinaires, depuisUtc = null) {
   // typesDestinaires = ['coureur'] ou ['supporter'] ou ['coureur','supporter']
+  // depuisUtc = date ISO UTC optionnelle — filtre les inscrits après cette date
+  const dateFiltre = depuisUtc ? new Date(depuisUtc) : null;
+  if (dateFiltre) envoiGroupeLog(`🗓️ Filtre "depuis" : ${depuisUtc} (UTC)`, 'info');
+
   const participants = [];
   const vus = new Set();
 
@@ -1852,6 +1925,12 @@ async function fetchParticipantsEvenement(nomEvent, typesDestinaires) {
         const typeP = isSupporter ? 'supporter' : 'coureur';
         if (!typesDestinaires.includes(typeP)) continue;
 
+        // Filtre date "depuis" — utilise created_at ou date du paiement
+        if (dateFiltre) {
+          const datePaiement = new Date(p.created_at || p.date || 0);
+          if (datePaiement <= dateFiltre) continue;
+        }
+
         // Éviter les doublons sur contact_id
         if (vus.has(String(p.contact_id))) continue;
         vus.add(String(p.contact_id));
@@ -1864,7 +1943,7 @@ async function fetchParticipantsEvenement(nomEvent, typesDestinaires) {
         const email  = contact.email || '';
         if (!email) { envoiGroupeLog(`⚠️ Contact ${prenom} ${nom} — email vide, ignoré`, 'warn'); continue; }
 
-        participants.push({ prenom: prenom || 'Participant', nom, email, contactId: contact.id, type: typeP });
+        participants.push({ prenom: prenom || 'Participant', nom, email, contactId: contact.id, type: typeP, datePaiement: p.created_at || p.date });
       }
 
       if (items.length < 500) break;
@@ -1878,7 +1957,7 @@ async function fetchParticipantsEvenement(nomEvent, typesDestinaires) {
 }
 
 // ── Lancer un envoi groupé
-async function lancerEnvoiGroupe(campagneId) {
+async function lancerEnvoiGroupe(campagneId, depuisUtc = null) {
   if (envoiGroupe.running) return { error: 'Un envoi groupé est déjà en cours' };
   const campagne = CAMPAGNES[campagneId];
   if (!campagne) return { error: `Campagne "${campagneId}" introuvable` };
@@ -1894,7 +1973,8 @@ async function lancerEnvoiGroupe(campagneId) {
       envoiGroupeLog(`Démarrage : ${campagne.label}`, 'info');
       envoiGroupeLog(`Récupération des participants (${campagne.destinataires.join(', ')}) pour "${campagne.event}"…`, 'info');
 
-      const tous = await fetchParticipantsEvenement(campagne.event, campagne.destinataires);
+      const tous = await fetchParticipantsEvenement(campagne.event, campagne.destinataires, depuisUtc);
+      if (depuisUtc) envoiGroupeLog(`🗓️ Filtre actif : inscrits depuis ${depuisUtc} uniquement`, 'info');
 
       // Exclure les contacts déjà envoyés (traçage Redis)
       const dejaEnvoyes = await getContactsDejaEnvoyes(campagneId);
@@ -1974,10 +2054,13 @@ app.post('/api/campagnes/:id/preview', async (req, res) => {
   const campagne = CAMPAGNES[req.params.id];
   if (!campagne) return res.status(404).json({ error: 'Campagne introuvable' });
   if (envoiGroupe.running) return res.json({ error: 'Un envoi est déjà en cours' });
+  const depuisUtc = req.body.depuisUtc || null;
   try {
-    envoiGroupeLog(`🔍 Comptage destinataires pour "${campagne.label}"…`, 'info');
-    const participants = await fetchParticipantsEvenement(campagne.event, campagne.destinataires);
-    res.json({ count: participants.length, label: campagne.label, event: campagne.event });
+    envoiGroupeLog(`🔍 Comptage destinataires pour "${campagne.label}"${depuisUtc ? ` (depuis ${depuisUtc})` : ''}…`, 'info');
+    const tous = await fetchParticipantsEvenement(campagne.event, campagne.destinataires, depuisUtc);
+    const dejaEnvoyes = await getContactsDejaEnvoyes(req.params.id);
+    const nouveaux = tous.filter(p => !dejaEnvoyes.has(String(p.contactId)));
+    res.json({ count: nouveaux.length, total: tous.length, dejaEnvoyes: dejaEnvoyes.size, label: campagne.label, event: campagne.event, depuisUtc });
   } catch(e) {
     res.json({ error: e.message });
   }
@@ -2002,7 +2085,8 @@ app.post('/api/campagnes/:id/test', async (req, res) => {
 });
 
 app.post('/api/campagnes/:id/start', async (req, res) => {
-  const result = await lancerEnvoiGroupe(req.params.id);
+  const depuisUtc = req.body.depuisUtc || null;
+  const result = await lancerEnvoiGroupe(req.params.id, depuisUtc);
   res.json(result);
 });
 
