@@ -683,8 +683,6 @@ async function confirmerEnvoi() {
 
 function pollEnvoiGroupe() {
   if (envoiGroupeTimer) clearInterval(envoiGroupeTimer);
-  pollEnvoiGroupe();
-  // legacy timer
   envoiGroupeTimer = setInterval(async () => {
     // Vérifier d'abord si des doublons sont apparus
     const ds = await apiFetch('/api/campagnes/doublons').then(r=>r.json()).catch(()=>({pending:false}));
@@ -776,8 +774,7 @@ async function validerDoublons() {
     document.getElementById('envoiGroupeProgress').scrollIntoView({ behavior: 'smooth' });
     showToast('🚀 Envoi lancé !', `${d.total} destinataire(s)`);
     // Démarrer le polling de progression
-    if (envoiGroupeTimer) clearInterval(envoiGroupeTimer);
-    envoiGroupeTimer = setInterval(pollEnvoiGroupe, 3000);
+    pollEnvoiGroupe();
   } catch(e) { showToast('❌ Erreur', e.message); }
 }
 
