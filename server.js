@@ -154,7 +154,7 @@ async function saveCurrentVersion() {
 // ══════════════════════════════════════════════════════
 //  VERSION
 // ══════════════════════════════════════════════════════
-const SERVER_VERSION = '94';
+const SERVER_VERSION = '94b';
 
 // ══════════════════════════════════════════════════════
 //  ÉTAT SERVEUR
@@ -2193,23 +2193,26 @@ async function detecterDoublons(participants) {
       uniques.push(groupe[0]);
     } else {
       // Vérifier si cet email est celui d'un référent d'équipe
+      // Stratégie : chercher parmi les participants si l'un appartient à une équipe
+      // dont cet email est le référent
       let isReferent = false;
       let nomEquipe  = '';
       try {
-        await sleep(OHME_DELAY_MS);
-        const res = await fetch(
-          `${CONFIG.ohmeBase}/api/v1/structures?email_referent_defi_enfance=${encodeURIComponent(email)}&limit=5`,
-          { headers: { 'Accept': 'application/json', 'client-name': CONFIG.ohmeClientName, 'client-secret': CONFIG.ohmeClientSecret } }
-        );
-        if (res.ok) {
-          const json = await res.json();
-          const structures = json.data || [];
-          if (structures.length > 0) {
-            isReferent = true;
-            nomEquipe  = structures[0].name || '';
+        for (const participant of groupe) {
+          if (!participant.nomEquipe) continue;
+          await sleep(300);
+          const structure = await fetchOhmeStructureByName(participant.nomEquipe);
+          if (structure) {
+            const cf = structure.custom_fields || structure;
+            const emailRef = (cf.email_referent_defi_enfance || structure.email_referent_defi_enfance || '').toLowerCase().trim();
+            if (emailRef && emailRef === email.toLowerCase().trim()) {
+              isReferent = true;
+              nomEquipe  = structure.name || participant.nomEquipe;
+              break;
+            }
           }
         }
-      } catch(e) { addLog(`⚠️ detecterDoublons erreur API : ${e.message}`, 'warn'); }
+      } catch(e) { addLog(`⚠️ detecterDoublons erreur : ${e.message}`, 'warn'); }
 
       doublons.push({ email, participants: groupe, isReferent, nomEquipe });
     }
@@ -2276,7 +2279,9 @@ async function lancerEnvoiGroupe(campagneId, depuisUtc = null, nbJours = null) {
         envoiGroupe.running    = false;
         envoiGroupe.finishedAt = new Date().toISOString();
         envoiGroupe.suspended  = true;
+        envoiGroupe.label      = campagne.label;
         addEvent('⚠️', `Doublons détectés`, `${doublons.length} doublon(s) — validation requise`, 'bill');
+        addLog(`⚠️ Envoi suspendu — ${doublons.length} doublon(s) à valider dans le dashboard`, 'warn');
         return;
       }
 
