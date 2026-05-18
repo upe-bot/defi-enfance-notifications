@@ -154,7 +154,7 @@ async function saveCurrentVersion() {
 // ══════════════════════════════════════════════════════
 //  VERSION
 // ══════════════════════════════════════════════════════
-const SERVER_VERSION = '95';
+const SERVER_VERSION = '95b';
 
 // ══════════════════════════════════════════════════════
 //  ÉTAT SERVEUR
@@ -738,7 +738,7 @@ function tplGroupeJ4Angers({ prenom, nbJours, nomAsso, urlPageCoureur, urlPromes
       </div>`
     : '';
   const equipeBlock = nomEquipe && urlPageEquipe
-    ? `<a href="${urlPageEquipe}" style="display:inline-block;background:linear-gradient(135deg,#ef6135,#ff8533);color:#fff!important;text-decoration:none;padding:10px 22px;border-radius:99px;font-weight:700;font-size:.82rem;margin-bottom:20px">🏆 Page de mon équipe ${nomEquipe}</a>`
+    ? `<div style="text-align:center;margin-bottom:20px"><a href="${urlPageEquipe}" style="display:inline-block;background:linear-gradient(135deg,#ef6135,#ff8533);color:#fff!important;text-decoration:none;padding:10px 22px;border-radius:99px;font-weight:700;font-size:.82rem">🏆 Page de mon équipe ${nomEquipe}</a></div>`
     : '';
   const urlDon = urlPageCoureur || 'https://defienfance.fr/faire-un-don/';
   const urlProm = urlPromesseCoureur || 'https://defienfance.fr/suivre-la-collecte-defi-enfance/?de_promise=1';
@@ -2021,7 +2021,7 @@ const CAMPAGNES = {
     label: 'J-4 Angers — Coureurs (go dons + promesses)',
     event: 'Défi Enfance #Course #Angers2026',
     destinataires: ['coureur'],
-    sujet: '🏃 Dans 4 jours, faites décoller votre collecte — Défi Enfance Angers !',
+    sujet: '🚀 C\'est le moment de faire décoller ta collecte !',
     template: (prenom, nbJours, extra) => tplGroupeJ4Angers({ prenom, nbJours, nomAsso: extra?.nomAsso, urlPageCoureur: extra?.urlPageCoureur, urlPromesseCoureur: extra?.urlPromesseCoureur, urlPageEquipe: extra?.urlPageEquipe, nomEquipe: extra?.nomEquipe }),
     personnalise: true,
   },
