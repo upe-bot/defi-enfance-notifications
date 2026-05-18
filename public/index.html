@@ -258,6 +258,18 @@
       </div>
     </div>
 
+
+    <!-- Zone doublons -->
+    <div id="doublonsZone" style="display:none;background:rgba(255,59,92,0.06);border:1px solid rgba(255,59,92,0.3);border-radius:12px;padding:18px 20px;margin-bottom:16px">
+      <div style="font-size:.88rem;font-weight:600;color:var(--error);margin-bottom:6px">⚠️ Doublons détectés — validation requise</div>
+      <div style="font-size:.82rem;color:var(--text-muted);margin-bottom:16px;line-height:1.6">Plusieurs coureurs partagent la même adresse email. Pour chaque doublon, choisissez le destinataire ou confirmez l'envoi au référent d'équipe.</div>
+      <div id="doublonsList"></div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:16px">
+        <button class="btn btn-sm btn-success" onclick="validerDoublons()">✅ Confirmer et lancer l'envoi</button>
+        <button class="btn btn-sm btn-danger"  onclick="annulerDoublons()">🗑️ Annuler l'envoi</button>
+      </div>
+    </div>
+
     <!-- Zone de confirmation -->
     <div id="confirmEnvoi" style="display:none;background:rgba(255,214,0,0.06);border:1px solid rgba(255,214,0,0.25);border-radius:12px;padding:18px 20px;margin-bottom:16px">
       <div style="font-size:.88rem;font-weight:600;color:var(--warning);margin-bottom:8px">⚠️ Confirmation d'envoi</div>
@@ -668,7 +680,20 @@ async function confirmerEnvoi() {
   showToast('🚀 Envoi lancé !', d.label);
   campagnePendingId = null;
 
+
+function pollEnvoiGroupe() {
+  if (envoiGroupeTimer) clearInterval(envoiGroupeTimer);
+  pollEnvoiGroupe();
+  // legacy timer
   envoiGroupeTimer = setInterval(async () => {
+    // Vérifier d'abord si des doublons sont apparus
+    const ds = await apiFetch('/api/campagnes/doublons').then(r=>r.json()).catch(()=>({pending:false}));
+    if (ds.pending && ds.doublons.length > 0) {
+      clearInterval(envoiGroupeTimer);
+      document.getElementById('envoiGroupeProgress').style.display = 'none';
+      checkDoublons();
+      return;
+    }
     try {
       const r = await apiFetch('/api/campagnes/status');
       const d = await r.json();
@@ -695,8 +720,75 @@ async function confirmerEnvoi() {
   }, 3000);
 }
 
+
+
+// ── DOUBLONS
+let doublonsChoix = {}; // email → contactId
+
+async function checkDoublons() {
+  try {
+    const r = await apiFetch('/api/campagnes/doublons');
+    const d = await r.json();
+    if (!d.pending || d.doublons.length === 0) {
+      document.getElementById('doublonsZone').style.display = 'none';
+      return;
+    }
+    doublonsChoix = {};
+    document.getElementById('doublonsZone').style.display = 'block';
+    document.getElementById('doublonsZone').scrollIntoView({ behavior: 'smooth' });
+
+    const list = document.getElementById('doublonsList');
+    list.innerHTML = d.doublons.map(doublon => {
+      if (doublon.isReferent) {
+        return `<div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:12px 16px;margin-bottom:10px">
+          <div style="font-size:.82rem;font-weight:600;color:var(--warning);margin-bottom:4px">📧 ${doublon.email}</div>
+          <div style="font-size:.78rem;color:var(--success);margin-bottom:8px">✅ Email du référent de l'équipe <strong>${doublon.nomEquipe}</strong></div>
+          <div style="font-size:.75rem;color:var(--text-muted)">→ L'email sera envoyé au référent avec la mention <em>"merci de faire suivre à vos équipiers"</em></div>
+          <div style="font-size:.72rem;color:var(--text-muted);margin-top:4px">Coureurs concernés : ${doublon.participants.map(p => `${p.prenom} ${p.nom}`).join(', ')}</div>
+        </div>`;
+      } else {
+        // Choix du destinataire
+        const options = doublon.participants.map(p =>
+          `<label style="display:flex;align-items:center;gap:8px;padding:6px 0;cursor:pointer;font-size:.8rem">
+            <input type="radio" name="doublon_${doublon.email.replace(/[@.]/g,'_')}" value="${p.contactId}" onchange="doublonsChoix['${doublon.email}']='${p.contactId}'">
+            <span><strong>${p.prenom} ${p.nom}</strong>${p.nomAsso ? ` — ${p.nomAsso}` : ''}${p.nomEquipe ? ` (équipe ${p.nomEquipe})` : ''}</span>
+          </label>`
+        ).join('');
+        return `<div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:12px 16px;margin-bottom:10px">
+          <div style="font-size:.82rem;font-weight:600;color:var(--warning);margin-bottom:8px">📧 ${doublon.email} — choisissez le destinataire :</div>
+          ${options}
+        </div>`;
+      }
+    }).join('');
+  } catch(e) {}
+}
+
+async function validerDoublons() {
+  try {
+    const r = await apiFetch('/api/campagnes/doublons/valider', {
+      method: 'POST',
+      body: JSON.stringify({ choix: doublonsChoix })
+    });
+    const d = await r.json();
+    if (d.error) { showToast('❌ Erreur', d.error); return; }
+    document.getElementById('doublonsZone').style.display = 'none';
+    document.getElementById('envoiGroupeProgress').style.display = 'block';
+    document.getElementById('envoiGroupeProgress').scrollIntoView({ behavior: 'smooth' });
+    showToast('🚀 Envoi lancé !', `${d.total} destinataire(s)`);
+    // Démarrer le polling de progression
+    if (envoiGroupeTimer) clearInterval(envoiGroupeTimer);
+    envoiGroupeTimer = setInterval(pollEnvoiGroupe, 3000);
+  } catch(e) { showToast('❌ Erreur', e.message); }
+}
+
+async function annulerDoublons() {
+  await apiFetch('/api/campagnes/doublons/annuler', { method: 'POST' });
+  document.getElementById('doublonsZone').style.display = 'none';
+  showToast('🗑️ Annulé', 'Envoi groupé annulé');
+}
+
 // ── REFRESH
-function refresh() { fetchStatus(); fetchLogs(); fetchEvents(); fetchDonsAttente(); }
+function refresh() { fetchStatus(); fetchLogs(); fetchEvents(); fetchDonsAttente(); checkDoublons(); }
 refresh();
 setInterval(refresh, 30000);
 loadCampagnes();
