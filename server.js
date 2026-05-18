@@ -1105,6 +1105,40 @@ async function fetchOhmePayments() {
   if (!CONFIG.ohmeClientName || !CONFIG.ohmeClientSecret || !CONFIG.ohmeBase) {
     addLog('Clé API Ohme manquante', 'warn'); return [];
   }
+
+  // En premierPoll : pagination complète pour récupérer TOUS les paiements
+  // En poll normal : 250 derniers suffisent (Redis protège des doublons)
+  if (premierPoll) {
+    addLog('📦 PremierPoll — récupération paginée de tous les paiements…', 'info');
+    let all = [];
+    let cursor = null;
+    const limit = 250;
+    try {
+      while (true) {
+        const url = cursor
+          ? `${CONFIG.ohmeBase}/api/v1/payments?limit=${limit}&since_date=2026-03-01&cursor=${cursor}`
+          : `${CONFIG.ohmeBase}/api/v1/payments?limit=${limit}&since_date=2026-03-01`;
+        const res = await fetch(url, { headers: { 'Accept': 'application/json', 'client-name': CONFIG.ohmeClientName, 'client-secret': CONFIG.ohmeClientSecret } });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const json = await res.json();
+        const items = json.data || [];
+        all = all.concat(items);
+        if (items.length < limit) break;
+        cursor = json.cursor || (items.length > 0 ? items[items.length - 1].id : null);
+        if (!cursor) break;
+        addLog(`📦 Pagination : ${all.length} paiements récupérés…`, 'info');
+        await sleep(OHME_DELAY_MS);
+      }
+      addLog(`📦 PremierPoll — ${all.length} paiement(s) récupérés au total`, 'info');
+      return all;
+    } catch(e) {
+      addLog(`Erreur Ohme (pagination) : ${e.message}`, 'error');
+      state.stats.errors++;
+      return all;
+    }
+  }
+
+  // Poll normal : 250 derniers
   try {
     const url = `${CONFIG.ohmeBase}/api/v1/payments?limit=250&since_date=2026-03-01`;
     const res = await fetch(url, { headers: { 'Accept': 'application/json', 'client-name': CONFIG.ohmeClientName, 'client-secret': CONFIG.ohmeClientSecret } });
@@ -1394,6 +1428,8 @@ async function processPayments(payments, ignoreDate = false) {
 
     // ── MODE PREMIER POLL
     if (premierPoll && !ignoreDate) {
+      // Si l'ID est déjà dans Redis → déjà traité, skip silencieux (pas de doublon)
+      if (state.processedIds.has(String(p.id))) { continue; }
       const typeId    = p.payment_type_id;
       const cf        = p.custom_fields || p;
       const isPromesse = !!(parseFloat(cf.montant_promesse_don_par_km || 0));
