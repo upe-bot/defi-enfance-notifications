@@ -1369,6 +1369,11 @@ async function processPayments(payments, ignoreDate = false) {
       state.processedIds.add(String(p.id));
       continue;
     }
+    if (qualiteParticipant === 'exclu') {
+      addLog(`⏭️ Paiement ${p.id} ignoré — "exclu" (pas d'email)`, 'info');
+      state.processedIds.add(String(p.id));
+      continue;
+    }
 
     // Bloquer les paiements non effectués — mis en attente (pas dans processedIds)
     // → au prochain poll, si le statut a changé, le paiement sera retraité automatiquement
