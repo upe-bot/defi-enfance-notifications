@@ -732,9 +732,16 @@ async function checkDoublons() {
       document.getElementById('doublonsZone').style.display = 'none';
       return;
     }
-    doublonsChoix = {};
+    // Ne pas reconstruire si déjà affiché (évite la réinitialisation au refresh)
+    const dejaAffiche = document.getElementById('doublonsZone').style.display === 'block';
+    if (!dejaAffiche) {
+      doublonsChoix = {};
+      d.doublons.forEach(doublon => { doublonsChoix[doublon.email] = 'SKIP'; });
+    }
     document.getElementById('doublonsZone').style.display = 'block';
-    document.getElementById('doublonsZone').scrollIntoView({ behavior: 'smooth' });
+    if (!dejaAffiche) document.getElementById('doublonsZone').scrollIntoView({ behavior: 'smooth' });
+
+    if (dejaAffiche) return; // Ne pas reconstruire le formulaire
 
     const list = document.getElementById('doublonsList');
     list.innerHTML = d.doublons.map(doublon => {
@@ -747,12 +754,21 @@ async function checkDoublons() {
         </div>`;
       } else {
         // Choix du destinataire
-        const options = doublon.participants.map(p =>
-          `<label style="display:flex;align-items:center;gap:8px;padding:6px 0;cursor:pointer;font-size:.8rem">
-            <input type="radio" name="doublon_${doublon.email.replace(/[@.]/g,'_')}" value="${p.contactId}" onchange="doublonsChoix['${doublon.email}']='${p.contactId}'">
-            <span><strong>${p.prenom} ${p.nom}</strong>${p.nomAsso ? ` — ${p.nomAsso}` : ''}${p.nomEquipe ? ` (équipe ${p.nomEquipe})` : ''}</span>
-          </label>`
-        ).join('');
+        const fieldName = `doublon_${doublon.email.replace(/[@.]/g,'_')}`;
+        const options = [
+          // Option "Ne pas envoyer"
+          `<label style="display:flex;align-items:center;gap:8px;padding:6px 0;cursor:pointer;font-size:.8rem;color:var(--error)">
+            <input type="radio" name="${fieldName}" value="SKIP" onchange="doublonsChoix['${doublon.email}']='SKIP'" checked>
+            <span>⛔ Ne pas envoyer à cet email</span>
+          </label>`,
+          // Un choix par participant
+          ...doublon.participants.map(p =>
+            `<label style="display:flex;align-items:center;gap:8px;padding:6px 0;cursor:pointer;font-size:.8rem">
+              <input type="radio" name="${fieldName}" value="${p.contactId}" onchange="doublonsChoix['${doublon.email}']='${p.contactId}'">
+              <span><strong>${p.prenom} ${p.nom}</strong>${p.nomAsso ? ` — ${p.nomAsso}` : ''}${p.nomEquipe ? ` (équipe ${p.nomEquipe})` : ''}</span>
+            </label>`
+          )
+        ].join('');
         return `<div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:12px 16px;margin-bottom:10px">
           <div style="font-size:.82rem;font-weight:600;color:var(--warning);margin-bottom:8px">📧 ${doublon.email} — choisissez le destinataire :</div>
           ${options}
