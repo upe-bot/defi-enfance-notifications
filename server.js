@@ -154,7 +154,7 @@ async function saveCurrentVersion() {
 // ══════════════════════════════════════════════════════
 //  VERSION
 // ══════════════════════════════════════════════════════
-const SERVER_VERSION = '93b';
+const SERVER_VERSION = '94';
 
 // ══════════════════════════════════════════════════════
 //  ÉTAT SERVEUR
@@ -2067,6 +2067,7 @@ const envoiGroupe = {
   campagneId: null,
   label:      '',
   nbJours:    null,
+  suspended:  false,
   total:      0,
   done:       0,
   sent:       0,
@@ -2170,6 +2171,64 @@ async function fetchParticipantsEvenement(nomEvent, typesDestinaires, depuisUtc 
 }
 
 // ── Lancer un envoi groupé
+
+// ══════════════════════════════════════════════════════
+//  GESTION DES DOUBLONS — ENVOIS GROUPÉS
+// ══════════════════════════════════════════════════════
+
+// ── Détecter les doublons dans une liste de participants
+// Retourne { uniques: [...], doublons: [{email, participants: [...], isReferent, nomEquipe}] }
+async function detecterDoublons(participants) {
+  const parEmail = {};
+  for (const p of participants) {
+    if (!parEmail[p.email]) parEmail[p.email] = [];
+    parEmail[p.email].push(p);
+  }
+
+  const uniques   = [];
+  const doublons  = [];
+
+  for (const [email, groupe] of Object.entries(parEmail)) {
+    if (groupe.length === 1) {
+      uniques.push(groupe[0]);
+    } else {
+      // Vérifier si cet email est celui d'un référent d'équipe
+      let isReferent = false;
+      let nomEquipe  = '';
+      try {
+        await sleep(OHME_DELAY_MS);
+        const res = await fetch(
+          `${CONFIG.ohmeBase}/api/v1/structures?email_referent_defi_enfance=${encodeURIComponent(email)}&limit=5`,
+          { headers: { 'Accept': 'application/json', 'client-name': CONFIG.ohmeClientName, 'client-secret': CONFIG.ohmeClientSecret } }
+        );
+        if (res.ok) {
+          const json = await res.json();
+          const structures = json.data || [];
+          if (structures.length > 0) {
+            isReferent = true;
+            nomEquipe  = structures[0].name || '';
+          }
+        }
+      } catch(e) { addLog(`⚠️ detecterDoublons erreur API : ${e.message}`, 'warn'); }
+
+      doublons.push({ email, participants: groupe, isReferent, nomEquipe });
+    }
+  }
+
+  return { uniques, doublons };
+}
+
+// État des doublons en attente de validation
+const doublonsEnAttente = {
+  campagneId:   null,
+  depuisUtc:    null,
+  nbJours:      null,
+  uniques:      [],
+  doublons:     [],
+  choix:        {}, // email → contactId choisi
+  ts:           null,
+};
+
 async function lancerEnvoiGroupe(campagneId, depuisUtc = null, nbJours = null) {
   if (envoiGroupe.running) return { error: 'Un envoi groupé est déjà en cours' };
   const campagne = CAMPAGNES[campagneId];
@@ -2191,16 +2250,39 @@ async function lancerEnvoiGroupe(campagneId, depuisUtc = null, nbJours = null) {
 
       // Exclure les contacts déjà envoyés (traçage Redis)
       const dejaEnvoyes = await getContactsDejaEnvoyes(campagneId);
-      const participants = tous.filter(p => !dejaEnvoyes.has(String(p.contactId)));
-      envoiGroupe.skipped = tous.length - participants.length;
+      const filtres = tous.filter(p => !dejaEnvoyes.has(String(p.contactId)));
+      envoiGroupe.skipped = tous.length - filtres.length;
 
-      envoiGroupe.total = participants.length;
-      envoiGroupeLog(`✅ ${tous.length} participant(s) trouvé(s) — ${participants.length} à envoyer (${envoiGroupe.skipped} déjà envoyés)`, 'ok');
+      envoiGroupeLog(`✅ ${tous.length} participant(s) trouvé(s) — ${filtres.length} à envoyer (${envoiGroupe.skipped} déjà envoyés)`, 'ok');
 
-      if (participants.length === 0) {
+      if (filtres.length === 0) {
         envoiGroupeLog('⚠️ Tous les participants ont déjà reçu cet email — envoi annulé', 'warn');
         return;
       }
+
+      // Détecter les doublons d'email
+      envoiGroupeLog('🔍 Détection des doublons en cours…', 'info');
+      const { uniques, doublons } = await detecterDoublons(filtres);
+
+      if (doublons.length > 0) {
+        envoiGroupeLog(`⚠️ ${doublons.length} doublon(s) détecté(s) — validation requise avant envoi`, 'warn');
+        doublonsEnAttente.campagneId = campagneId;
+        doublonsEnAttente.depuisUtc  = depuisUtc;
+        doublonsEnAttente.nbJours    = nbJours;
+        doublonsEnAttente.uniques    = uniques;
+        doublonsEnAttente.doublons   = doublons;
+        doublonsEnAttente.choix      = {};
+        doublonsEnAttente.ts         = new Date().toISOString();
+        envoiGroupe.running    = false;
+        envoiGroupe.finishedAt = new Date().toISOString();
+        envoiGroupe.suspended  = true;
+        addEvent('⚠️', `Doublons détectés`, `${doublons.length} doublon(s) — validation requise`, 'bill');
+        return;
+      }
+
+      envoiGroupe.suspended = false;
+      const participants = uniques;
+      envoiGroupe.total = participants.length;
 
       // Calcul du délai pour tenir dans 30 min
       const delaiMs = Math.max(ENVOI_GROUPE_DELAY_MS, Math.ceil((30 * 60 * 1000) / participants.length));
@@ -2260,6 +2342,128 @@ async function lancerEnvoiGroupe(campagneId, depuisUtc = null, nbJours = null) {
 }
 
 // ── API — Envois groupés
+
+// ── GET doublons en attente
+app.get('/api/campagnes/doublons', (req, res) => {
+  res.json({
+    pending:    doublonsEnAttente.campagneId !== null,
+    campagneId: doublonsEnAttente.campagneId,
+    doublons:   doublonsEnAttente.doublons.map(d => ({
+      email:        d.email,
+      isReferent:   d.isReferent,
+      nomEquipe:    d.nomEquipe,
+      participants: d.participants.map(p => ({
+        contactId: p.contactId,
+        prenom:    p.prenom,
+        nom:       p.nom,
+        nomAsso:   p.nomAsso,
+        nomEquipe: p.nomEquipe,
+      })),
+    })),
+    ts: doublonsEnAttente.ts,
+  });
+});
+
+// ── POST valider les choix de doublons et reprendre l'envoi
+app.post('/api/campagnes/doublons/valider', async (req, res) => {
+  if (!doublonsEnAttente.campagneId) return res.json({ error: 'Aucun doublon en attente' });
+
+  const choix = req.body.choix || {}; // { email: contactId } pour les non-référents
+
+  // Construire la liste finale des participants
+  const participantsFinals = [...doublonsEnAttente.uniques];
+
+  for (const doublon of doublonsEnAttente.doublons) {
+    if (doublon.isReferent) {
+      // Référent → envoyer au premier participant avec mention "faire suivre"
+      const p = doublon.participants[0];
+      participantsFinals.push({ ...p, isReferentDoublon: true, nbEquipiers: doublon.participants.length - 1, nomEquipeDoublon: doublon.nomEquipe });
+    } else {
+      // Non-référent → utiliser le choix de l'utilisateur
+      const contactIdChoisi = choix[doublon.email];
+      if (!contactIdChoisi) return res.json({ error: `Choix manquant pour l'email ${doublon.email}` });
+      const pChoisi = doublon.participants.find(p => String(p.contactId) === String(contactIdChoisi));
+      if (!pChoisi) return res.json({ error: `Contact ${contactIdChoisi} introuvable` });
+      participantsFinals.push(pChoisi);
+    }
+  }
+
+  // Relancer l'envoi avec la liste finale
+  const campagneId = doublonsEnAttente.campagneId;
+  const depuisUtc  = doublonsEnAttente.depuisUtc;
+  const nbJours    = doublonsEnAttente.nbJours;
+
+  // Reset doublons
+  doublonsEnAttente.campagneId = null;
+  doublonsEnAttente.doublons   = [];
+  doublonsEnAttente.uniques    = [];
+
+  // Reprendre l'envoi directement avec la liste validée
+  const campagne = CAMPAGNES[campagneId];
+  if (!campagne) return res.json({ error: 'Campagne introuvable' });
+
+  envoiGroupe.running   = true;
+  envoiGroupe.suspended = false;
+  envoiGroupe.total     = participantsFinals.length;
+  envoiGroupe.done      = 0;
+  envoiGroupe.sent      = 0;
+  envoiGroupe.errors    = 0;
+
+  (async () => {
+    try {
+      const delaiMs = Math.max(ENVOI_GROUPE_DELAY_MS, Math.ceil((30 * 60 * 1000) / participantsFinals.length));
+      envoiGroupeLog(`🚀 Reprise après validation doublons — ${participantsFinals.length} destinataire(s)`, 'ok');
+      const contactsEnvoyesCetteFois = [];
+
+      for (const p of participantsFinals) {
+        envoiGroupe.done++;
+        try {
+          let extraData = null;
+          if (campagne.personnalise) {
+            const urlPageCoureur     = await buildUrlPageCoureur(p.contactId, p.eventName || campagne.event);
+            const urlPromesseCoureur = await buildUrlPromesseCoureur(p.contactId, p.eventName || campagne.event);
+            const urlPageEquipe      = p.nomEquipe ? await buildUrlPageEquipe(null, p.nomEquipe, p.eventName || campagne.event) : null;
+            extraData = { nomAsso: p.nomAsso, nomEquipe: p.nomEquipe, urlPageCoureur, urlPromesseCoureur, urlPageEquipe };
+          }
+          const html = campagne.template(p.prenom, nbJours, extraData);
+          const sujetFinal = nbJours ? campagne.sujet.replace(/\d+ jours?/gi, `${nbJours} jours`) : campagne.sujet;
+
+          // Ajouter mention "faire suivre" si référent doublon
+          const sujetRef = p.isReferentDoublon ? `[À transmettre à votre équipe] ${sujetFinal}` : sujetFinal;
+          const ok = await sendBrevo(p.email, sujetRef, html);
+          if (ok) {
+            envoiGroupe.sent++;
+            state.stats.sent++;
+            contactsEnvoyesCetteFois.push(String(p.contactId));
+            const tag = p.isReferentDoublon ? `[Référent +${p.nbEquipiers} équipiers]` : '';
+            envoiGroupeLog(`✅ [${envoiGroupe.done}/${envoiGroupe.total}] ${p.prenom} ${p.nom} ${tag}`, 'ok');
+          } else {
+            envoiGroupe.errors++;
+          }
+        } catch(e) { envoiGroupe.errors++; }
+        await new Promise(r => setTimeout(r, delaiMs));
+      }
+
+      if (contactsEnvoyesCetteFois.length > 0) await saveContactsEnvoyes(campagneId, contactsEnvoyesCetteFois);
+      envoiGroupeLog(`🎉 Terminé — ${envoiGroupe.sent} envoyé(s), ${envoiGroupe.errors} erreur(s)`, 'ok');
+      addEvent('📢', `Envoi groupé terminé`, `${campagne.label} — ${envoiGroupe.sent} emails`, 'bill');
+    } catch(e) { envoiGroupeLog(`Exception : ${e.message}`, 'error'); }
+    finally { envoiGroupe.running = false; envoiGroupe.finishedAt = new Date().toISOString(); }
+  })();
+
+  res.json({ success: true, total: participantsFinals.length });
+});
+
+// ── POST ignorer les doublons et annuler
+app.post('/api/campagnes/doublons/annuler', (req, res) => {
+  doublonsEnAttente.campagneId = null;
+  doublonsEnAttente.doublons   = [];
+  doublonsEnAttente.uniques    = [];
+  envoiGroupe.suspended = false;
+  addLog('🗑️ Doublons annulés — envoi groupé annulé', 'info');
+  res.json({ success: true });
+});
+
 app.get('/api/campagnes', (req, res) => {
   const liste = Object.entries(CAMPAGNES).map(([id, c]) => ({
     id,
@@ -2328,6 +2532,7 @@ app.post('/api/campagnes/:id/start', async (req, res) => {
 app.get('/api/campagnes/status', (req, res) => {
   res.json({
     running:    envoiGroupe.running,
+    suspended:  envoiGroupe.suspended || false,
     campagneId: envoiGroupe.campagneId,
     label:      envoiGroupe.label,
     total:      envoiGroupe.total,
