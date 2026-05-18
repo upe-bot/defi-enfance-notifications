@@ -154,7 +154,7 @@ async function saveCurrentVersion() {
 // ══════════════════════════════════════════════════════
 //  VERSION
 // ══════════════════════════════════════════════════════
-const SERVER_VERSION = '95b';
+const SERVER_VERSION = '95c';
 
 // ══════════════════════════════════════════════════════
 //  ÉTAT SERVEUR
@@ -813,8 +813,6 @@ ${equipeBlock}
   </div>
   <div style="text-align:center"><a href="https://defienfance.fr/motivations-des-coureurs/" style="display:inline-block;background:linear-gradient(135deg,#7c3aed,#fb0089);color:#fff!important;text-decoration:none;padding:9px 20px;border-radius:99px;font-weight:700;font-size:.78rem">🏃 Découvrir toutes les motivations</a></div>
 </div>
-
-${BLOC_IFI}
 
 <div style="background:linear-gradient(135deg,#1a0a12,#2d1020);border-radius:14px;padding:20px 24px;margin-bottom:20px">
   <div style="font-size:.75rem;font-weight:700;color:#fb0089;text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">✉️ Email prêt à envoyer à vos proches</div>
