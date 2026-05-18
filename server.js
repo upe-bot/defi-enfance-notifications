@@ -154,7 +154,7 @@ async function saveCurrentVersion() {
 // ══════════════════════════════════════════════════════
 //  VERSION
 // ══════════════════════════════════════════════════════
-const SERVER_VERSION = '94c';
+const SERVER_VERSION = '94d';
 
 // ══════════════════════════════════════════════════════
 //  ÉTAT SERVEUR
@@ -2378,7 +2378,10 @@ app.post('/api/campagnes/doublons/valider', async (req, res) => {
     } else {
       // Non-référent → utiliser le choix de l'utilisateur
       const contactIdChoisi = choix[doublon.email];
-      if (!contactIdChoisi) return res.json({ error: `Choix manquant pour l'email ${doublon.email}` });
+      if (!contactIdChoisi || contactIdChoisi === 'SKIP') {
+        addLog(`⛔ Doublon ignoré — email ${doublon.email} (choix: ne pas envoyer)`, 'info');
+        continue; // Ne pas envoyer à cet email
+      }
       const pChoisi = doublon.participants.find(p => String(p.contactId) === String(contactIdChoisi));
       if (!pChoisi) return res.json({ error: `Contact ${contactIdChoisi} introuvable` });
       participantsFinals.push(pChoisi);
