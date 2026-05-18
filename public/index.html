@@ -643,7 +643,7 @@ async function previewCampagne(id, label, nbTypes) {
     if (d.error) { showToast('❌ Erreur', d.error); return; }
     campagnePendingId = id;
     campagnePendingDepuisUtc = depuisUtc;
-  campagnePendingNbJours = nbJours;
+    campagnePendingNbJours = nbJours;
     const filtreInfo = depuisUtc ? `<br>🗓️ Filtre : inscrits depuis <strong>${depuisRaw} UTC</strong>` : '';
     const joursInfo = nbJours ? `<br>⏳ Email adapté : <strong>J-${nbJours}</strong> (${nbJours} jours avant la course)` : '';
     const dejaInfo = d.dejaEnvoyes > 0 ? `<br>📋 Déjà envoyés (Redis) : <strong>${d.dejaEnvoyes}</strong> exclus` : '';
