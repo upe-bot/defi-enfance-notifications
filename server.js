@@ -154,7 +154,7 @@ async function saveCurrentVersion() {
 // ══════════════════════════════════════════════════════
 //  VERSION
 // ══════════════════════════════════════════════════════
-const SERVER_VERSION = '95c';
+const SERVER_VERSION = '96';
 
 // ══════════════════════════════════════════════════════
 //  ÉTAT SERVEUR
@@ -2269,6 +2269,250 @@ async function fetchParticipantsEvenement(nomEvent, typesDestinaires, depuisUtc 
 
 // ── Lancer un envoi groupé
 
+
+
+// ── Registre des templates pour les envois groupés libres
+const TEMPLATES_SUJETS = {
+  'groupe_j4_angers_coureurs':    '🚀 C\'est le moment de faire décoller ta collecte !',
+  'groupe_j10_angers_coureurs':   '🎽 Dans 8 jours, on court pour l\'enfance à Angers — tout ce qu\'il faut savoir !',
+  'inscription_coureur':          'Heureux de votre inscription au Défi Enfance !',
+  'inscription_supporter':        'Heureux de votre inscription au Défi Enfance !',
+  'inscription_asso':             '🏃 Nouveau coureur — Défi Enfance !',
+  'merci_donateur':               '❤️ Merci pour votre don !',
+  'merci_donateur_equipe':        '❤️ Merci pour votre don !',
+  'merci_donateur_global':        '❤️ Merci pour votre don au Défi Enfance !',
+  'nouveau_coureur_equipe':       '🏅 Votre promesse de don vient de grandir !',
+  'placeholder':                  '📢 Défi Enfance — Information importante',
+};
+
+function getTemplateFunction(templateId) {
+  const map = {
+    'groupe_j4_angers_coureurs':  (prenom, nbJours, extra) => tplGroupeJ4Angers({ prenom, nbJours, ...extra }),
+    'groupe_j10_angers_coureurs': (prenom, nbJours) => tplGroupeJ10Angers({ prenom, nbJours }),
+    'inscription_coureur':        (prenom, _, extra) => tplInscriptionCoureur({ prenom, nomComplet: prenom, nomAsso: extra?.nomAsso }),
+    'inscription_supporter':      (prenom) => tplInscriptionSupporter({ prenom }),
+    'inscription_asso':           (prenom, _, extra) => tplInscriptionAsso({ nomAsso: extra?.nomAsso || '', coureur: prenom, email_coureur: '', ville: '', prenomReferent: prenom }),
+    'merci_donateur':             (prenom) => tplMerciDonateurGlobal({ prenomDonateur: prenom, montant: '?', historiqueHtml: '' }),
+    'merci_donateur_equipe':      (prenom, _, extra) => tplMerciDonateurEquipe({ prenomDonateur: prenom, montant: '?', donateur: prenom, nomEquipe: extra?.nomEquipe || '', historiqueHtml: '' }),
+    'nouveau_coureur_equipe':     (prenom, _, extra) => tplNouveauCoureurEquipe({ prenomPrometteur: prenom, nomEquipe: extra?.nomEquipe || '', montantParKm: '?', nbCoureurs: 1, donEstime: 0, donPrecedent: 0, augmentation: 0 }),
+    'placeholder':                (prenom, nbJours) => tplGroupePlaceholder({ prenom, nbJours, nomTemplate: 'Envoi groupé' }),
+  };
+  return map[templateId] || null;
+}
+
+// ══════════════════════════════════════════════════════
+//  FETCH DESTINATAIRES — envois groupés refondés
+// ══════════════════════════════════════════════════════
+
+const EVENTS_MAP = {
+  'angers_coureurs':   ['Défi Enfance #Course #Angers2026'],
+  'joue_coureurs':     ['Défi Enfance #Course #Joué-lès-Tours2026'],
+  'global_coureurs':   ['Défi Enfance #Course #Angers2026', 'Défi Enfance #Course #Joué-lès-Tours2026'],
+  'angers_supporters': ['Défi Enfance #Supporters #Angers2026'],
+  'joue_supporters':   ['Défi Enfance #Supporters #Joué-lès-Tours2026'],
+  'global_supporters': ['Défi Enfance #Supporters #Angers2026', 'Défi Enfance #Supporters #Joué-lès-Tours2026'],
+  'dejeuner':          ['Défi Enfance #Déjeuner #Angers2026'],
+};
+
+// Convertir heure française → UTC ISO string
+function heuresFranceVersUTC(dateTimeLocal) {
+  if (!dateTimeLocal) return null;
+  // dateTimeLocal = "2026-05-13T23:25" (heure France)
+  // France été = UTC+2 → soustraire 2h
+  const d = new Date(dateTimeLocal);
+  if (isNaN(d.getTime())) return null;
+  const utc = new Date(d.getTime() - 2 * 60 * 60 * 1000);
+  return utc.toISOString();
+}
+
+async function fetchDestinataires({ typeDestinataire, filtreEquipe, depuisFrance, nbJours }) {
+  // typeDestinataire : 'angers_coureurs' | 'joue_coureurs' | 'global_coureurs' |
+  //                   'angers_supporters' | 'joue_supporters' | 'global_supporters' |
+  //                   'dejeuner' | 'referents_equipe' | 'assos_soutenues' | 'donateurs'
+
+  const depuisUtc = heuresFranceVersUTC(depuisFrance);
+  const dateFiltre = depuisUtc ? new Date(depuisUtc) : null;
+
+  const destinataires = [];
+  const emailsVus = new Set();
+
+  try {
+
+    // ── CAS 1 : Coureurs / Supporters / Déjeuner (paiements billetterie type 3)
+    if (['angers_coureurs','joue_coureurs','global_coureurs',
+         'angers_supporters','joue_supporters','global_supporters','dejeuner'].includes(typeDestinataire)) {
+
+      const eventsAttendus = EVENTS_MAP[typeDestinataire] || [];
+      let cursor = null;
+
+      while (true) {
+        await sleep(OHME_DELAY_MS);
+        const url = cursor
+          ? `${CONFIG.ohmeBase}/api/v1/payments?limit=250&payment_type_id=3&since_date=2026-01-01&cursor=${encodeURIComponent(cursor)}`
+          : `${CONFIG.ohmeBase}/api/v1/payments?limit=250&payment_type_id=3&since_date=2026-01-01`;
+
+        const res = await fetch(url, { headers: { 'Accept': 'application/json', 'client-name': CONFIG.ohmeClientName, 'client-secret': CONFIG.ohmeClientSecret } });
+        if (!res.ok) { addLog(`⚠️ Ohme HTTP ${res.status} (fetchDestinataires billetterie)`, 'warn'); break; }
+        const json = await res.json();
+        const items = json.data || [];
+
+        for (const p of items) {
+          const cf = p.custom_fields || p;
+          const eventNom = (p.nom_de_levent || cf.nom_de_levent || '').trim();
+
+          // Filtre event
+          if (!eventsAttendus.some(e => eventNom.toLowerCase().includes(e.toLowerCase().replace('défi enfance ', '')))) continue;
+
+          // Filtre date
+          if (dateFiltre) {
+            const datePmt = new Date(p.created_at || p.date || 0);
+            if (datePmt <= dateFiltre) continue;
+          }
+
+          // Filtre équipe
+          if (filtreEquipe) {
+            const equipeP = (cf.equipe || '').toLowerCase();
+            if (!equipeP.includes(filtreEquipe.toLowerCase())) continue;
+          }
+
+          // Filtre qualité
+          const qualite = (cf.qualite_du_participant || '').toLowerCase().trim();
+          if (qualite === 'don attendu' || qualite === 'exclu') continue;
+
+          if (!p.contact_id) continue;
+          await sleep(300);
+          const contact = await fetchOhmeContactById(p.contact_id);
+          if (!contact || !contact.email) continue;
+          if (emailsVus.has(contact.email)) continue;
+          emailsVus.add(contact.email);
+
+          const prenom = contact.firstname || contact.first_name || '';
+          const nom    = contact.lastname  || contact.last_name  || '';
+          destinataires.push({
+            prenom:       prenom || 'Participant',
+            nom,
+            email:        contact.email,
+            contactId:    contact.id,
+            nomAsso:      (cf.asso_soutenue || '').trim(),
+            nomEquipe:    (cf.equipe || '').trim(),
+            eventName:    eventNom,
+            datePaiement: p.created_at || p.date,
+          });
+        }
+
+        if (items.length < 250) break;
+        cursor = json.cursor || (items.length > 0 ? String(items[items.length - 1].id) : null);
+        if (!cursor) break;
+        addLog(`📦 Pagination destinataires : ${destinataires.length} trouvés…`, 'info');
+      }
+    }
+
+    // ── CAS 2 : Référents d'équipe
+    else if (typeDestinataire === 'referents_equipe') {
+      // Récupérer tous les paiements billetterie pour connaître les équipes actives
+      const equipesActives = new Set();
+      await sleep(OHME_DELAY_MS);
+      const res = await fetch(`${CONFIG.ohmeBase}/api/v1/payments?limit=250&payment_type_id=3&since_date=2026-01-01`, {
+        headers: { 'Accept': 'application/json', 'client-name': CONFIG.ohmeClientName, 'client-secret': CONFIG.ohmeClientSecret }
+      });
+      if (res.ok) {
+        const json = await res.json();
+        for (const p of (json.data || [])) {
+          const cf = p.custom_fields || p;
+          const equipe = (cf.equipe || '').trim();
+          if (equipe) equipesActives.add(equipe);
+        }
+      }
+
+      // Filtrer par équipe si renseigné
+      const equipesFiltrees = filtreEquipe
+        ? [...equipesActives].filter(e => e.toLowerCase().includes(filtreEquipe.toLowerCase()))
+        : [...equipesActives];
+
+      // Récupérer les structures correspondantes
+      for (const nomEquipe of equipesFiltrees) {
+        await sleep(OHME_DELAY_MS);
+        const structure = await fetchOhmeStructureByName(nomEquipe);
+        if (!structure) continue;
+        const cf = structure.custom_fields || structure;
+        const email = cf.email_referent_defi_enfance || structure.email_referent_defi_enfance || '';
+        const prenom = cf.prenom_du_referent_defi_enfance || structure.prenom_du_referent_defi_enfance || '';
+        const nom    = cf.nom_du_referent_defi_enfance   || structure.nom_du_referent_defi_enfance   || '';
+        if (!email || emailsVus.has(email)) continue;
+        emailsVus.add(email);
+        destinataires.push({ prenom: prenom || nomEquipe, nom, email, contactId: `struct_${structure.id}`, nomEquipe, nomAsso: '', eventName: '', datePaiement: null });
+      }
+    }
+
+    // ── CAS 3 : Assos soutenues
+    else if (typeDestinataire === 'assos_soutenues') {
+      const assosActives = new Set();
+      await sleep(OHME_DELAY_MS);
+      const res = await fetch(`${CONFIG.ohmeBase}/api/v1/payments?limit=250&payment_type_id=3&since_date=2026-01-01`, {
+        headers: { 'Accept': 'application/json', 'client-name': CONFIG.ohmeClientName, 'client-secret': CONFIG.ohmeClientSecret }
+      });
+      if (res.ok) {
+        const json = await res.json();
+        for (const p of (json.data || [])) {
+          const cf = p.custom_fields || p;
+          const asso = (cf.asso_soutenue || '').trim();
+          if (asso) assosActives.add(asso);
+        }
+      }
+
+      for (const nomAsso of assosActives) {
+        await sleep(OHME_DELAY_MS);
+        const structure = await fetchOhmeStructureByName(nomAsso);
+        if (!structure) continue;
+        const cf = structure.custom_fields || structure;
+        const email = cf.email_referent_defi_enfance || structure.email_referent_defi_enfance || '';
+        const prenom = cf.prenom_du_referent_defi_enfance || structure.prenom_du_referent_defi_enfance || '';
+        const nom    = cf.nom_du_referent_defi_enfance   || structure.nom_du_referent_defi_enfance   || '';
+        if (!email || emailsVus.has(email)) continue;
+        emailsVus.add(email);
+        destinataires.push({ prenom: prenom || nomAsso, nom, email, contactId: `struct_${structure.id}`, nomAsso, nomEquipe: '', eventName: '', datePaiement: null });
+      }
+    }
+
+    // ── CAS 4 : Donateurs
+    else if (typeDestinataire === 'donateurs') {
+      let cursor = null;
+      while (true) {
+        await sleep(OHME_DELAY_MS);
+        const url = cursor
+          ? `${CONFIG.ohmeBase}/api/v1/payments?limit=250&payment_type_id=1&since_date=2026-01-01&cursor=${encodeURIComponent(cursor)}`
+          : `${CONFIG.ohmeBase}/api/v1/payments?limit=250&payment_type_id=1&since_date=2026-01-01`;
+        const res = await fetch(url, { headers: { 'Accept': 'application/json', 'client-name': CONFIG.ohmeClientName, 'client-secret': CONFIG.ohmeClientSecret } });
+        if (!res.ok) { addLog(`⚠️ Ohme HTTP ${res.status} (fetchDestinataires donateurs)`, 'warn'); break; }
+        const json = await res.json();
+        const items = json.data || [];
+        for (const p of items) {
+          if (dateFiltre) {
+            const datePmt = new Date(p.created_at || p.date || 0);
+            if (datePmt <= dateFiltre) continue;
+          }
+          if (!p.contact_id) continue;
+          await sleep(300);
+          const contact = await fetchOhmeContactById(p.contact_id);
+          if (!contact || !contact.email || emailsVus.has(contact.email)) continue;
+          emailsVus.add(contact.email);
+          const prenom = contact.firstname || contact.first_name || '';
+          const nom    = contact.lastname  || contact.last_name  || '';
+          destinataires.push({ prenom: prenom || 'Donateur', nom, email: contact.email, contactId: contact.id, nomAsso: '', nomEquipe: '', eventName: '', datePaiement: p.date });
+        }
+        if (items.length < 250) break;
+        cursor = json.cursor || (items.length > 0 ? String(items[items.length - 1].id) : null);
+        if (!cursor) break;
+      }
+    }
+
+  } catch(e) {
+    addLog(`⚠️ fetchDestinataires erreur : ${e.message}`, 'warn');
+  }
+
+  return destinataires;
+}
+
 // ══════════════════════════════════════════════════════
 //  GESTION DES DOUBLONS — ENVOIS GROUPÉS
 // ══════════════════════════════════════════════════════
@@ -2559,6 +2803,154 @@ app.post('/api/campagnes/doublons/annuler', (req, res) => {
   envoiGroupe.suspended = false;
   addLog('🗑️ Doublons annulés — envoi groupé annulé', 'info');
   res.json({ success: true });
+});
+
+
+// ── GET /api/envoi-groupe/preview — comptage + aperçu 10 premiers
+app.post('/api/envoi-groupe/preview', async (req, res) => {
+  if (envoiGroupe.running) return res.json({ error: 'Un envoi est déjà en cours' });
+  const { typeDestinataire, filtreEquipe, depuisFrance, nbJours, template } = req.body;
+  if (!typeDestinataire) return res.json({ error: 'typeDestinataire requis' });
+  if (!template) return res.json({ error: 'template requis' });
+
+  try {
+    envoiGroupeLog(`🔍 Comptage : ${typeDestinataire}…`, 'info');
+    const tous = await fetchDestinataires({ typeDestinataire, filtreEquipe, depuisFrance, nbJours });
+    const dejaEnvoyes = await getContactsDejaEnvoyes(`custom_${typeDestinataire}_${template}`);
+    const nouveaux = tous.filter(p => !dejaEnvoyes.has(String(p.contactId)));
+
+    const apercu = nouveaux.slice(0, 10).map(p => ({
+      prenom:    p.prenom,
+      nom:       p.nom,
+      email:     p.email,
+      nomEquipe: p.nomEquipe,
+      nomAsso:   p.nomAsso,
+      eventName: p.eventName,
+    }));
+
+    res.json({
+      count:      nouveaux.length,
+      total:      tous.length,
+      dejaEnvoyes: dejaEnvoyes.size,
+      apercu,
+      typeDestinataire,
+      template,
+    });
+  } catch(e) {
+    res.json({ error: e.message });
+  }
+});
+
+// ── POST /api/envoi-groupe/start — lancer l'envoi
+app.post('/api/envoi-groupe/start', async (req, res) => {
+  if (envoiGroupe.running) return res.json({ error: 'Un envoi est déjà en cours' });
+  const { typeDestinataire, filtreEquipe, depuisFrance, nbJours, template } = req.body;
+  if (!typeDestinataire || !template) return res.json({ error: 'typeDestinataire et template requis' });
+
+  const campagneId = `custom_${typeDestinataire}_${template}`;
+  envoiGroupe.running   = true;
+  envoiGroupe.suspended = false;
+  envoiGroupe.label     = `${typeDestinataire} → ${template}`;
+  envoiGroupe.total     = 0;
+  envoiGroupe.done      = 0;
+  envoiGroupe.sent      = 0;
+  envoiGroupe.errors    = 0;
+  envoiGroupe.skipped   = 0;
+  envoiGroupe.startedAt = new Date().toISOString();
+  envoiGroupe.finishedAt = null;
+  envoiGroupe.log       = [];
+
+  res.json({ success: true, label: envoiGroupe.label });
+
+  // Lancer en async
+  (async () => {
+    try {
+      envoiGroupeLog(`🚀 Démarrage envoi groupé : ${typeDestinataire} → template: ${template}`, 'info');
+      const tous = await fetchDestinataires({ typeDestinataire, filtreEquipe, depuisFrance, nbJours });
+      const dejaEnvoyes = await getContactsDejaEnvoyes(campagneId);
+      const filtres = tous.filter(p => !dejaEnvoyes.has(String(p.contactId)));
+      envoiGroupe.skipped = tous.length - filtres.length;
+      envoiGroupeLog(`✅ ${filtres.length} destinataire(s) à envoyer (${envoiGroupe.skipped} déjà envoyés)`, 'ok');
+
+      if (filtres.length === 0) { envoiGroupeLog('⚠️ Aucun destinataire — envoi annulé', 'warn'); return; }
+
+      // Détecter doublons
+      const { uniques, doublons } = await detecterDoublons(filtres);
+      if (doublons.length > 0) {
+        envoiGroupeLog(`⚠️ ${doublons.length} doublon(s) — validation requise`, 'warn');
+        doublonsEnAttente.campagneId = campagneId;
+        doublonsEnAttente.depuisUtc  = null;
+        doublonsEnAttente.nbJours    = nbJours;
+        doublonsEnAttente.uniques    = uniques;
+        doublonsEnAttente.doublons   = doublons;
+        doublonsEnAttente.choix      = {};
+        doublonsEnAttente.ts         = new Date().toISOString();
+        doublonsEnAttente.templateId = template;
+        envoiGroupe.running    = false;
+        envoiGroupe.suspended  = true;
+        envoiGroupe.finishedAt = new Date().toISOString();
+        return;
+      }
+
+      envoiGroupe.total = uniques.length;
+      const contactsEnvoyesCetteFois = [];
+
+      // Récupérer le template
+      const tplFn = getTemplateFunction(template);
+      if (!tplFn) { envoiGroupeLog(`❌ Template "${template}" introuvable`, 'error'); return; }
+
+      for (const p of uniques) {
+        envoiGroupe.done++;
+        try {
+          const html = tplFn(p.prenom, nbJours ? parseInt(nbJours) : null, {
+            nomAsso: p.nomAsso, nomEquipe: p.nomEquipe,
+            urlPageCoureur:     await buildUrlPageCoureur(p.contactId, p.eventName),
+            urlPromesseCoureur: await buildUrlPromesseCoureur(p.contactId, p.eventName),
+            urlPageEquipe:      p.nomEquipe ? await buildUrlPageEquipe(null, p.nomEquipe, p.eventName) : null,
+          });
+          const campagne = CAMPAGNES[campagneId] || { sujet: template };
+          const sujetBase = TEMPLATES_SUJETS[template] || template;
+          const sujetFinal = nbJours ? sujetBase.replace(/\d+ jours?/gi, `${nbJours} jours`) : sujetBase;
+          const ok = await sendBrevo(p.email, sujetFinal, html);
+          if (ok) {
+            envoiGroupe.sent++;
+            state.stats.sent++;
+            contactsEnvoyesCetteFois.push(String(p.contactId));
+            envoiGroupeLog(`✅ [${envoiGroupe.done}/${envoiGroupe.total}] ${p.prenom} ${p.nom} (${p.email})`, 'ok');
+          } else {
+            envoiGroupe.errors++;
+            envoiGroupeLog(`❌ [${envoiGroupe.done}/${envoiGroupe.total}] Échec → ${p.email}`, 'error');
+          }
+        } catch(e) {
+          envoiGroupe.errors++;
+          envoiGroupeLog(`❌ Exception → ${p.email} : ${e.message}`, 'error');
+        }
+        await new Promise(r => setTimeout(r, ENVOI_GROUPE_DELAY_MS));
+      }
+
+      if (contactsEnvoyesCetteFois.length > 0) await saveContactsEnvoyes(campagneId, contactsEnvoyesCetteFois);
+      envoiGroupeLog(`🎉 Terminé — ${envoiGroupe.sent} envoyé(s), ${envoiGroupe.errors} erreur(s)`, 'ok');
+      addEvent('📢', `Envoi groupé terminé`, `${envoiGroupe.label} — ${envoiGroupe.sent} emails`, 'bill');
+
+    } catch(e) { envoiGroupeLog(`Exception : ${e.message}`, 'error'); }
+    finally { envoiGroupe.running = false; envoiGroupe.finishedAt = new Date().toISOString(); }
+  })();
+});
+
+// ── POST /api/envoi-groupe/test — envoyer à Victor uniquement
+app.post('/api/envoi-groupe/test', async (req, res) => {
+  const { template, nbJours } = req.body;
+  const tplFn = getTemplateFunction(template);
+  if (!tplFn) return res.json({ error: `Template "${template}" introuvable` });
+  try {
+    const nbJ = nbJours ? parseInt(nbJours) : null;
+    const html = tplFn('Victor', nbJ, { nomAsso: 'Association Test', nomEquipe: 'Équipe Test', urlPageCoureur: URL_COUREURS, urlPromesseCoureur: URL_PROMESSE_FALLBACK, urlPageEquipe: URL_EQUIPES });
+    const sujetBase = TEMPLATES_SUJETS[template] || `[TEST] ${template}`;
+    const sujetFinal = nbJ ? sujetBase.replace(/\d+ jours?/gi, `${nbJ} jours`) : sujetBase;
+    const ok = await sendBrevo(EMAIL_TEST_VICTOR, `[TEST] ${sujetFinal}`, html);
+    if (ok) { addLog(`🧪 Test envoi groupé "${template}" → Victor`, 'ok'); res.json({ success: true }); }
+    else res.json({ success: false, error: 'Échec Brevo' });
+  } catch(e) { res.json({ success: false, error: e.message }); }
 });
 
 app.get('/api/campagnes', (req, res) => {
