@@ -154,7 +154,7 @@ async function saveCurrentVersion() {
 // ══════════════════════════════════════════════════════
 //  VERSION
 // ══════════════════════════════════════════════════════
-const SERVER_VERSION = '89';
+const SERVER_VERSION = '91';
 
 // ══════════════════════════════════════════════════════
 //  ÉTAT SERVEUR
@@ -407,7 +407,7 @@ function tplDonCoureur({ coureurPrenom, donateur, montant, email_donateur, assoc
   return `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Antonio:wght@700&display=swap" rel="stylesheet"><style>${CSS_COMMUN}</style></head><body><div class="outer"><div class="logo-header"><div class="logo-text">🤝 Défi Enfance</div><div class="logo-sub">Générateur de victoires pour l'enfance</div></div><div class="header"><h1>❤️ Nouveau don pour toi !</h1><p>Générateur de victoires pour l'enfance</p></div><div class="body"><div class="greeting">Bonjour ${coureurPrenom} 👋</div><div class="intro">Bonne nouvelle ! Un nouveau don vient d'être enregistré sur <strong>ta page de collecte Défi Enfance</strong>.</div><div class="don-box"><div class="don-amount">${montant} €</div><div class="don-label">Don reçu de ${donateur}</div></div><div class="card"><h3>📋 Coordonnées du donateur</h3><div class="row"><span class="ic">👤</span><div><strong>Nom :</strong> ${donateur}</div></div><div class="row"><span class="ic">✉️</span><div><strong>Email :</strong> <a href="mailto:${email_donateur}" style="color:#fb0089">${email_donateur}</a></div></div></div>${motLine}<div class="note magenta">💌 <strong>N'hésite pas à remercier ${donateur} personnellement</strong> — un message sincère fait toujours une grande différence !</div><div class="cta-box"><p>✨ <strong>Et si tu faisais grimper ta collecte encore plus haut ?</strong><br>Partage ta page et invite tes proches à te soutenir !</p><a href="${URL_COUREURS}" class="cta-btn">🏃 Voir ma page de collecte</a></div>${blocCtaDonPromesse({ nomCoureur: coureurPrenom })}<div class="divider"></div><div style="font-size:.75rem;color:#888;text-align:center">Email envoyé automatiquement dans les 10 minutes suivant le don.${assoLine}</div></div>${BLOC_IFI}<div class="footer"><div style="font-family:Arial,sans-serif;font-size:1.1rem;font-weight:700;color:#fb0089;letter-spacing:.08em;margin-bottom:6px">DÉFI ENFANCE</div><div class="footer-sub">Générateur de victoires pour l'enfance<br>contact@defienfance.fr</div></div></div></body></html>`;
 }
 
-function tplDonEquipe({ chefPrenom, chefNom, nomEquipe, donateur, montant, email_donateur, motEncouragement }) {
+function tplDonEquipe({ chefPrenom, chefNom, nomEquipe, donateur, montant, email_donateur, motEncouragement, coureurPrenom, coureurNom }) {
   const isDE   = nomEquipe === 'Défi Enfance';
   const motLine = motEncouragement ? `<div class="note" style="margin-top:16px;border-left-color:#fb0089;background:#fff0f8">💬 <strong>Mot d'encouragement :</strong><br><em>"${motEncouragement}"</em></div>` : '';
   const referentLine = isDE && chefNom ? `<div class="row"><span class="ic">👤</span><div><strong>Référent :</strong> ${chefPrenom} ${chefNom}</div></div>` : '';
@@ -434,6 +434,28 @@ function tplPromesseCoureur({ coureurPrenom, donateur, montantParKm, email_donat
  * Promesse de don → chef d'équipe
  * Envoie au référent d'équipe : quelqu'un promet X€/km pour toute l'équipe
  */
+
+function tplPromesseCoureurPourEquipe({ chefPrenom, chefNom, nomEquipe, donateur, montantParKm, email_donateur, coureurPrenom, coureurNom, motEncouragement, nbPromessesEquipe, totalKmParEquipe }) {
+  const motLine = motEncouragement ? `<div class="note violet" style="margin-top:16px">💬 <strong>Message de ${donateur} :</strong><br><em>"${motEncouragement}"</em></div>` : '';
+  const recap = nbPromessesEquipe > 0 ? `<div class="recap-box">
+    <div class="recap-title">📊 Promesses sur votre équipe</div>
+    <div class="recap-row"><span>🏅 Total promesses équipe</span><span class="recap-num violet">${nbPromessesEquipe} promesse${nbPromessesEquipe > 1 ? 's' : ''}</span></div>
+    <div class="recap-row"><span>💰 Total engagé / km (équipe)</span><span class="recap-num violet">${totalKmParEquipe} € / km</span></div>
+  </div>` : '';
+  return `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Antonio:wght@700&display=swap" rel="stylesheet"><style>${CSS_COMMUN}</style></head><body><div class="outer"><div class="logo-header"><div class="logo-text">🤝 Défi Enfance</div><div class="logo-sub">Générateur de victoires pour l'enfance</div></div><div class="header violet"><h1>🏅 Promesse de don<br>pour un coureur de votre équipe !</h1><p>Générateur de victoires pour l'enfance</p></div><div class="body">
+<div class="greeting">Bonjour ${chefPrenom} 👋</div>
+<div style="margin-bottom:16px"><span class="badge violet">🏃 Équipe ${nomEquipe}</span></div>
+<div class="intro"><strong>${donateur}</strong> vient de faire une <strong>promesse de don au km</strong> pour <strong>${coureurPrenom} ${coureurNom}</strong>, l'un des coureurs de votre équipe !</div>
+<div class="promesse-box"><div class="promesse-km">${montantParKm} €</div><div class="promesse-label">promis par km couru par ${coureurPrenom} ${coureurNom}</div></div>
+<div class="note violet">ℹ️ <strong>Important :</strong> cette promesse est fléchée uniquement sur <strong>${coureurPrenom} ${coureurNom}</strong>. Ce sont exclusivement les km parcourus par ${coureurPrenom} le jour de la course qui généreront ce don — pas ceux des autres membres de l'équipe.</div>
+<div class="card violet"><h3 class="violet">📋 Coureur concerné</h3><div class="row"><span class="ic">🏃</span><div><strong>${coureurPrenom} ${coureurNom}</strong> — membre de l'équipe ${nomEquipe}</div></div><div class="row"><span class="ic">👤</span><div><strong>Promettant :</strong> ${donateur}</div></div><div class="row"><span class="ic">✉️</span><div><strong>Email :</strong> <a href="mailto:${email_donateur}" style="color:#7c3aed">${email_donateur}</a></div></div></div>
+${motLine}
+<div class="note magenta">💌 <strong>Transmettez cette bonne nouvelle à ${coureurPrenom} !</strong> Cette promesse de don est un formidable moteur de motivation pour sa course.</div>
+${recap}
+<div class="cta-box violet"><p>✨ <strong>Encouragez d'autres supporters à promettre un don au km</strong> pour les coureurs de votre équipe !</p><a href="${URL_COUREURS}" class="cta-btn violet">🏃 Voir les pages coureurs</a></div>
+<div class="divider"></div><div style="font-size:.75rem;color:#888;text-align:center">Email envoyé automatiquement dans les 10 minutes suivant la promesse.</div></div>${BLOC_IFI}<div class="footer"><div style="font-family:Arial,sans-serif;font-size:1.1rem;font-weight:700;color:#fb0089;letter-spacing:.08em;margin-bottom:6px">DÉFI ENFANCE</div><div class="footer-sub">Générateur de victoires pour l'enfance<br>contact@defienfance.fr</div></div></div></body></html>`;
+}
+
 function tplPromesseEquipe({ chefPrenom, chefNom, nomEquipe, donateur, montantParKm, email_donateur, motEncouragement, nbPromessesEquipe, totalKmParEquipe }) {
   const motLine  = motEncouragement ? `<div class="note violet" style="margin-top:16px">💬 <strong>Message de ${donateur} :</strong><br><em>"${motEncouragement}"</em></div>` : '';
   const recap    = blocRecapPromesses({ nbPromessesCoureur: 0, totalKmParCoureur: 0, nbPromessesEquipe, totalKmParEquipe, isCoureur: false });
@@ -549,7 +571,8 @@ ${historiqueHtml || ''}
 
 const URL_DEJEUNER_ANGERS = 'https://luma.com/defi-dejeuner-angers2026';
 
-function tplGroupeJ10Angers({ prenom }) {
+function tplGroupeJ10Angers({ prenom, nbJours }) {
+  const j = nbJours || 8;
   return `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Antonio:wght@700&display=swap" rel="stylesheet"><style>${CSS_COMMUN}
     .programme-item{display:flex;align-items:flex-start;gap:12px;padding:10px 0;border-bottom:1px solid #f5dced;font-size:.84rem;color:#3d1830}
     .programme-item:last-child{border-bottom:none}
@@ -557,9 +580,9 @@ function tplGroupeJ10Angers({ prenom }) {
     .programme-time{font-weight:700;color:#fb0089;min-width:48px;flex-shrink:0}
     .liste-item{display:flex;align-items:flex-start;gap:10px;padding:7px 0;border-bottom:1px solid #f5e5d5;font-size:.84rem;color:#3d1830}
     .liste-item:last-child{border-bottom:none}
-  </style></head><body><div class="outer"><div class="logo-header"><div class="logo-text">🤝 Défi Enfance</div><div class="logo-sub">Générateur de victoires pour l'enfance</div></div><div class="header mixed"><h1>🎽 Dans 8 jours,<br>on court pour l'enfance !</h1><p>Défi Enfance · Angers · 22 mai 2026</p></div><div class="body">
+  </style></head><body><div class="outer"><div class="logo-header"><div class="logo-text">🤝 Défi Enfance</div><div class="logo-sub">Générateur de victoires pour l'enfance</div></div><div class="header mixed"><h1>🎽 Dans ${j} jours,<br>on court pour l'enfance !</h1><p>Défi Enfance · Angers · 22 mai 2026</p></div><div class="body">
 <div class="greeting">Bonjour ${prenom} 👋</div>
-<div class="intro">Dans 8 jours, c'est le grand jour ! 🎉 Nous sommes vraiment impatients de vous retrouver au <strong>Parc Saint-Serge</strong> pour cette deuxième édition du Défi Enfance à Angers. Vous faites partie d'une belle aventure — voici tout ce qu'il faut savoir pour arriver prêt(e) et serein(e) ! 💪</div>
+<div class="intro">Dans ${j} jours, c'est le grand jour ! 🎉 Nous sommes vraiment impatients de vous retrouver au <strong>Parc Saint-Serge</strong> pour cette deuxième édition du Défi Enfance à Angers. Vous faites partie d'une belle aventure — voici tout ce qu'il faut savoir pour arriver prêt(e) et serein(e) ! 💪</div>
 
 <div class="card" style="margin-bottom:22px"><h3>🤲 Pourquoi est-ce qu'on court ?</h3>
 <div style="font-size:.86rem;color:#3d1830;line-height:1.7">Le Défi Enfance, c'est bien plus qu'une course — c'est un élan collectif pour soutenir tout le secteur de l'aide à l'enfance. Chaque kilomètre parcouru, chaque don collecté va compter.<br><br>Dès maintenant, faites décoller votre collecte ! <strong>50% des dons</strong> vont directement aux associations choisies, <strong>50%</strong> soutiennent le plaidoyer pour les enfants en France. 🙏<br><br><strong>Nouveauté exclusive :</strong> faites et faites faire des <strong>promesses de dons au km</strong> — une manière percutante de challenger vos proches pour la cause de l'enfance !</div>
@@ -599,14 +622,15 @@ function tplGroupeJ10Angers({ prenom }) {
 <div class="note magenta">🎽 <strong>Votre dossard</strong><br>Vous recevrez un email le <strong>jeudi 21 mai</strong> avec votre numéro de dossard. Il ne vous restera plus qu'à le récupérer sur place dès 8h30 et à enfiler vos baskets ! 👟</div>
 
 <div class="divider"></div>
-<div style="font-size:.84rem;color:#3d1830;text-align:center;line-height:1.8">Pour toute question : <a href="mailto:contact@defienfance.fr" style="color:#fb0089;font-weight:600">contact@defienfance.fr</a> 📩<br><br><strong>On vous attend avec impatience — allez, plus que 8 jours ! 🏁</strong></div>
+<div style="font-size:.84rem;color:#3d1830;text-align:center;line-height:1.8">Pour toute question : <a href="mailto:contact@defienfance.fr" style="color:#fb0089;font-weight:600">contact@defienfance.fr</a> 📩<br><br><strong>On vous attend avec impatience — allez, plus que ${j} jours ! 🏁</strong></div>
 <div style="margin-top:16px;font-size:.82rem;color:#fb0089;font-weight:600;text-align:center">— L'équipe du Défi Enfance 🤲</div>
 
 </div><div class="footer"><div style="font-family:Arial,sans-serif;font-size:1.1rem;font-weight:700;color:#fb0089;letter-spacing:.08em;margin-bottom:6px">DÉFI ENFANCE</div><div class="footer-sub">Générateur de victoires pour l'enfance<br>contact@defienfance.fr — defienfance.fr</div></div></div></body></html>`;
 }
 
 // Placeholder pour les futurs templates — à compléter au fur et à mesure
-function tplGroupePlaceholder({ prenom, nomTemplate }) {
+function tplGroupePlaceholder({ prenom, nomTemplate, nbJours }) {
+  const j = nbJours || '?';
   return `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Antonio:wght@700&display=swap" rel="stylesheet"><style>${CSS_COMMUN}</style></head><body><div class="outer"><div class="logo-header"><div class="logo-text">🤝 Défi Enfance</div><div class="logo-sub">Générateur de victoires pour l'enfance</div></div><div class="header mixed"><h1>🔧 Template à venir</h1><p>${nomTemplate}</p></div><div class="body"><div class="greeting">Bonjour ${prenom} 👋</div><div class="intro">Ce template (${nomTemplate}) est en cours de création. Il sera disponible prochainement.</div></div><div class="footer"><div style="font-family:Arial,sans-serif;font-size:1.1rem;font-weight:700;color:#fb0089;letter-spacing:.08em;margin-bottom:6px">DÉFI ENFANCE</div><div class="footer-sub">contact@defienfance.fr</div></div></div></body></html>`;
 }
 
@@ -1212,7 +1236,7 @@ async function processPayments(payments, ignoreDate = false) {
             const chefEmail = structure?.email_referent_defi_enfance || '';
             const chefPrenom = structure?.prenom_du_referent_defi_enfance || 'Bonjour';
             const chefNom   = structure?.nom_du_referent_defi_enfance || '';
-            if (chefEmail) { const htmlE = tplDonEquipe({ chefPrenom, chefNom, nomEquipe: equipe, donateur, montant, email_donateur: emailDon, motEncouragement }); const okE = await sendBrevo(chefEmail, `❤️ Don pour votre équipe de ${donateur} !`, htmlE); if (okE) { state.stats.sent++; addLog(`✅ Don → chef équipe ${equipe}`, 'ok'); } }
+            if (chefEmail) { const htmlE = tplDonEquipe({ chefPrenom, chefNom, nomEquipe: equipe, donateur, montant, email_donateur: emailDon, motEncouragement, coureurPrenom, coureurNom: coureurParraine.split(' ').slice(1).join(' ') }); const okE = await sendBrevo(chefEmail, `❤️ Don de ${donateur} pour ${coureurPrenom} — équipe ${equipe} !`, htmlE); if (okE) { state.stats.sent++; addLog(`✅ Don → chef équipe ${equipe}`, 'ok'); } }
           }
         } else { addLog(`⚠️ Coureur "${coureurParraine}" introuvable`, 'warn'); }
       } else if (equipeParraine) {
@@ -1276,8 +1300,8 @@ async function processPayments(payments, ignoreDate = false) {
             const chefPrenom = structure?.prenom_du_referent_defi_enfance || 'Bonjour';
             const chefNom    = structure?.nom_du_referent_defi_enfance || '';
             if (chefEmail) {
-              const htmlEquipe = tplPromesseEquipe({ chefPrenom, chefNom, nomEquipe: equipe, donateur, montantParKm: montantKm, email_donateur: emailDon, motEncouragement, nbPromessesEquipe: promEquipe.nb, totalKmParEquipe: promEquipe.total });
-              const okE = await sendBrevo(chefEmail, `🏅 Promesse de don pour votre équipe — ${montantKm}€/km !`, htmlEquipe);
+              const htmlEquipe = tplPromesseCoureurPourEquipe({ chefPrenom, chefNom, nomEquipe: equipe, donateur, montantParKm: montantKm, email_donateur: emailDon, coureurPrenom, coureurNom: coureurParraine.split(' ').slice(1).join(' '), motEncouragement, nbPromessesEquipe: promEquipe.nb, totalKmParEquipe: promEquipe.total });
+              const okE = await sendBrevo(chefEmail, `🏅 Promesse de ${donateur} pour ${coureurPrenom} — équipe ${equipe} !`, htmlEquipe);
               if (okE) { state.stats.sent++; addLog(`✅ Promesse ${montantKm}€/km → chef équipe ${equipe}`, 'ok'); }
             }
           }
@@ -1485,6 +1509,7 @@ app.post('/api/test-email', async (req, res) => {
     don_nonfleche:         { subject: '🧪 Test — ❤️ Don non fléché reçu !',                        html: tplDonEquipe({ chefPrenom: 'Responsable', chefNom: 'Défi', nomEquipe: 'Défi Enfance', donateur: 'Thomas Bernard', montant: '30', email_donateur: 't.bernard@test.fr' }) },
     // ── PROMESSES DE DONS
     promesse_coureur:      { subject: '🧪 Test — 🏅 Promesse de don pour toi !',                   html: tplPromesseCoureur({ coureurPrenom: 'Pierre', donateur: 'Jean-Claude Martin', montantParKm: '5', email_donateur: 'jc.martin@test.fr', association: 'Les Enfants du Soleil', motEncouragement: 'Cours comme jamais, je te soutiens !', nbPromessesCoureur: 3, totalKmParCoureur: 12, nbPromessesEquipe: 7, totalKmParEquipe: 31 }) },
+    promesse_coureur_equipe: { subject: '🧪 Test — 🏅 Promesse coureur → Référent équipe !',    html: tplPromesseCoureurPourEquipe({ chefPrenom: 'Sophie', chefNom: 'Dupont', nomEquipe: 'Les Gazelles', donateur: 'Marc Leroy', montantParKm: '5', email_donateur: 'marc@test.fr', coureurPrenom: 'Pierre', coureurNom: 'Martin', nbPromessesEquipe: 3, totalKmParEquipe: 12 }) },
     promesse_equipe:       { subject: '🧪 Test — 🏅 Promesse de don pour votre équipe !',          html: tplPromesseEquipe({ chefPrenom: 'Sophie', chefNom: 'Dupont', nomEquipe: 'Les Gazelles Solidaires', donateur: 'Marc Leroy', montantParKm: '3', email_donateur: 'marc.leroy@test.fr', motEncouragement: 'Toute l\'équipe est incroyable !', nbPromessesEquipe: 5, totalKmParEquipe: 18 }) },
     merci_prometteur_coureur: { subject: '🧪 Test — 🙏 Merci pour votre promesse de don !',       html: tplMerciPrometteurCoureur({ prenomDonateur: 'Jean-Claude', montantParKm: '5', coureurPrenom: 'Pierre', coureurNom: 'Martin', association: 'Les Enfants du Soleil' }) },
     merci_prometteur_equipe:  { subject: '🧪 Test — 🙏 Merci pour votre promesse d\'équipe !',    html: tplMerciPrometteurEquipe({ prenomDonateur: 'Marc', montantParKm: '3', nomEquipe: 'Les Gazelles Solidaires' }) },
@@ -1662,7 +1687,7 @@ app.post('/api/dons-attente/:paiementId/valider', async (req, res) => {
       ok = await sendBrevo(emailC, '❤️ Nouveau don pour ton Défi Enfance !', html);
       if (ok) { state.stats.sent++; addLog(`✅ Don validé → ${coureurParraine}`, 'ok'); sendMerciDonateur({ email: emailDon, prenom: prenomMerciValider, montant, donateur, isStructure: infosValider.isStructure, nomStructure: infosValider.nomStructure }); }
       const equipe = await fetchEquipeCoureur(contact?.id);
-      if (equipe) { const s = await fetchOhmeStructureByName(equipe); if (s?.email_referent_defi_enfance) { const htmlE = tplDonEquipe({ chefPrenom: s.prenom_du_referent_defi_enfance || 'Bonjour', chefNom: s.nom_du_referent_defi_enfance || '', nomEquipe: equipe, donateur, montant, email_donateur: emailDon }); const okE = await sendBrevo(s.email_referent_defi_enfance, `❤️ Don pour votre équipe de ${donateur.split(' ')[0]} !`, htmlE); if (okE) { state.stats.sent++; } } }
+      if (equipe) { const s = await fetchOhmeStructureByName(equipe); if (s?.email_referent_defi_enfance) { const htmlE = tplDonEquipe({ chefPrenom: s.prenom_du_referent_defi_enfance || 'Bonjour', chefNom: s.nom_du_referent_defi_enfance || '', nomEquipe: equipe, donateur, montant, email_donateur: emailDon, coureurPrenom: coureurParraine.split(' ')[0], coureurNom: coureurParraine.split(' ').slice(1).join(' ') }); const okE = await sendBrevo(s.email_referent_defi_enfance, `❤️ Don de ${donateur} pour ${coureurParraine.split(' ')[0]} — équipe ${equipe} !`, htmlE); if (okE) { state.stats.sent++; } } }
     } else { return res.json({ success: false, error: `Coureur "${coureurParraine}" introuvable` }); }
 
   } else if (equipeParraine) {
@@ -1750,56 +1775,56 @@ const CAMPAGNES = {
     event: 'Défi Enfance #Course #Angers2026',
     destinataires: ['coureur'],
     sujet: '🎽 Dans 8 jours, on court pour l\'enfance à Angers — tout ce qu\'il faut savoir !',
-    template: (prenom) => tplGroupeJ10Angers({ prenom }),
+    template: (prenom, nbJours) => tplGroupeJ10Angers({ prenom, nbJours }),
   },
   'angers_j1_supporters': {
     label: 'J-1 Angers — Supporters',
     event: 'Défi Enfance #Supporters #Angers2026',
     destinataires: ['supporter'],
     sujet: '🎽 Dans 1 jour, soutenez les coureurs du Défi Enfance à Angers !',
-    template: (prenom) => tplGroupePlaceholder({ prenom, nomTemplate: 'J-1 Supporters Angers' }),
+    template: (prenom, nbJours) => tplGroupePlaceholder({ prenom, nbJours, nomTemplate: 'J-1 Supporters Angers' }),
   },
   'angers_j4_coureurs': {
     label: 'J-4 Angers — Coureurs',
     event: 'Défi Enfance #Course #Angers2026',
     destinataires: ['coureur'],
     sujet: '🏃 Plus que 4 jours — Défi Enfance Angers !',
-    template: (prenom) => tplGroupePlaceholder({ prenom, nomTemplate: 'J-4 Coureurs Angers' }),
+    template: (prenom, nbJours) => tplGroupePlaceholder({ prenom, nbJours, nomTemplate: 'J-4 Coureurs Angers' }),
   },
   'angers_j4_supporters': {
     label: 'J-4 Angers — Supporters',
     event: 'Défi Enfance #Supporters #Angers2026',
     destinataires: ['supporter'],
     sujet: '🏃 Plus que 4 jours — soutenez le Défi Enfance Angers !',
-    template: (prenom) => tplGroupePlaceholder({ prenom, nomTemplate: 'J-4 Supporters Angers' }),
+    template: (prenom, nbJours) => tplGroupePlaceholder({ prenom, nbJours, nomTemplate: 'J-4 Supporters Angers' }),
   },
   'angers_j1_coureurs': {
     label: 'J-1 Angers — Coureurs',
     event: 'Défi Enfance #Course #Angers2026',
     destinataires: ['coureur'],
     sujet: '🌟 Demain, c\'est le jour J — Défi Enfance Angers !',
-    template: (prenom) => tplGroupePlaceholder({ prenom, nomTemplate: 'J-1 Coureurs Angers' }),
+    template: (prenom, nbJours) => tplGroupePlaceholder({ prenom, nbJours, nomTemplate: 'J-1 Coureurs Angers' }),
   },
   'angers_jourj_coureurs': {
     label: 'Jour J Angers — Coureurs',
     event: 'Défi Enfance #Course #Angers2026',
     destinataires: ['coureur'],
     sujet: '🏁 C\'est aujourd\'hui ! Défi Enfance Angers — on vous attend !',
-    template: (prenom) => tplGroupePlaceholder({ prenom, nomTemplate: 'Jour J Coureurs Angers' }),
+    template: (prenom, nbJours) => tplGroupePlaceholder({ prenom, nbJours, nomTemplate: 'Jour J Coureurs Angers' }),
   },
   'angers_jp1_coureurs': {
     label: 'J+1 Angers — Coureurs',
     event: 'Défi Enfance #Course #Angers2026',
     destinataires: ['coureur'],
     sujet: '🙏 Merci pour votre engagement — Défi Enfance Angers !',
-    template: (prenom) => tplGroupePlaceholder({ prenom, nomTemplate: 'J+1 Coureurs Angers' }),
+    template: (prenom, nbJours) => tplGroupePlaceholder({ prenom, nbJours, nomTemplate: 'J+1 Coureurs Angers' }),
   },
   'angers_jp10_coureurs': {
     label: 'J+10 Angers — Coureurs',
     event: 'Défi Enfance #Course #Angers2026',
     destinataires: ['coureur'],
     sujet: '💌 10 jours après le Défi Enfance Angers…',
-    template: (prenom) => tplGroupePlaceholder({ prenom, nomTemplate: 'J+10 Coureurs Angers' }),
+    template: (prenom, nbJours) => tplGroupePlaceholder({ prenom, nbJours, nomTemplate: 'J+10 Coureurs Angers' }),
   },
   // ── JOUÉ-LÈS-TOURS
   'joue_j10_coureurs': {
@@ -1807,56 +1832,56 @@ const CAMPAGNES = {
     event: 'Défi Enfance #Course #Joué-lès-Tours2026',
     destinataires: ['coureur'],
     sujet: '🎽 Dans 9 jours, on court pour l\'enfance à Joué-lès-Tours !',
-    template: (prenom) => tplGroupePlaceholder({ prenom, nomTemplate: 'J-10 Coureurs Joué' }),
+    template: (prenom, nbJours) => tplGroupePlaceholder({ prenom, nbJours, nomTemplate: 'J-10 Coureurs Joué' }),
   },
   'joue_j1_supporters': {
     label: 'J-1 Joué — Supporters',
     event: 'Défi Enfance #Supporters #Joué-lès-Tours2026',
     destinataires: ['supporter'],
     sujet: '🎽 Dans 1 jour, soutenez les coureurs du Défi Enfance à Joué !',
-    template: (prenom) => tplGroupePlaceholder({ prenom, nomTemplate: 'J-1 Supporters Joué' }),
+    template: (prenom, nbJours) => tplGroupePlaceholder({ prenom, nbJours, nomTemplate: 'J-1 Supporters Joué' }),
   },
   'joue_j4_coureurs': {
     label: 'J-4 Joué — Coureurs',
     event: 'Défi Enfance #Course #Joué-lès-Tours2026',
     destinataires: ['coureur'],
     sujet: '🏃 Plus que 4 jours — Défi Enfance Joué-lès-Tours !',
-    template: (prenom) => tplGroupePlaceholder({ prenom, nomTemplate: 'J-4 Coureurs Joué' }),
+    template: (prenom, nbJours) => tplGroupePlaceholder({ prenom, nbJours, nomTemplate: 'J-4 Coureurs Joué' }),
   },
   'joue_j4_supporters': {
     label: 'J-4 Joué — Supporters',
     event: 'Défi Enfance #Supporters #Joué-lès-Tours2026',
     destinataires: ['supporter'],
     sujet: '🏃 Plus que 4 jours — soutenez le Défi Enfance Joué !',
-    template: (prenom) => tplGroupePlaceholder({ prenom, nomTemplate: 'J-4 Supporters Joué' }),
+    template: (prenom, nbJours) => tplGroupePlaceholder({ prenom, nbJours, nomTemplate: 'J-4 Supporters Joué' }),
   },
   'joue_j1_coureurs': {
     label: 'J-1 Joué — Coureurs',
     event: 'Défi Enfance #Course #Joué-lès-Tours2026',
     destinataires: ['coureur'],
     sujet: '🌟 Demain, c\'est le jour J — Défi Enfance Joué !',
-    template: (prenom) => tplGroupePlaceholder({ prenom, nomTemplate: 'J-1 Coureurs Joué' }),
+    template: (prenom, nbJours) => tplGroupePlaceholder({ prenom, nbJours, nomTemplate: 'J-1 Coureurs Joué' }),
   },
   'joue_jourj_coureurs': {
     label: 'Jour J Joué — Coureurs',
     event: 'Défi Enfance #Course #Joué-lès-Tours2026',
     destinataires: ['coureur'],
     sujet: '🏁 C\'est aujourd\'hui ! Défi Enfance Joué — on vous attend !',
-    template: (prenom) => tplGroupePlaceholder({ prenom, nomTemplate: 'Jour J Coureurs Joué' }),
+    template: (prenom, nbJours) => tplGroupePlaceholder({ prenom, nbJours, nomTemplate: 'Jour J Coureurs Joué' }),
   },
   'joue_jp1_coureurs': {
     label: 'J+1 Joué — Coureurs',
     event: 'Défi Enfance #Course #Joué-lès-Tours2026',
     destinataires: ['coureur'],
     sujet: '🙏 Merci pour votre engagement — Défi Enfance Joué !',
-    template: (prenom) => tplGroupePlaceholder({ prenom, nomTemplate: 'J+1 Coureurs Joué' }),
+    template: (prenom, nbJours) => tplGroupePlaceholder({ prenom, nbJours, nomTemplate: 'J+1 Coureurs Joué' }),
   },
   'joue_jp10_coureurs': {
     label: 'J+10 Joué — Coureurs',
     event: 'Défi Enfance #Course #Joué-lès-Tours2026',
     destinataires: ['coureur'],
     sujet: '💌 10 jours après le Défi Enfance Joué…',
-    template: (prenom) => tplGroupePlaceholder({ prenom, nomTemplate: 'J+10 Coureurs Joué' }),
+    template: (prenom, nbJours) => tplGroupePlaceholder({ prenom, nbJours, nomTemplate: 'J+10 Coureurs Joué' }),
   },
 };
 
@@ -1865,6 +1890,7 @@ const envoiGroupe = {
   running:    false,
   campagneId: null,
   label:      '',
+  nbJours:    null,
   total:      0,
   done:       0,
   sent:       0,
@@ -1957,7 +1983,7 @@ async function fetchParticipantsEvenement(nomEvent, typesDestinaires, depuisUtc 
 }
 
 // ── Lancer un envoi groupé
-async function lancerEnvoiGroupe(campagneId, depuisUtc = null) {
+async function lancerEnvoiGroupe(campagneId, depuisUtc = null, nbJours = null) {
   if (envoiGroupe.running) return { error: 'Un envoi groupé est déjà en cours' };
   const campagne = CAMPAGNES[campagneId];
   if (!campagne) return { error: `Campagne "${campagneId}" introuvable` };
@@ -1999,8 +2025,9 @@ async function lancerEnvoiGroupe(campagneId, depuisUtc = null) {
       for (const p of participants) {
         envoiGroupe.done++;
         try {
-          const html = campagne.template(p.prenom);
-          const ok = await sendBrevo(p.email, campagne.sujet, html);
+          const html = campagne.template(p.prenom, nbJours);
+          const sujetFinal = nbJours ? campagne.sujet.replace(/\d+ jours?/gi, `${nbJours} jours`) : campagne.sujet;
+          const ok = await sendBrevo(p.email, sujetFinal, html);
           if (ok) {
             envoiGroupe.sent++;
             state.stats.sent++;
@@ -2071,7 +2098,8 @@ app.post('/api/campagnes/:id/test', async (req, res) => {
   if (!campagne) return res.status(404).json({ error: 'Campagne introuvable' });
   if (envoiGroupe.running) return res.json({ error: 'Un envoi est déjà en cours' });
   try {
-    const html = campagne.template('Victor');
+    const nbJoursTest = req.body.nbJours ? parseInt(req.body.nbJours) : null;
+    const html = campagne.template('Victor', nbJoursTest);
     const ok = await sendBrevo(EMAIL_TEST_VICTOR, `[TEST] ${campagne.sujet}`, html);
     if (ok) {
       addLog(`🧪 Email test "${campagne.label}" envoyé à Victor`, 'ok');
@@ -2086,7 +2114,8 @@ app.post('/api/campagnes/:id/test', async (req, res) => {
 
 app.post('/api/campagnes/:id/start', async (req, res) => {
   const depuisUtc = req.body.depuisUtc || null;
-  const result = await lancerEnvoiGroupe(req.params.id, depuisUtc);
+  const nbJours  = req.body.nbJours ? parseInt(req.body.nbJours) : null;
+  const result = await lancerEnvoiGroupe(req.params.id, depuisUtc, nbJours);
   res.json(result);
 });
 
