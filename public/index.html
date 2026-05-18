@@ -679,7 +679,8 @@ async function confirmerEnvoi() {
 
   showToast('🚀 Envoi lancé !', d.label);
   campagnePendingId = null;
-
+  pollEnvoiGroupe();
+}
 
 function pollEnvoiGroupe() {
   if (envoiGroupeTimer) clearInterval(envoiGroupeTimer);
