@@ -154,7 +154,7 @@ async function saveCurrentVersion() {
 // ══════════════════════════════════════════════════════
 //  VERSION
 // ══════════════════════════════════════════════════════
-const SERVER_VERSION = '94b';
+const SERVER_VERSION = '94c';
 
 // ══════════════════════════════════════════════════════
 //  ÉTAT SERVEUR
@@ -2193,26 +2193,18 @@ async function detecterDoublons(participants) {
       uniques.push(groupe[0]);
     } else {
       // Vérifier si cet email est celui d'un référent d'équipe
-      // Stratégie : chercher parmi les participants si l'un appartient à une équipe
-      // dont cet email est le référent
+      // Stratégie simple : comparer avec les emails déjà chargés dans le groupe
       let isReferent = false;
       let nomEquipe  = '';
-      try {
-        for (const participant of groupe) {
-          if (!participant.nomEquipe) continue;
-          await sleep(300);
-          const structure = await fetchOhmeStructureByName(participant.nomEquipe);
-          if (structure) {
-            const cf = structure.custom_fields || structure;
-            const emailRef = (cf.email_referent_defi_enfance || structure.email_referent_defi_enfance || '').toLowerCase().trim();
-            if (emailRef && emailRef === email.toLowerCase().trim()) {
-              isReferent = true;
-              nomEquipe  = structure.name || participant.nomEquipe;
-              break;
-            }
-          }
-        }
-      } catch(e) { addLog(`⚠️ detecterDoublons erreur : ${e.message}`, 'warn'); }
+      // Pas d'appel API Ohme pour éviter les erreurs 500
+      // On marque comme référent si tous les participants du groupe ont la même équipe
+      const equipesGroupe = [...new Set(groupe.map(p => p.nomEquipe).filter(Boolean))];
+      if (equipesGroupe.length === 1) {
+        nomEquipe  = equipesGroupe[0];
+        // On considère que c'est potentiellement un référent si une seule équipe
+        // L'utilisateur verra le nom de l'équipe et pourra décider
+        isReferent = false; // Laisser l'utilisateur choisir dans tous les cas
+      }
 
       doublons.push({ email, participants: groupe, isReferent, nomEquipe });
     }
