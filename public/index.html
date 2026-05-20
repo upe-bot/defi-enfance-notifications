@@ -246,7 +246,12 @@
           </optgroup>
           <optgroup label="── AUTRES ──────────────────────">
             <option value="dejeuner">🥗 Inscrits déjeuner</option>
-            <option value="referents_equipe">🏆 Référents d'équipe</option>
+            <option value="referents_equipe_angers">🏆 Référents d'équipe — Angers</option>
+            <option value="referents_equipe_joue">🏆 Référents d'équipe — Joué</option>
+            <option value="referents_equipe">🏆 Référents d'équipe — Tous</option>
+            <option value="coureurs_solo_angers">🏃 Coureurs solo Angers (sans équipe)</option>
+            <option value="coureurs_solo_joue">🏃 Coureurs solo Joué (sans équipe)</option>
+            <option value="coureurs_solo_global">🏃 Coureurs solo Défi Global</option>
             <option value="assos_soutenues">🏳️ Associations soutenues</option>
             <option value="donateurs">❤️ Donateurs</option>
           </optgroup>
@@ -257,7 +262,10 @@
         <label style="font-size:.72rem;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:6px">📋 Template email</label>
         <select id="egTemplate" style="width:100%;padding:9px 12px;background:rgba(0,0,0,0.35);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:#fff;font-family:'Poppins',sans-serif;font-size:.82rem">
           <option value="groupe_j4_angers_coureurs">🏃 J-4 Angers — Go dons + promesses</option>
-          <option value="groupe_j10_angers_coureurs">🎽 J-10 — Infos pratiques</option>
+          <option value="groupe_j2_referents_angers">🏆 J-2 Angers — Référents d'équipe (boost collecte)</option>
+          <option value="groupe_j1_angers_coureurs">🎽 J-1 Angers — Dernières infos + dossard</option>
+          <option value="groupe_j10_angers_coureurs">🎽 J-10 Angers — Infos pratiques</option>
+          <option value="groupe_j10_joue_coureurs">🎽 J-10 Joué — Infos pratiques</option>
           <option value="inscription_coureur">🚀 Bienvenue coureur</option>
           <option value="inscription_supporter">🚀 Bienvenue supporter</option>
           <option value="inscription_asso">🏃 Nouveau coureur → Association</option>
@@ -868,11 +876,17 @@ async function egTester() {
   } catch(e) { showToast('❌ Erreur', e.message); }
 }
 
+let egDoublonsChoix = {}; // email → contactId choisi
+let egContactIdsFinals = null; // liste finale après résolution doublons
+
 async function egCompter() {
   const cfg = egGetConfig();
   showToast('🔍 Comptage…', `${cfg.typeDestinataire}`);
   document.getElementById('egApercu').style.display = 'none';
   document.getElementById('confirmEnvoi').style.display = 'none';
+  egContactIdsFinals = null;
+  egDoublonsChoix = {};
+
   try {
     const r = await apiFetch('/api/envoi-groupe/preview', { method: 'POST', body: JSON.stringify(cfg) });
     const d = await r.json();
@@ -884,29 +898,78 @@ async function egCompter() {
     const apercu = document.getElementById('egApercu');
     const apercuTitre = document.getElementById('egApercuTitre');
     const apercuListe = document.getElementById('egApercuListe');
-    apercuTitre.textContent = `👁️ ${d.count} destinataire(s) trouvé(s)${d.dejaEnvoyes > 0 ? ` (${d.dejaEnvoyes} déjà envoyés exclus)` : ''}`;
-    apercuListe.innerHTML = d.apercu.length > 0
-      ? d.apercu.map(p => `<div style="padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.05);color:var(--text-muted)">
-          ${p.prenom} ${p.nom} &lt;${p.email}&gt;${p.nomEquipe ? ` — équipe: ${p.nomEquipe}` : ''}${p.nomAsso ? ` — asso: ${p.nomAsso}` : ''}
+
+    let apercuHtml = d.apercu.length > 0
+      ? d.apercu.map(p => `<div style="padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.05);color:var(--text-muted);font-size:.75rem">
+          ${p.prenom} ${p.nom} &lt;${p.email}&gt;${p.nomEquipe ? ` — ${p.nomEquipe}` : ''}${p.nomAsso ? ` / ${p.nomAsso}` : ''}
         </div>`).join('') + (d.count > 10 ? `<div style="color:var(--text-muted);font-size:.72rem;margin-top:6px">… et ${d.count - 10} autres</div>` : '')
       : '<div style="color:var(--text-muted)">Aucun destinataire trouvé.</div>';
+
+    // ── Afficher les doublons à résoudre
+    if (d.doublons && d.doublons.length > 0) {
+      apercuTitre.innerHTML = `👁️ ${d.count} destinataire(s) — <span style="color:var(--warning)">⚠️ ${d.doublons.length} doublon(s) à résoudre avant envoi</span>`;
+      let doublonsHtml = `<div style="background:rgba(255,214,0,0.06);border:1px solid rgba(255,214,0,0.25);border-radius:10px;padding:14px 16px;margin-bottom:12px">
+        <div style="font-size:.78rem;font-weight:600;color:var(--warning);margin-bottom:10px">⚠️ Ces emails apparaissent plusieurs fois — choisissez le destinataire :</div>`;
+      for (const doublon of d.doublons) {
+        const fieldName = `doublon_${doublon.email.replace(/[@.]/g,'_')}`;
+        doublonsHtml += `<div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:10px 14px;margin-bottom:8px">
+          <div style="font-size:.78rem;font-weight:600;color:var(--text);margin-bottom:8px">📧 ${doublon.email}</div>
+          <label style="display:flex;align-items:center;gap:8px;padding:4px 0;cursor:pointer;font-size:.76rem;color:var(--error)">
+            <input type="radio" name="${fieldName}" value="SKIP" checked onchange="egDoublonsChoix['${doublon.email}']='SKIP'">
+            ⛔ Ne pas envoyer
+          </label>
+          ${doublon.participants.map(p => `
+          <label style="display:flex;align-items:center;gap:8px;padding:4px 0;cursor:pointer;font-size:.76rem;color:var(--text-muted)">
+            <input type="radio" name="${fieldName}" value="${p.contactId}" onchange="egDoublonsChoix['${doublon.email}']='${p.contactId}'">
+            <span><strong>${p.prenom} ${p.nom}</strong>${p.nomEquipe ? ` — ${p.nomEquipe}` : ''}${p.nomAsso ? ` / ${p.nomAsso}` : ''}</span>
+          </label>`).join('')}
+        </div>`;
+        egDoublonsChoix[doublon.email] = 'SKIP'; // défaut
+      }
+      doublonsHtml += `<button class="btn btn-sm btn-success" style="margin-top:8px" onclick="egValiderDoublons(${JSON.stringify(d).replace(/"/g,'&quot;')})">✅ Valider mes choix et continuer</button></div>`;
+      apercuHtml = doublonsHtml + apercuHtml;
+      apercu.style.display = 'block';
+      apercuListe.innerHTML = apercuHtml;
+      apercu.scrollIntoView({ behavior: 'smooth' });
+      showToast('⚠️ Doublons détectés', `${d.doublons.length} email(s) à résoudre`);
+      return; // Ne pas afficher la zone de confirmation tant que doublons non résolus
+    }
+
+    apercuTitre.textContent = `👁️ ${d.count} destinataire(s) trouvé(s)${d.dejaEnvoyes > 0 ? ` (${d.dejaEnvoyes} déjà envoyés exclus)` : ''}`;
+    apercuListe.innerHTML = apercuHtml;
     apercu.style.display = 'block';
 
     if (d.count === 0) { showToast('⚠️ 0 destinataire', 'Vérifiez vos filtres'); return; }
-
-    // Zone confirmation
-    const joursInfo = cfg.nbJours ? `<br>⏳ J-${cfg.nbJours}` : '';
-    const filtreInfo = cfg.depuisFrance ? `<br>🗓️ Depuis : ${cfg.depuisFrance} (heure française)` : '';
-    const equipeInfo = cfg.filtreEquipe ? `<br>🏆 Équipe : ${cfg.filtreEquipe}` : '';
-    document.getElementById('confirmTexte').innerHTML =
-      `Destinataires : <strong>${cfg.typeDestinataire}</strong><br>` +
-      `Template : <strong>${cfg.template}</strong>${joursInfo}${filtreInfo}${equipeInfo}<br>` +
-      `À envoyer : <strong style="color:var(--success)">${d.count} personnes</strong><br><br>` +
-      `⏱️ Durée estimée : ~${Math.ceil(d.count * 3 / 60)} minutes<br>` +
-      `<span style="color:var(--warning);font-size:.8rem">⚠️ Confirmez uniquement si vous êtes sûr(e).</span>`;
-    document.getElementById('confirmEnvoi').style.display = 'block';
-    document.getElementById('confirmEnvoi').scrollIntoView({ behavior: 'smooth' });
+    egAfficherConfirmation(d, cfg);
   } catch(e) { showToast('❌ Erreur', e.message); }
+}
+
+async function egValiderDoublons(d) {
+  // Résoudre les doublons avec les choix faits
+  const cfg = { ...egPendingConfig, choixDoublons: egDoublonsChoix };
+  try {
+    const r = await apiFetch('/api/envoi-groupe/preview', { method: 'POST', body: JSON.stringify(cfg) });
+    const d2 = await r.json();
+    if (d2.error) { showToast('❌ Erreur', d2.error); return; }
+    egContactIdsFinals = d2.destinatairesFinals;
+    document.getElementById('egApercuTitre').textContent = `✅ ${d2.count} destinataire(s) après résolution des doublons`;
+    egAfficherConfirmation(d2, egPendingConfig);
+    showToast('✅ Doublons résolus', `${d2.count} destinataire(s) confirmés`);
+  } catch(e) { showToast('❌ Erreur', e.message); }
+}
+
+function egAfficherConfirmation(d, cfg) {
+  const joursInfo  = cfg.nbJours     ? `<br>⏳ J-${cfg.nbJours}` : '';
+  const filtreInfo = cfg.depuisFrance ? `<br>🗓️ Depuis : ${cfg.depuisFrance} (heure française)` : '';
+  const equipeInfo = cfg.filtreEquipe ? `<br>🏆 Équipe : ${cfg.filtreEquipe}` : '';
+  document.getElementById('confirmTexte').innerHTML =
+    `Destinataires : <strong>${cfg.typeDestinataire}</strong><br>` +
+    `Template : <strong>${cfg.template}</strong>${joursInfo}${filtreInfo}${equipeInfo}<br>` +
+    `À envoyer : <strong style="color:var(--success)">${d.count} personnes</strong><br><br>` +
+    `⏱️ Durée estimée : ~${Math.ceil(d.count * 3 / 60)} minutes<br>` +
+    `<span style="color:var(--warning);font-size:.8rem">⚠️ Confirmez uniquement si vous êtes sûr(e).</span>`;
+  document.getElementById('confirmEnvoi').style.display = 'block';
+  document.getElementById('confirmEnvoi').scrollIntoView({ behavior: 'smooth' });
 }
 
 async function confirmerEnvoiGroupe() {
@@ -915,7 +978,10 @@ async function confirmerEnvoiGroupe() {
   document.getElementById('envoiGroupeProgress').style.display = 'block';
   document.getElementById('envoiGroupeProgress').scrollIntoView({ behavior: 'smooth' });
 
-  const r = await apiFetch('/api/envoi-groupe/start', { method: 'POST', body: JSON.stringify(egPendingConfig) });
+  const payload = egContactIdsFinals
+    ? { ...egPendingConfig, contactIdsFinals: egContactIdsFinals }
+    : egPendingConfig;
+  const r = await apiFetch('/api/envoi-groupe/start', { method: 'POST', body: JSON.stringify(payload) });
   const d = await r.json();
   if (d.error) { showToast('❌ Erreur', d.error); return; }
   showToast('🚀 Envoi lancé !', d.label || '');
