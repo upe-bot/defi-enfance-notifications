@@ -154,7 +154,7 @@ async function saveCurrentVersion() {
 // ══════════════════════════════════════════════════════
 //  VERSION
 // ══════════════════════════════════════════════════════
-const SERVER_VERSION = '102';
+const SERVER_VERSION = '107';
 
 // ══════════════════════════════════════════════════════
 //  ÉTAT SERVEUR
@@ -723,6 +723,27 @@ function tplGroupeJ10Angers({ prenom, nbJours, urlPageCoureur, urlPromesseCoureu
 
 <div class="note magenta">🎽 <strong>Votre dossard</strong><br>Vous recevrez un email le <strong>jeudi 21 mai</strong> avec votre numéro de dossard. Il ne vous restera plus qu'à le récupérer sur place dès 8h30 et à enfiler vos baskets ! 👟</div>
 
+
+<div style="background:linear-gradient(135deg,#1a0a12,#2d1020);border-radius:14px;padding:20px 24px;margin-bottom:20px">
+  <div style="font-size:.75rem;font-weight:700;color:#fb0089;text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">✉️ Email prêt à envoyer à vos proches</div>
+  <div style="font-size:.72rem;color:rgba(255,255,255,0.5);margin-bottom:16px">Copiez-collez ce message à vos amis, collègues, clients, fournisseurs…</div>
+  <div style="background:#fff;border-radius:10px;padding:20px 22px">
+    <div style="font-size:.7rem;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">Objet</div>
+    <div style="font-size:.84rem;font-weight:700;color:#3d1830;margin-bottom:16px;border-bottom:1px solid #f5dced;padding-bottom:12px">Plus qu'un défi sportif, une urgence pour l'enfance 🏁</div>
+    <div style="font-size:.82rem;color:#3d1830;line-height:1.8">
+      <p style="margin:0 0 12px">Bonjour [Prénom],</p>
+      <p style="margin:0 0 12px">Je t'écris parce que j'ai décidé de relever un défi qui me tient particulièrement à cœur : le <strong>Défi Enfance</strong>.</p>
+      <p style="margin:0 0 12px">Comme tu le sais peut-être, le secteur de l'aide à l'enfance traverse une crise sans précédent. Le système est aujourd'hui "embolisé" : manque de places, manque de coordination, et surtout, une approche trop souvent cloisonnée qui laisse des enfants vulnérables sur le bord de la route.</p>
+      <p style="margin:0 0 12px">L'objectif du Défi Enfance est simple : <strong>casser ces silos</strong>. L'argent collecté permet de financer des projets innovants qui placent l'intérêt de l'enfant au centre, en faisant travailler ensemble tous les acteurs qui l'entourent. C'est en décloisonnant nos pratiques que nous réussirons à protéger durablement ces parcours de vie.</p>
+      <p style="margin:0 0 12px"><strong>J'ai besoin de ton aide</strong> pour atteindre mon objectif de collecte.</p>
+      <p style="margin:0 0 12px">Chaque don, même modeste, est un signal fort envoyé à ceux qui se battent sur le terrain. Les fonds sont directement fléchés vers mon équipe et reversés aux associations partenaires.</p>
+      <p style="margin:0 0 12px">Pour me soutenir, c'est par ici : 👉 <a href="${urlDon}" style="color:#fb0089;font-weight:600">Faire un don</a></p>
+      <div style="background:linear-gradient(135deg,#fff0f8,#fff5ef);border-left:3px solid #fb0089;padding:10px 14px;border-radius:0 8px 8px 0;margin:12px 0;font-size:.8rem">💡 <strong>Ton don est défiscalisé à hauteur de 66%.</strong> Un don de 50€ ne te coûte réellement que <strong>17€</strong> après réduction d'impôt.</div>
+      <p style="margin:0 0 12px">Un immense merci pour ton soutien, tes encouragements et pour l'aide que tu apportes à ces enfants.</p>
+      <p style="margin:0">À très vite,<br><strong>${prenom}</strong></p>
+    </div>
+  </div>
+</div>
 <div class="divider"></div>
 <div style="font-size:.84rem;color:#3d1830;text-align:center;line-height:1.8">Pour toute question : <a href="mailto:contact@defienfance.fr" style="color:#fb0089;font-weight:600">contact@defienfance.fr</a> 📩<br><br><strong>On vous attend avec impatience — allez, plus que ${j} jours ! 🏁</strong></div>
 <div style="margin-top:16px;font-size:.82rem;color:#fb0089;font-weight:600;text-align:center">— L'équipe du Défi Enfance 🤲</div>
@@ -912,6 +933,27 @@ function tplGroupeJ10Joue({ prenom, nbJours, urlPageCoureur, urlPromesseCoureur 
 <div class="note magenta">🎽 <strong>Votre dossard</strong><br>Vous recevrez un email la veille, le <strong>jeudi 28 mai</strong>, avec votre numéro de dossard. Il ne vous restera plus qu'à le récupérer sur place dès 13h00 et à enfiler vos baskets ! 👟</div>
 
 ${BLOC_TEMOIGNAGES}${BLOC_SOCIAUX}${BLOC_IFI}${BLOC_RECUS_FISCAUX}
+
+<div style="background:linear-gradient(135deg,#1a0a12,#2d1020);border-radius:14px;padding:20px 24px;margin-bottom:20px">
+  <div style="font-size:.75rem;font-weight:700;color:#fb0089;text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">✉️ Email prêt à envoyer à vos proches</div>
+  <div style="font-size:.72rem;color:rgba(255,255,255,0.5);margin-bottom:16px">Copiez-collez ce message à vos amis, collègues, clients, fournisseurs…</div>
+  <div style="background:#fff;border-radius:10px;padding:20px 22px">
+    <div style="font-size:.7rem;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">Objet</div>
+    <div style="font-size:.84rem;font-weight:700;color:#3d1830;margin-bottom:16px;border-bottom:1px solid #f5dced;padding-bottom:12px">Plus qu'un défi sportif, une urgence pour l'enfance 🏁</div>
+    <div style="font-size:.82rem;color:#3d1830;line-height:1.8">
+      <p style="margin:0 0 12px">Bonjour [Prénom],</p>
+      <p style="margin:0 0 12px">Je t'écris parce que j'ai décidé de relever un défi qui me tient particulièrement à cœur : le <strong>Défi Enfance</strong>.</p>
+      <p style="margin:0 0 12px">Comme tu le sais peut-être, le secteur de l'aide à l'enfance traverse une crise sans précédent. Le système est aujourd'hui "embolisé" : manque de places, manque de coordination, et surtout, une approche trop souvent cloisonnée qui laisse des enfants vulnérables sur le bord de la route.</p>
+      <p style="margin:0 0 12px">L'objectif du Défi Enfance est simple : <strong>casser ces silos</strong>. L'argent collecté permet de financer des projets innovants qui placent l'intérêt de l'enfant au centre, en faisant travailler ensemble tous les acteurs qui l'entourent. C'est en décloisonnant nos pratiques que nous réussirons à protéger durablement ces parcours de vie.</p>
+      <p style="margin:0 0 12px"><strong>J'ai besoin de ton aide</strong> pour atteindre mon objectif de collecte.</p>
+      <p style="margin:0 0 12px">Chaque don, même modeste, est un signal fort envoyé à ceux qui se battent sur le terrain. Les fonds sont directement fléchés vers mon équipe et reversés aux associations partenaires.</p>
+      <p style="margin:0 0 12px">Pour me soutenir, c'est par ici : 👉 <a href="${urlDon}" style="color:#fb0089;font-weight:600">Faire un don</a></p>
+      <div style="background:linear-gradient(135deg,#fff0f8,#fff5ef);border-left:3px solid #fb0089;padding:10px 14px;border-radius:0 8px 8px 0;margin:12px 0;font-size:.8rem">💡 <strong>Ton don est défiscalisé à hauteur de 66%.</strong> Un don de 50€ ne te coûte réellement que <strong>17€</strong> après réduction d'impôt.</div>
+      <p style="margin:0 0 12px">Un immense merci pour ton soutien, tes encouragements et pour l'aide que tu apportes à ces enfants.</p>
+      <p style="margin:0">À très vite,<br><strong>${prenom}</strong></p>
+    </div>
+  </div>
+</div>
 <div class="divider"></div>
 <div style="font-size:.84rem;color:#3d1830;text-align:center;line-height:1.8">Pour toute question : <a href="mailto:contact@defienfance.com" style="color:#fb0089;font-weight:600">contact@defienfance.com</a> 📩<br><br><strong>On vous attend avec impatience — allez, plus que ${j} jours ! 🏁</strong></div>
 <div style="margin-top:16px;font-size:.82rem;color:#fb0089;font-weight:600;text-align:center">— L'équipe du Défi Enfance 🤲</div>
@@ -938,8 +980,7 @@ function tplGroupeJ2Referents({ prenom, urlPromesseEquipe, urlPageEquipe }) {
 
 <!-- Vidéo Victor -->
 <div style="background:linear-gradient(135deg,#1a0a12,#2d1020);border-radius:14px;padding:20px 24px;margin-bottom:22px;text-align:center">
-  <div style="font-size:.75rem;font-weight:700;color:#fb0089;text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px">🎥 Message personnel de Victor Vieilfault</div>
-  <div style="font-size:.82rem;color:rgba(255,255,255,0.7);margin-bottom:16px;line-height:1.6">Victor Vieilfault, responsable du Défi Enfance, vous adresse un message personnel avant le grand jour.</div>
+  <div style="font-size:.75rem;font-weight:700;color:#fb0089;text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px">🎥 Message personnel aux référents d'équipe</div>
   <a href="https://www.youtube.com/shorts/-AT4nCYk7zo" style="display:block;max-width:280px;margin:0 auto 14px;border-radius:12px;overflow:hidden;text-decoration:none;position:relative">
     <img src="https://img.youtube.com/vi/-AT4nCYk7zo/hqdefault.jpg" alt="Message de Victor Vieilfault" style="width:100%;display:block;border-radius:12px">
     <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:56px;height:56px;background:rgba(251,0,137,0.9);border-radius:50%;display:flex;align-items:center;justify-content:center">
@@ -991,6 +1032,27 @@ function tplGroupeJ2Referents({ prenom, urlPromesseEquipe, urlPageEquipe }) {
 <div style="background:linear-gradient(135deg,#fff0f8,#fff5ef);border:1.5px solid rgba(251,0,137,0.25);border-radius:14px;padding:18px 22px;margin-bottom:22px;text-align:center">
   <div style="font-size:.75rem;font-weight:700;color:#fb0089;text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px">🏆 Votre page d'équipe</div>
   <a href="${urlPage}" style="display:inline-block;background:linear-gradient(135deg,#ef6135,#ff8533);color:#fff!important;text-decoration:none;padding:11px 24px;border-radius:99px;font-weight:700;font-size:.82rem">🏆 Voir la page de mon équipe</a>
+</div>
+
+<div style="background:linear-gradient(135deg,#1a0a12,#2d1020);border-radius:14px;padding:20px 24px;margin-bottom:20px">
+  <div style="font-size:.75rem;font-weight:700;color:#fb0089;text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">✉️ Email / post prêt à partager à vos proches</div>
+  <div style="font-size:.72rem;color:rgba(255,255,255,0.5);margin-bottom:16px">Copiez-collez ce message à vos coureurs pour qu'ils le partagent autour d'eux</div>
+  <div style="background:#fff;border-radius:10px;padding:20px 22px">
+    <div style="font-size:.7rem;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">Objet</div>
+    <div style="font-size:.84rem;font-weight:700;color:#3d1830;margin-bottom:16px;border-bottom:1px solid #f5dced;padding-bottom:12px">Plus qu'un défi sportif, une urgence pour l'enfance 🏁</div>
+    <div style="font-size:.82rem;color:#3d1830;line-height:1.8">
+      <p style="margin:0 0 12px">Bonjour [Prénom],</p>
+      <p style="margin:0 0 12px">Je t'écris parce que j'ai décidé de relever un défi qui me tient particulièrement à cœur : le <strong>Défi Enfance</strong>.</p>
+      <p style="margin:0 0 12px">Comme tu le sais peut-être, le secteur de l'aide à l'enfance traverse une crise sans précédent. Le système est aujourd'hui "embolisé" : manque de places, manque de coordination, et surtout, une approche trop souvent cloisonnée qui laisse des enfants vulnérables sur le bord de la route.</p>
+      <p style="margin:0 0 12px">L'objectif du Défi Enfance est simple : <strong>casser ces silos</strong>. L'argent collecté permet de financer des projets innovants qui placent l'intérêt de l'enfant au centre, en faisant travailler ensemble tous les acteurs qui l'entourent. C'est en décloisonnant nos pratiques que nous réussirons à protéger durablement ces parcours de vie.</p>
+      <p style="margin:0 0 12px"><strong>J'ai besoin de ton aide</strong> pour atteindre mon objectif de collecte.</p>
+      <p style="margin:0 0 12px">Chaque don, même modeste, est un signal fort envoyé à ceux qui se battent sur le terrain. Les fonds sont directement fléchés vers mon équipe et reversés aux associations partenaires.</p>
+      <p style="margin:0 0 12px">Pour me soutenir, c'est par ici : 👉 <a href="https://defienfance.fr/faire-un-don/" style="color:#fb0089;font-weight:600">Faire un don</a></p>
+      <div style="background:linear-gradient(135deg,#fff0f8,#fff5ef);border-left:3px solid #fb0089;padding:10px 14px;border-radius:0 8px 8px 0;margin:12px 0;font-size:.8rem">💡 <strong>Ton don est défiscalisé à hauteur de 66%.</strong> Un don de 50€ ne te coûte réellement que <strong>17€</strong> après réduction d'impôt.</div>
+      <p style="margin:0 0 12px">Un immense merci pour ton soutien, tes encouragements et pour l'aide que tu apportes à ces enfants.</p>
+      <p style="margin:0">À très vite, <strong>Victor</strong></p>
+    </div>
+  </div>
 </div>
 
 ${BLOC_RECUS_FISCAUX}${BLOC_IFI}
@@ -1431,18 +1493,33 @@ async function fetchOhmeContactByName(name) {
 async function fetchEquipeCoureur(contactId) {
   if (!contactId) return null;
   try {
-    await sleep(OHME_DELAY_MS);
-    const res = await fetch(`${CONFIG.ohmeBase}/api/v1/payments?contact_id=${contactId}&payment_type_id=3&limit=10`, { headers: { 'Accept': 'application/json', 'client-name': CONFIG.ohmeClientName, 'client-secret': CONFIG.ohmeClientSecret } });
-    if (!res.ok) return null;
-    const json = await res.json();
-    for (const p of (json.data || [])) {
-      const eventName = (p.nom_de_levent || (p.custom_fields && p.custom_fields.nom_de_levent) || '').toUpperCase();
-      if (!eventName.includes('ENFANCE')) continue;
-      const equipe = ((p.custom_fields || p).equipe || '').trim();
-      if (equipe) return equipe;
+    // Pagination complète — filtre local par contact_id (filtre URL non supporté par Ohme)
+    let cursor = null;
+    while (true) {
+      await sleep(OHME_DELAY_MS);
+      const url = cursor
+        ? `${CONFIG.ohmeBase}/api/v1/payments?payment_type_id=3&limit=250&since_date=2026-01-01&cursor=${encodeURIComponent(cursor)}`
+        : `${CONFIG.ohmeBase}/api/v1/payments?payment_type_id=3&limit=250&since_date=2026-01-01`;
+      const res = await fetch(url, {
+        headers: { 'Accept': 'application/json', 'client-name': CONFIG.ohmeClientName, 'client-secret': CONFIG.ohmeClientSecret }
+      });
+      if (!res.ok) { addLog(`⚠️ fetchEquipeCoureur HTTP ${res.status}`, 'warn'); return null; }
+      const json = await res.json();
+      const items = json.data || [];
+      for (const p of items) {
+        if (String(p.contact_id) !== String(contactId)) continue;
+        const eventName = (p.nom_de_levent || (p.custom_fields && p.custom_fields.nom_de_levent) || '').toUpperCase();
+        if (!eventName.includes('ENFANCE')) continue;
+        const equipe = ((p.custom_fields || p).equipe || '').trim();
+        if (equipe) { addLog(`🔍 Équipe coureur trouvée : ${equipe}`, 'info'); return equipe; }
+      }
+      if (items.length < 250) break;
+      cursor = json.cursor || (items.length > 0 ? String(items[items.length - 1].id) : null);
+      if (!cursor) break;
     }
+    addLog(`⚠️ fetchEquipeCoureur — aucune équipe trouvée pour contact ${contactId}`, 'warn');
     return null;
-  } catch(e) { return null; }
+  } catch(e) { addLog(`⚠️ fetchEquipeCoureur erreur : ${e.message}`, 'warn'); return null; }
 }
 
 async function fetchOhmeStructureByName(name) {
