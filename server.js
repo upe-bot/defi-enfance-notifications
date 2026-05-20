@@ -154,7 +154,7 @@ async function saveCurrentVersion() {
 // ══════════════════════════════════════════════════════
 //  VERSION
 // ══════════════════════════════════════════════════════
-const SERVER_VERSION = '107';
+const SERVER_VERSION = '108';
 
 // ══════════════════════════════════════════════════════
 //  ÉTAT SERVEUR
@@ -1870,15 +1870,16 @@ async function processPayments(payments, ignoreDate = false) {
         const coureurPrenom = coureurParraine.split(' ')[0];
         const assoSoutenue  = (cf.asso_soutenue || '').trim();
 
-        // Récupérer les totaux de promesses pour le coureur et son équipe
-        const promCoureur = await fetchTotalPromessesCoureur(contact?.id);
-        const equipe      = await fetchEquipeCoureur(contact?.id);
-        const promEquipe  = equipe ? await fetchTotalPromessesEquipe(equipe) : { nb: 0, total: 0 };
-
         if (emailCoureur) {
+          // Récupérer les totaux de promesses + équipe du coureur
+          const promCoureur = await fetchTotalPromessesCoureur(contact?.id);
+          const equipe      = await fetchEquipeCoureur(contact?.id);
+          const promEquipe  = equipe ? await fetchTotalPromessesEquipe(equipe) : { nb: 0, total: 0 };
+
           // URLs personnalisées
           const urlPromesseCoureur = await buildUrlPromesseCoureur(contact?.id, eventName);
           const urlPageCoureur     = await buildUrlPageCoureur(contact?.id, eventName);
+
           // 1. Email au coureur
           const html = tplPromesseCoureur({ coureurPrenom, donateur, montantParKm: montantKm, email_donateur: emailDon, association: assoSoutenue, motEncouragement, nbPromessesCoureur: promCoureur.nb, totalKmParCoureur: promCoureur.total, nbPromessesEquipe: promEquipe.nb, totalKmParEquipe: promEquipe.total, urlPromesseCoureur, urlPageCoureur });
           const ok = await sendBrevo(emailCoureur, `🏅 ${prenomMerci || donateur.split(' ')[0]} promet ${montantKm}€/km pour toi !`, html);
@@ -1889,21 +1890,22 @@ async function processPayments(payments, ignoreDate = false) {
           const okMerci = await sendBrevo(emailDon, `🙏 Merci pour votre promesse de don au coureur ${coureurPrenom} !`, htmlMerci);
           if (okMerci) { state.stats.sent++; addLog(`✅ Merci promesse envoyé à ${donateur}`, 'ok'); }
 
-          // 3. Email au chef d'équipe si le coureur est dans une équipe
+          // 3. Email au chef d'équipe — même logique que pour les dons
           if (equipe) {
-            const structure = await fetchOhmeStructureByName(equipe);
+            const structure  = await fetchOhmeStructureByName(equipe);
             const chefEmail  = structure?.email_referent_defi_enfance || '';
             const chefPrenom = structure?.prenom_du_referent_defi_enfance || 'Bonjour';
             const chefNom    = structure?.nom_du_referent_defi_enfance || '';
             if (chefEmail) {
-              const urlPageCoureurE  = await buildUrlPageCoureur(contact?.id, eventName);
+              const urlPageCoureurE     = await buildUrlPageCoureur(contact?.id, eventName);
               const urlPromesseCoureurE = await buildUrlPromesseCoureur(contact?.id, eventName);
               const htmlEquipe = tplPromesseCoureurPourEquipe({ chefPrenom, chefNom, nomEquipe: equipe, donateur, montantParKm: montantKm, email_donateur: emailDon, coureurPrenom, coureurNom: coureurParraine.split(' ').slice(1).join(' '), motEncouragement, nbPromessesEquipe: promEquipe.nb, totalKmParEquipe: promEquipe.total, urlPageCoureur: urlPageCoureurE, urlPromesseCoureur: urlPromesseCoureurE });
               const okE = await sendBrevo(chefEmail, `🏅 Promesse de ${donateur} pour ${coureurPrenom} — équipe ${equipe} !`, htmlEquipe);
               if (okE) { state.stats.sent++; addLog(`✅ Promesse ${montantKm}€/km → chef équipe ${equipe}`, 'ok'); }
-            }
-          }
-        } else { addLog(`⚠️ Promesse → coureur "${coureurParraine}" introuvable`, 'warn'); }
+            } else { addLog(`⚠️ Promesse → équipe "${equipe}" — email référent introuvable`, 'warn'); }
+          } else { addLog(`⚠️ Promesse → coureur "${coureurParraine}" — pas d'équipe trouvée`, 'warn'); }
+
+        } else { addLog(`⚠️ Promesse → coureur "${coureurParraine}" introuvable ou sans email`, 'warn'); }
 
       } else if (equipeParraine) {
         const structure = await fetchOhmeStructureByName(equipeParraine);
