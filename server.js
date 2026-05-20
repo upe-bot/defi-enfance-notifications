@@ -154,7 +154,7 @@ async function saveCurrentVersion() {
 // ══════════════════════════════════════════════════════
 //  VERSION
 // ══════════════════════════════════════════════════════
-const SERVER_VERSION = '115';
+const SERVER_VERSION = '118';
 
 // ══════════════════════════════════════════════════════
 //  ÉTAT SERVEUR
@@ -265,14 +265,16 @@ const URL_INSTAGRAM= 'https://www.instagram.com/defienfance';
 const contactsCache = new Map(); // contactId → contact
 const contactsByNameCache = new Map(); // nom complet lowercase → contact
 
-// ── Index contactId → nomEquipe (construit depuis les paiements billetterie)
+// ── Index contactId → nomEquipe + assoSoutenue (construit depuis les paiements billetterie)
 // Evite de paginer tous les paiements à chaque promesse/don
-const equipeParContactId = new Map();
+const equipeParContactId = new Map(); // contactId → nomEquipe
+const assoParContactId   = new Map(); // contactId → nomAsso
 
 async function buildEquipeIndex() {
-  addLog('🏗️ Construction index équipes…', 'info');
+  addLog('🏗️ Construction index équipes + assos…', 'info');
   let cursor = null;
-  let nb = 0;
+  let nbEquipes = 0;
+  let nbAssos = 0;
   while (true) {
     await sleep(OHME_DELAY_MS);
     const url = cursor
@@ -288,17 +290,20 @@ async function buildEquipeIndex() {
       if (!p.contact_id) continue;
       const cf = p.custom_fields || p;
       const equipe = (cf.equipe || '').trim();
+      const asso   = (cf.asso_soutenue || '').trim();
       const eventName = (p.nom_de_levent || cf.nom_de_levent || '').toUpperCase();
-      if (equipe && eventName.includes('ENFANCE')) {
-        equipeParContactId.set(String(p.contact_id), equipe);
-        nb++;
-      }
+      if (!eventName.includes('ENFANCE')) continue;
+      const key = String(p.contact_id);
+      if (equipe) { equipeParContactId.set(key, equipe); nbEquipes++; }
+      if (asso)   { assoParContactId.set(key, asso);     nbAssos++; }
+      // Log diagnostic pour contacts spécifiques
+      if (key === '11259000003002230') addLog(`🔍 Index: Victor trouvé — equipe="${equipe}" asso="${asso}"`, 'info');
     }
     if (items.length < 250) break;
     cursor = json.cursor || (items.length > 0 ? String(items[items.length - 1].id) : null);
     if (!cursor) break;
   }
-  addLog(`✅ Index équipes : ${nb} coureur(s) avec équipe indexés`, 'ok');
+  addLog(`✅ Index : ${nbEquipes} équipe(s), ${nbAssos} asso(s) indexées`, 'ok');
 }
 
 function cacheContact(contact) {
@@ -1636,12 +1641,33 @@ async function fetchOhmeContactByName(name) {
 async function fetchEquipeCoureur(contactId) {
   if (!contactId) return null;
   const key = String(contactId);
-  // Utiliser l'index en mémoire — construit au démarrage, couvre tous les paiements
+
+  // Stratégie 1 : index en mémoire (instantané)
   if (equipeParContactId.has(key)) {
     const equipe = equipeParContactId.get(key);
     addLog(`🔍 Équipe coureur (index) : ${equipe}`, 'info');
     return equipe;
   }
+
+  // Stratégie 2 : le contact peut avoir un doublon dans Ohme (deux contact_id)
+  // Chercher via l'email du contact dans l'index
+  try {
+    const contact = await fetchOhmeContactById(contactId);
+    if (contact?.email) {
+      const emailLower = contact.email.toLowerCase().trim();
+      // Parcourir l'index pour trouver un contact avec le même email
+      for (const [idxKey, equipe] of equipeParContactId.entries()) {
+        const cachedContact = contactsCache.get(idxKey);
+        if (cachedContact?.email?.toLowerCase().trim() === emailLower) {
+          addLog(`🔍 Équipe coureur (doublon email) : ${equipe}`, 'info');
+          // Ajouter l'alias dans l'index pour les prochaines fois
+          equipeParContactId.set(key, equipe);
+          return equipe;
+        }
+      }
+    }
+  } catch(e) {}
+
   addLog(`⚠️ fetchEquipeCoureur — contact ${contactId} absent de l'index`, 'warn');
   return null;
 }
@@ -1934,7 +1960,8 @@ async function processPayments(payments, ignoreDate = false) {
         const contact      = await fetchOhmeContactByName(coureurParraine);
         const emailCoureur = contact?.email || '';
         const coureurPrenom = coureurParraine.split(' ')[0];
-        const assoSoutenue  = (cf.asso_soutenue || '').trim();
+        // Asso soutenue : lire depuis l'index billetterie du coureur (pas du paiement don)
+        const assoSoutenue  = (contact?.id ? (assoParContactId.get(String(contact.id)) || '') : '') || (cf.asso_soutenue || '').trim();
         if (emailCoureur) {
           const urlPageCoureur     = await buildUrlPageCoureur(contact?.id, eventName);
           const urlPromesseCoureur = await buildUrlPromesseCoureur(contact?.id, eventName);
@@ -1992,7 +2019,8 @@ async function processPayments(payments, ignoreDate = false) {
         const contact      = await fetchOhmeContactByName(coureurParraine);
         const emailCoureur = contact?.email || '';
         const coureurPrenom = coureurParraine.split(' ')[0];
-        const assoSoutenue  = (cf.asso_soutenue || '').trim();
+        // Asso soutenue : lire depuis l'index billetterie du coureur
+        const assoSoutenue  = (contact?.id ? (assoParContactId.get(String(contact.id)) || '') : '') || (cf.asso_soutenue || '').trim();
 
         if (emailCoureur) {
           // Récupérer les totaux de promesses + équipe du coureur
@@ -2395,6 +2423,26 @@ app.post('/api/dons-attente/:paiementId/valider', async (req, res) => {
         const htmlMerci = tplMerciPrometteurCoureur({ prenomDonateur: prenomPrometteur, montantParKm: montantKm, coureurPrenom: coureurParraine.split(' ')[0], coureurNom: coureurParraine.split(' ').slice(1).join(' ') });
         const okMerci = await sendBrevo(emailDon, `🙏 Merci pour votre promesse de don au coureur ${coureurParraine.split(' ')[0]} !`, htmlMerci);
         if (okMerci) { state.stats.sent++; }
+
+        // 3. Email au référent d'équipe du coureur
+        const equipe = await fetchEquipeCoureur(contact?.id);
+        if (equipe) {
+          const structure  = await fetchOhmeStructureByName(equipe);
+          const chefEmail  = structure?.email_referent_defi_enfance || '';
+          const chefPrenom = structure?.prenom_du_referent_defi_enfance || 'Bonjour';
+          const chefNom    = structure?.nom_du_referent_defi_enfance || '';
+          if (chefEmail) {
+            const coureurPrenom = coureurParraine.split(' ')[0];
+            const coureurNom    = coureurParraine.split(' ').slice(1).join(' ');
+            const promEquipe    = await fetchTotalPromessesEquipe(equipe);
+            const urlPageCoureurE     = await buildUrlPageCoureur(contact?.id, eventName);
+            const urlPromesseCoureurE = await buildUrlPromesseCoureur(contact?.id, eventName);
+            const htmlEquipe = tplPromesseCoureurPourEquipe({ chefPrenom, chefNom, nomEquipe: equipe, donateur, montantParKm: montantKm, email_donateur: emailDon, coureurPrenom, coureurNom, motEncouragement: (cf.mot_encouragement_sur_mur || '').trim(), nbPromessesEquipe: promEquipe.nb, totalKmParEquipe: promEquipe.total, urlPageCoureur: urlPageCoureurE, urlPromesseCoureur: urlPromesseCoureurE });
+            const okE = await sendBrevo(chefEmail, `🏅 Promesse de ${donateur} pour ${coureurPrenom} — équipe ${equipe} !`, htmlEquipe);
+            if (okE) { state.stats.sent++; addLog(`✅ Promesse validée → chef équipe ${equipe}`, 'ok'); }
+          } else { addLog(`⚠️ Promesse validée — email référent "${equipe}" introuvable`, 'warn'); }
+        } else { addLog(`⚠️ Promesse validée — pas d'équipe trouvée pour ${coureurParraine}`, 'warn'); }
+
       } else { return res.json({ success: false, error: `Coureur "${coureurParraine}" introuvable` }); }
     } else if (equipeParraine) {
       const structure = await fetchOhmeStructureByName(equipeParraine);
