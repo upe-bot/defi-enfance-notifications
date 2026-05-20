@@ -154,7 +154,7 @@ async function saveCurrentVersion() {
 // ══════════════════════════════════════════════════════
 //  VERSION
 // ══════════════════════════════════════════════════════
-const SERVER_VERSION = '108';
+const SERVER_VERSION = '111';
 
 // ══════════════════════════════════════════════════════
 //  ÉTAT SERVEUR
@@ -259,6 +259,19 @@ const URL_LINKEDIN = 'https://www.linkedin.com/company/d%C3%A9fi-enfance/';
 const URL_FACEBOOK = 'https://www.facebook.com/people/D%C3%A9fi-Enfance/61586953989862/';
 const URL_INSTAGRAM= 'https://www.instagram.com/defienfance';
 
+
+
+// ── Cache contacts en mémoire (évite les appels répétés à Ohme)
+const contactsCache = new Map(); // contactId → contact
+const contactsByNameCache = new Map(); // nom complet lowercase → contact
+
+function cacheContact(contact) {
+  if (!contact) return;
+  const id = String(contact.id || '');
+  if (id) contactsCache.set(id, contact);
+  const fullName = `${contact.firstname||contact.first_name||''} ${contact.lastname||contact.last_name||''}`.trim().toLowerCase();
+  if (fullName) contactsByNameCache.set(fullName, contact);
+}
 
 // ── IDs événements Défi Enfance
 const EVENT_ID_ANGERS = '36946';
@@ -507,9 +520,46 @@ function tplDonCoureur({ coureurPrenom, donateur, montant, email_donateur, assoc
 
 function tplDonEquipe({ chefPrenom, chefNom, nomEquipe, donateur, montant, email_donateur, motEncouragement, coureurPrenom, coureurNom, urlPageEquipe }) {
   const isDE   = nomEquipe === 'Défi Enfance';
-  const motLine = motEncouragement ? `<div class="note" style="margin-top:16px;border-left-color:#fb0089;background:#fff0f8">💬 <strong>Mot d'encouragement :</strong><br><em>"${motEncouragement}"</em></div>` : '';
-  const referentLine = isDE && chefNom ? `<div class="row"><span class="ic">👤</span><div><strong>Référent :</strong> ${chefPrenom} ${chefNom}</div></div>` : '';
-  return `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Antonio:wght@700&display=swap" rel="stylesheet"><style>${CSS_COMMUN}</style></head><body><div class="outer"><div class="logo-header"><div class="logo-text">🤝 Défi Enfance</div><div class="logo-sub">Générateur de victoires pour l'enfance</div></div><div class="header orange"><h1>${isDE ? '❤️ Don non fléché reçu !' : '🏆 Nouveau don pour votre équipe !'}</h1><p>Générateur de victoires pour l'enfance</p></div><div class="body"><div class="greeting">Bonjour ${chefPrenom} 👋</div>${!isDE ? `<div style="margin-bottom:16px"><span class="badge">🏃 Équipe ${nomEquipe}</span></div>` : ''}<div class="intro">${isDE ? `Un don de <strong>${montant} €</strong> vient d'être reçu sans être fléché vers un coureur ou une équipe.` : `Un nouveau don vient d'être enregistré pour soutenir <strong>votre équipe au Défi Enfance</strong> !`}</div><div class="don-box orange"><div class="don-amount orange">${montant} €</div><div class="don-label">Don reçu de ${donateur}</div></div><div class="card orange"><h3 class="orange">📋 Coordonnées du donateur</h3><div class="row"><span class="ic">👤</span><div><strong>Nom :</strong> ${donateur}</div></div><div class="row"><span class="ic">✉️</span><div><strong>Email :</strong> <a href="mailto:${email_donateur}" style="color:#ef6135">${email_donateur}</a></div></div>${referentLine}</div>${motLine}<div class="note">${isDE ? `💌 N'hésitez pas à <strong>contacter ${donateur}</strong> pour le remercier !` : `💌 En tant que référent, <strong>remerciez ${donateur} au nom de toute l'équipe</strong> !`}</div>${!isDE ? `<div class="cta-box orange"><p>✨ <strong>Faites grimper la collecte de votre équipe !</strong></p><a href="${urlPageEquipe || URL_EQUIPES}" class="cta-btn orange">🏆 Voir la page de notre équipe</a></div>` : `<div class="cta-box orange"><p>✨ Invitez ${donateur} à flécher son prochain don !</p><a href="${URL_DON}" class="cta-btn orange">❤️ Page de don Défi Enfance</a></div>`}<div class="divider"></div><div style="font-size:.75rem;color:#888;text-align:center">Email envoyé automatiquement dans les 10 minutes suivant le don.</div></div>${BLOC_IFI}<div class="footer"><div style="font-family:Arial,sans-serif;font-size:1.1rem;font-weight:700;color:#fb0089;letter-spacing:.08em;margin-bottom:6px">DÉFI ENFANCE</div><div class="footer-sub">Générateur de victoires pour l'enfance<br>contact@defienfance.fr</div></div></div></body></html>`;
+  const motLine = motEncouragement ? `<div style="background:linear-gradient(135deg,#fff0f8,#fdf5ff);border-left:3px solid #fb0089;border-radius:0 10px 10px 0;padding:14px 18px;margin:16px 0">
+    <div style="font-size:.78rem;font-weight:700;color:#fb0089;margin-bottom:6px">💬 Mot d'encouragement de ${donateur}</div>
+    <div style="font-size:.84rem;color:#3d1830;font-style:italic">"${motEncouragement}"</div>
+  </div>` : '';
+  const coureurLine = coureurPrenom ? `<div style="background:linear-gradient(135deg,#f5f0ff,#fdf0f8);border:1px solid rgba(124,58,237,0.2);border-radius:10px;padding:12px 16px;margin:12px 0;font-size:.84rem;color:#3d1830">🏃 <strong>Ce don est fléché vers ${coureurPrenom} ${coureurNom || ''}</strong>, membre de votre équipe.</div>` : '';
+
+  return `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Antonio:wght@700&display=swap" rel="stylesheet"><style>${CSS_COMMUN}</style></head><body><div class="outer">
+<div class="logo-header"><div class="logo-text">🤝 Défi Enfance</div><div class="logo-sub">Générateur de victoires pour l'enfance</div></div>
+<div class="header orange"><h1>${isDE ? '❤️ Nouveau don reçu !' : '🏆 Votre équipe vient de recevoir un don !'}</h1><p>Générateur de victoires pour l'enfance</p></div>
+<div class="body">
+<div class="greeting">Bonjour ${chefPrenom} 👋</div>
+
+${!isDE ? `<div style="background:linear-gradient(135deg,#fff5ef,#fff0f8);border:2px solid #ef6135;border-radius:14px;padding:14px 20px;margin-bottom:18px;text-align:center">
+  <div style="font-size:.72rem;font-weight:700;color:#ef6135;text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">🏆 Équipe soutenue</div>
+  <div style="font-family:'Antonio',Arial,sans-serif;font-size:1.3rem;color:#ef6135">${nomEquipe}</div>
+</div>` : ''}
+
+<div class="intro">${isDE
+  ? `<strong>${donateur}</strong> vient de faire un don de <strong>${montant} €</strong> au Défi Enfance. Ce don n'est pas encore fléché vers un coureur ou une équipe.`
+  : `Belle nouvelle ! <strong>${donateur}</strong> vient de faire un don de <strong>${montant} €</strong> pour soutenir votre équipe au Défi Enfance. C'est un beau geste de solidarité pour l'enfance !`
+}</div>
+
+<div class="don-box orange"><div class="don-amount orange">${montant} €</div><div class="don-label">Don de ${donateur} pour ${isDE ? 'le Défi Enfance' : `l'équipe ${nomEquipe}`}</div></div>
+
+${coureurLine}
+${motLine}
+
+<div class="card orange" style="margin-bottom:18px">
+  <h3 class="orange">📋 Coordonnées du donateur</h3>
+  <div class="row"><span class="ic">👤</span><div><strong>Nom :</strong> ${donateur}</div></div>
+  <div class="row"><span class="ic">✉️</span><div><strong>Email :</strong> <a href="mailto:${email_donateur}" style="color:#ef6135">${email_donateur}</a></div></div>
+</div>
+
+<div class="note magenta">💌 <strong>Prenez un moment pour remercier ${donateur} personnellement</strong> — un message chaleureux au nom de toute l'équipe fera une vraie différence et l'encouragera à renouveler son geste !</div>
+
+${!isDE ? `<div class="cta-box orange"><p>✨ <strong>Partagez la page de votre équipe</strong> pour multiplier les soutiens !</p><a href="${urlPageEquipe || URL_EQUIPES}" class="cta-btn orange">🏆 Voir la page de notre équipe</a></div>` : `<div class="cta-box orange"><p>✨ Invitez ${donateur} à flécher son prochain don vers un coureur ou une équipe !</p><a href="${URL_DON}" class="cta-btn orange">❤️ Page de don Défi Enfance</a></div>`}
+
+<div class="divider"></div>
+<div style="font-size:.75rem;color:#888;text-align:center">Notification automatique envoyée dans les 10 minutes suivant le don.</div>
+</div>${BLOC_IFI}<div class="footer"><div style="font-family:Arial,sans-serif;font-size:1.1rem;font-weight:700;color:#fb0089;letter-spacing:.08em;margin-bottom:6px">DÉFI ENFANCE</div><div class="footer-sub">Générateur de victoires pour l'enfance<br>contact@defienfance.fr</div></div></div></body></html>`;
 }
 
 // ══════════════════════════════════════════════════════
@@ -1464,30 +1514,86 @@ async function fetchOhmePayments() {
 
 async function fetchOhmeContactById(contactId) {
   if (!contactId) return null;
+  const key = String(contactId);
+  if (contactsCache.has(key)) return contactsCache.get(key);
   try {
     await sleep(OHME_DELAY_MS);
     const res = await fetch(`${CONFIG.ohmeBase}/api/v1/contacts/${contactId}`, { headers: { 'Accept': 'application/json', 'client-name': CONFIG.ohmeClientName, 'client-secret': CONFIG.ohmeClientSecret } });
     if (!res.ok) return null;
     const json = await res.json();
-    return json.data || json;
+    const contact = json.data || json;
+    cacheContact(contact);
+    return contact;
   } catch(e) { return null; }
 }
 
 async function fetchOhmeContactByName(name) {
+  if (!name) return null;
+  const nameLower = name.trim().toLowerCase();
+
+  // Stratégie 0 : cache en mémoire — instantané
+  if (contactsByNameCache.has(nameLower)) {
+    addLog(`🔍 Contact "${name}" trouvé en cache`, 'info');
+    return contactsByNameCache.get(nameLower);
+  }
+
   try {
+    // Stratégie 1 : contacts déjà en cache via leur ID → chercher le bon nom
+    for (const contact of contactsCache.values()) {
+      const fullName = `${contact.firstname||contact.first_name||''} ${contact.lastname||contact.last_name||''}`.trim().toLowerCase();
+      if (fullName === nameLower) {
+        contactsByNameCache.set(nameLower, contact);
+        return contact;
+      }
+    }
+
+    // Stratégie 2 : fallback via /api/v1/contacts (peut causer 422 sur certains champs)
     await sleep(OHME_DELAY_MS);
     const parts = name.trim().split(' ');
     const params = new URLSearchParams({ limit: '5' });
     if (parts[0]) params.set('firstname', parts[0]);
     if (parts.slice(1).join(' ')) params.set('lastname', parts.slice(1).join(' '));
-    const res = await fetch(`${CONFIG.ohmeBase}/api/v1/contacts?${params}`, { headers: { 'Accept': 'application/json', 'client-name': CONFIG.ohmeClientName, 'client-secret': CONFIG.ohmeClientSecret } });
-    if (!res.ok) return null;
-    const json = await res.json();
-    const items = json.data || [];
-    if (!items.length) return null;
-    const contact = items.find(c => `${c.firstname||c.first_name||''} ${c.lastname||c.last_name||''}`.trim().toLowerCase() === name.toLowerCase()) || items[0];
-    return { ...contact, email: contact.email || '' };
-  } catch(e) { return null; }
+    const res = await fetch(`${CONFIG.ohmeBase}/api/v1/contacts?${params}`, {
+      headers: { 'Accept': 'application/json', 'client-name': CONFIG.ohmeClientName, 'client-secret': CONFIG.ohmeClientSecret }
+    });
+    if (res.ok) {
+      const json = await res.json();
+      const items = json.data || [];
+      const contact = items.find(c => `${c.firstname||c.first_name||''} ${c.lastname||c.last_name||''}`.trim().toLowerCase() === nameLower) || items[0];
+      if (contact) {
+        cacheContact(contact);
+        addLog(`🔍 Contact trouvé via API contacts : ${name}`, 'info');
+        return { ...contact, email: contact.email || '' };
+      }
+    } else {
+      addLog(`⚠️ fetchOhmeContactByName HTTP ${res.status} pour "${name}"`, 'warn');
+    }
+
+    // Stratégie 3 : chercher dans les paiements billetterie (lent mais fiable)
+    // Seulement si les stratégies précédentes ont échoué
+    addLog(`🔍 Recherche de "${name}" dans les paiements billetterie…`, 'info');
+    await sleep(OHME_DELAY_MS);
+    const res2 = await fetch(
+      `${CONFIG.ohmeBase}/api/v1/payments?payment_type_id=3&limit=250&since_date=2026-01-01`,
+      { headers: { 'Accept': 'application/json', 'client-name': CONFIG.ohmeClientName, 'client-secret': CONFIG.ohmeClientSecret } }
+    );
+    if (res2.ok) {
+      const json2 = await res2.json();
+      for (const p of (json2.data || [])) {
+        if (!p.contact_id) continue;
+        const contact = await fetchOhmeContactById(p.contact_id); // mis en cache automatiquement
+        if (!contact) continue;
+        const fullName = `${contact.firstname||contact.first_name||''} ${contact.lastname||contact.last_name||''}`.trim().toLowerCase();
+        if (fullName === nameLower) {
+          addLog(`🔍 Contact "${name}" trouvé dans billetterie`, 'info');
+          return contact;
+        }
+      }
+    }
+
+    addLog(`⚠️ fetchOhmeContactByName — "${name}" introuvable partout`, 'warn');
+    return null;
+  } catch(e) { addLog(`⚠️ fetchOhmeContactByName erreur : ${e.message}`, 'warn'); return null; }
 }
 
 async function fetchEquipeCoureur(contactId) {
@@ -3522,6 +3628,14 @@ app.get('/api/campagnes/status', (req, res) => {
 // ══════════════════════════════════════════════════════
 const APP_URL = process.env.RENDER_EXTERNAL_URL || `http://localhost:${PORT}`;
 setInterval(async () => { try { await fetch(`${APP_URL}/api/status`); } catch (_) {} }, 14 * 60 * 1000);
+
+// Vider le cache contacts toutes les 2h pour éviter les fuites mémoire
+setInterval(() => {
+  const sizeBefore = contactsCache.size;
+  contactsCache.clear();
+  contactsByNameCache.clear();
+  if (sizeBefore > 0) addLog(`🗑️ Cache contacts vidé (${sizeBefore} entrées)`, 'info');
+}, 2 * 60 * 60 * 1000);
 
 // ══════════════════════════════════════════════════════
 //  START
