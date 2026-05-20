@@ -154,7 +154,7 @@ async function saveCurrentVersion() {
 // ══════════════════════════════════════════════════════
 //  VERSION
 // ══════════════════════════════════════════════════════
-const SERVER_VERSION = '118';
+const SERVER_VERSION = '119';
 
 // ══════════════════════════════════════════════════════
 //  ÉTAT SERVEUR
@@ -231,6 +231,30 @@ async function initFromRedis() {
     addLog(`⛔ Redis inaccessible — tous les envois sont bloqués par sécurité`, 'error');
     startPolling();
     return;
+  }
+
+  // ── Verrou Redis anti-doublon au démarrage
+  // Evite que deux instances Render traitent les paiements en même temps
+  const lockKey = 'defi_enfance_startup_lock';
+  const lockVal = `${Date.now()}_${Math.random().toString(36).slice(2)}`;
+  try {
+    const existingLock = await redisGet(lockKey);
+    if (existingLock && existingLock.length > 5) {
+      // Une autre instance tourne déjà — on attend 2 minutes avant de démarrer
+      console.log(`[INIT] ⏳ Instance secondaire détectée (verrou actif) — pause 120s`);
+      addLog('⏳ Instance secondaire détectée — pause 120s avant démarrage du poll', 'warn');
+      await new Promise(r => setTimeout(r, 120000));
+    }
+    // Poser le verrou (expire dans 5 min)
+    await redisSet(lockKey, lockVal);
+    setTimeout(async () => {
+      try {
+        const cur = await redisGet(lockKey);
+        if (cur === lockVal) await redisSet(lockKey, '');
+      } catch(_) {}
+    }, 5 * 60 * 1000);
+  } catch(e) {
+    console.log(`[INIT] ⚠️ Verrou Redis erreur : ${e.message} — on continue`);
   }
 
   state.processedIds  = await loadProcessedIds();
