@@ -154,7 +154,7 @@ async function saveCurrentVersion() {
 // ══════════════════════════════════════════════════════
 //  VERSION
 // ══════════════════════════════════════════════════════
-const SERVER_VERSION = '111';
+const SERVER_VERSION = '115';
 
 // ══════════════════════════════════════════════════════
 //  ÉTAT SERVEUR
@@ -264,6 +264,42 @@ const URL_INSTAGRAM= 'https://www.instagram.com/defienfance';
 // ── Cache contacts en mémoire (évite les appels répétés à Ohme)
 const contactsCache = new Map(); // contactId → contact
 const contactsByNameCache = new Map(); // nom complet lowercase → contact
+
+// ── Index contactId → nomEquipe (construit depuis les paiements billetterie)
+// Evite de paginer tous les paiements à chaque promesse/don
+const equipeParContactId = new Map();
+
+async function buildEquipeIndex() {
+  addLog('🏗️ Construction index équipes…', 'info');
+  let cursor = null;
+  let nb = 0;
+  while (true) {
+    await sleep(OHME_DELAY_MS);
+    const url = cursor
+      ? `${CONFIG.ohmeBase}/api/v1/payments?payment_type_id=3&limit=250&since_date=2026-01-01&cursor=${encodeURIComponent(cursor)}`
+      : `${CONFIG.ohmeBase}/api/v1/payments?payment_type_id=3&limit=250&since_date=2026-01-01`;
+    const res = await fetch(url, {
+      headers: { 'Accept': 'application/json', 'client-name': CONFIG.ohmeClientName, 'client-secret': CONFIG.ohmeClientSecret }
+    });
+    if (!res.ok) { addLog(`⚠️ buildEquipeIndex HTTP ${res.status}`, 'warn'); break; }
+    const json = await res.json();
+    const items = json.data || [];
+    for (const p of items) {
+      if (!p.contact_id) continue;
+      const cf = p.custom_fields || p;
+      const equipe = (cf.equipe || '').trim();
+      const eventName = (p.nom_de_levent || cf.nom_de_levent || '').toUpperCase();
+      if (equipe && eventName.includes('ENFANCE')) {
+        equipeParContactId.set(String(p.contact_id), equipe);
+        nb++;
+      }
+    }
+    if (items.length < 250) break;
+    cursor = json.cursor || (items.length > 0 ? String(items[items.length - 1].id) : null);
+    if (!cursor) break;
+  }
+  addLog(`✅ Index équipes : ${nb} coureur(s) avec équipe indexés`, 'ok');
+}
 
 function cacheContact(contact) {
   if (!contact) return;
@@ -647,6 +683,7 @@ function tplMerciDonateurAmbassadeur({ prenomDonateur, montant, coureurPrenom, c
   <div style="font-family:'Antonio',Arial,sans-serif;font-size:1.5rem;color:#fb0089;font-weight:700;margin-bottom:6px">Vous êtes Ambassadeur du Défi Enfance !</div>
   <div style="font-size:.82rem;color:#3d1830;line-height:1.6">Votre engagement répété pour l'enfance est une force rare et précieuse.<br>Merci de croire, encore et encore, que chaque km compte.</div>
 </div>
+${coureurPrenom ? `<div style="background:linear-gradient(135deg,#fff0f8,#fff5ef);border:1.5px solid rgba(251,0,137,0.3);border-radius:10px;padding:12px 18px;margin-bottom:18px;text-align:center"><div style="font-size:.72rem;font-weight:700;color:#fb0089;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">✅ Votre don est bien fléché vers</div><div style="font-family:'Antonio',Arial,sans-serif;font-size:1.2rem;color:#fb0089">${coureurPrenom} ${coureurNom || ''}</div></div>` : nomEquipe ? `<div style="background:linear-gradient(135deg,#fff5ef,#fff0f8);border:1.5px solid rgba(239,97,53,0.3);border-radius:10px;padding:12px 18px;margin-bottom:18px;text-align:center"><div style="font-size:.72rem;font-weight:700;color:#ef6135;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">✅ Votre don est bien fléché vers l'équipe</div><div style="font-family:'Antonio',Arial,sans-serif;font-size:1.2rem;color:#ef6135">${nomEquipe}</div></div>` : ''}
 <div class="intro">Votre nouveau don de <strong>${montant} €</strong> ${cibleIntro} vient renforcer votre soutien exceptionnel au Défi Enfance. Vous faites partie de ceux qui ne lâchent pas.</div>
 ${historiqueHtml}
 <div class="korczak">
@@ -663,8 +700,8 @@ ${BLOC_RECUS_FISCAUX}${BLOC_SOCIAUX}<div class="divider"></div>
 </div>${BLOC_IFI}<div class="footer"><div style="font-family:Arial,sans-serif;font-size:1.1rem;font-weight:700;color:#fb0089;letter-spacing:.08em;margin-bottom:6px">DÉFI ENFANCE</div><div class="footer-sub">Générateur de victoires pour l'enfance<br>contact@defienfance.fr</div></div></div></body></html>`;
 }
 
-function tplMerciDonateurFidele({ prenomDonateur, montant, historiqueHtml }) {
-  return `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Antonio:wght@700&display=swap" rel="stylesheet"><style>${CSS_COMMUN}</style></head><body><div class="outer"><div class="logo-header"><div class="logo-text">🤝 Défi Enfance</div><div class="logo-sub">Générateur de victoires pour l'enfance</div></div><div class="header"><h1>🏅 Super Badge Donateur<br>du Défi Enfance !</h1><p>Générateur de victoires pour l'enfance</p></div><div class="body"><div class="greeting">Bonjour ${prenomDonateur} 👋</div><div class="intro">Vous avez de nouveau soutenu le Défi Enfance avec un don de <strong>${montant} €</strong>. Merci !</div><div style="text-align:center;background:linear-gradient(135deg,#fff0f8,#fff5ef);border-radius:14px;padding:22px;margin-bottom:24px"><div style="font-size:3rem;margin-bottom:8px">🏅</div><div style="font-family:'Antonio',Arial,sans-serif;font-size:1.4rem;color:#fb0089;font-weight:700">Vous êtes officiellement<br>Super Donateur du Défi Enfance !</div></div>${historiqueHtml || ''}${BLOC_RECUS_FISCAUX}${BLOC_SOCIAUX}${blocCtaDonPromesse({})}<div class="divider"></div><div style="font-size:.75rem;color:#888;text-align:center">Merci pour votre don de ${montant} €.<br>contact@defienfance.fr — defienfance.fr</div></div>${BLOC_IFI}<div class="footer"><div style="font-family:Arial,sans-serif;font-size:1.1rem;font-weight:700;color:#fb0089;letter-spacing:.08em;margin-bottom:6px">DÉFI ENFANCE</div><div class="footer-sub">Générateur de victoires pour l'enfance<br>contact@defienfance.fr</div></div></div></body></html>`;
+function tplMerciDonateurFidele({ prenomDonateur, montant, historiqueHtml, coureurPrenom, coureurNom, nomEquipe }) {
+  return `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Antonio:wght@700&display=swap" rel="stylesheet"><style>${CSS_COMMUN}</style></head><body><div class="outer"><div class="logo-header"><div class="logo-text">🤝 Défi Enfance</div><div class="logo-sub">Générateur de victoires pour l'enfance</div></div><div class="header"><h1>🏅 Super Badge Donateur<br>du Défi Enfance !</h1><p>Générateur de victoires pour l'enfance</p></div><div class="body"><div class="greeting">Bonjour ${prenomDonateur} 👋</div><div class="intro">Vous avez de nouveau soutenu le Défi Enfance avec un don de <strong>${montant} €</strong>. Merci !</div><div style="text-align:center;background:linear-gradient(135deg,#fff0f8,#fff5ef);border-radius:14px;padding:22px;margin-bottom:24px"><div style="font-size:3rem;margin-bottom:8px">🏅</div><div style="font-family:'Antonio',Arial,sans-serif;font-size:1.4rem;color:#fb0089;font-weight:700">Vous êtes officiellement<br>Super Donateur du Défi Enfance !</div></div>${coureurPrenom ? `<div style="background:linear-gradient(135deg,#fff0f8,#fff5ef);border:1.5px solid rgba(251,0,137,0.3);border-radius:10px;padding:12px 18px;margin-bottom:18px;text-align:center"><div style="font-size:.72rem;font-weight:700;color:#fb0089;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">✅ Votre don est bien fléché vers</div><div style="font-family:'Antonio',Arial,sans-serif;font-size:1.2rem;color:#fb0089">${coureurPrenom} ${coureurNom || ''}</div></div>` : nomEquipe ? `<div style="background:linear-gradient(135deg,#fff5ef,#fff0f8);border:1.5px solid rgba(239,97,53,0.3);border-radius:10px;padding:12px 18px;margin-bottom:18px;text-align:center"><div style="font-size:.72rem;font-weight:700;color:#ef6135;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">✅ Votre don est bien fléché vers l'équipe</div><div style="font-family:'Antonio',Arial,sans-serif;font-size:1.2rem;color:#ef6135">${nomEquipe}</div></div>` : ''}${historiqueHtml || ''}${BLOC_RECUS_FISCAUX}${BLOC_SOCIAUX}${blocCtaDonPromesse({})}<div class="divider"></div><div style="font-size:.75rem;color:#888;text-align:center">Merci pour votre don de ${montant} €.<br>contact@defienfance.fr — defienfance.fr</div></div>${BLOC_IFI}<div class="footer"><div style="font-family:Arial,sans-serif;font-size:1.1rem;font-weight:700;color:#fb0089;letter-spacing:.08em;margin-bottom:6px">DÉFI ENFANCE</div><div class="footer-sub">Générateur de victoires pour l'enfance<br>contact@defienfance.fr</div></div></div></body></html>`;
 }
 
 function tplMerciDonateurStructure({ prenomDonateur, montant, nomStructure, coureurPrenom, coureurNom, association, nomEquipe }) {
@@ -1437,7 +1474,7 @@ async function sendMerciDonateur({ email, prenom, montant, donateur, coureurPren
       : nomEquipe
         ? `🏅 Super Badge Donateur — votre don via l'équipe ${nomEquipe} !`
         : '🏅 Super Badge Donateur du Défi Enfance !';
-    html = tplMerciDonateurFidele({ prenomDonateur: prenom, montant, historiqueHtml });
+    html = tplMerciDonateurFidele({ prenomDonateur: prenom, montant, historiqueHtml, coureurPrenom, coureurNom, nomEquipe });
 
   } else if (coureurPrenom) {
     // 1er don → coureur
@@ -1598,34 +1635,15 @@ async function fetchOhmeContactByName(name) {
 
 async function fetchEquipeCoureur(contactId) {
   if (!contactId) return null;
-  try {
-    // Pagination complète — filtre local par contact_id (filtre URL non supporté par Ohme)
-    let cursor = null;
-    while (true) {
-      await sleep(OHME_DELAY_MS);
-      const url = cursor
-        ? `${CONFIG.ohmeBase}/api/v1/payments?payment_type_id=3&limit=250&since_date=2026-01-01&cursor=${encodeURIComponent(cursor)}`
-        : `${CONFIG.ohmeBase}/api/v1/payments?payment_type_id=3&limit=250&since_date=2026-01-01`;
-      const res = await fetch(url, {
-        headers: { 'Accept': 'application/json', 'client-name': CONFIG.ohmeClientName, 'client-secret': CONFIG.ohmeClientSecret }
-      });
-      if (!res.ok) { addLog(`⚠️ fetchEquipeCoureur HTTP ${res.status}`, 'warn'); return null; }
-      const json = await res.json();
-      const items = json.data || [];
-      for (const p of items) {
-        if (String(p.contact_id) !== String(contactId)) continue;
-        const eventName = (p.nom_de_levent || (p.custom_fields && p.custom_fields.nom_de_levent) || '').toUpperCase();
-        if (!eventName.includes('ENFANCE')) continue;
-        const equipe = ((p.custom_fields || p).equipe || '').trim();
-        if (equipe) { addLog(`🔍 Équipe coureur trouvée : ${equipe}`, 'info'); return equipe; }
-      }
-      if (items.length < 250) break;
-      cursor = json.cursor || (items.length > 0 ? String(items[items.length - 1].id) : null);
-      if (!cursor) break;
-    }
-    addLog(`⚠️ fetchEquipeCoureur — aucune équipe trouvée pour contact ${contactId}`, 'warn');
-    return null;
-  } catch(e) { addLog(`⚠️ fetchEquipeCoureur erreur : ${e.message}`, 'warn'); return null; }
+  const key = String(contactId);
+  // Utiliser l'index en mémoire — construit au démarrage, couvre tous les paiements
+  if (equipeParContactId.has(key)) {
+    const equipe = equipeParContactId.get(key);
+    addLog(`🔍 Équipe coureur (index) : ${equipe}`, 'info');
+    return equipe;
+  }
+  addLog(`⚠️ fetchEquipeCoureur — contact ${contactId} absent de l'index`, 'warn');
+  return null;
 }
 
 async function fetchOhmeStructureByName(name) {
@@ -2185,6 +2203,10 @@ async function poll() {
   if (premierPoll) addLog('⚠️ Premier poll — paiements mis en attente de validation', 'warn');
   await processPayments(payments);
   if (premierPoll) { premierPoll = false; await saveProcessedIds(); addLog('✅ Mode validation manuelle terminé — surveillance automatique active', 'ok'); }
+  // Mettre à jour l'index équipes toutes les 10 polls (~1h40)
+  if (!state.pollCount) state.pollCount = 0;
+  state.pollCount++;
+  if (state.pollCount % 10 === 0) buildEquipeIndex().catch(()=>{});
 }
 
 function startPolling() {
@@ -2394,7 +2416,7 @@ app.post('/api/dons-attente/:paiementId/valider', async (req, res) => {
     if (emailC) {
       const html = tplDonCoureur({ coureurPrenom: coureurParraine.split(' ')[0], donateur, montant, email_donateur: emailDon, association: (cf.asso_soutenue || '') });
       ok = await sendBrevo(emailC, '❤️ Nouveau don pour ton Défi Enfance !', html);
-      if (ok) { state.stats.sent++; addLog(`✅ Don validé → ${coureurParraine}`, 'ok'); sendMerciDonateur({ email: emailDon, prenom: prenomMerciValider, montant, donateur, isStructure: infosValider.isStructure, nomStructure: infosValider.nomStructure }); }
+      if (ok) { state.stats.sent++; addLog(`✅ Don validé → ${coureurParraine}`, 'ok'); sendMerciDonateur({ email: emailDon, prenom: prenomMerciValider, montant, donateur, coureurPrenom: coureurParraine.split(' ')[0], coureurNom: coureurParraine.split(' ').slice(1).join(' '), association: (cf.asso_soutenue || '').trim(), contactId: paiement.contact_id, isStructure: infosValider.isStructure, nomStructure: infosValider.nomStructure }); }
       const equipe = await fetchEquipeCoureur(contact?.id);
       if (equipe) { const s = await fetchOhmeStructureByName(equipe); if (s?.email_referent_defi_enfance) { const htmlE = tplDonEquipe({ chefPrenom: s.prenom_du_referent_defi_enfance || 'Bonjour', chefNom: s.nom_du_referent_defi_enfance || '', nomEquipe: equipe, donateur, montant, email_donateur: emailDon, coureurPrenom: coureurParraine.split(' ')[0], coureurNom: coureurParraine.split(' ').slice(1).join(' ') }); const okE = await sendBrevo(s.email_referent_defi_enfance, `❤️ Don de ${donateur} pour ${coureurParraine.split(' ')[0]} — équipe ${equipe} !`, htmlE); if (okE) { state.stats.sent++; } } }
     } else { return res.json({ success: false, error: `Coureur "${coureurParraine}" introuvable` }); }
@@ -2406,7 +2428,7 @@ app.post('/api/dons-attente/:paiementId/valider', async (req, res) => {
     if (s?.email_referent_defi_enfance) {
       const html = tplDonEquipe({ chefPrenom: s.prenom_du_referent_defi_enfance || 'Bonjour', chefNom: s.nom_du_referent_defi_enfance || '', nomEquipe: equipeParraine, donateur, montant, email_donateur: emailDon });
       ok = await sendBrevo(s.email_referent_defi_enfance, `❤️ Don pour votre équipe de ${donateur.split(' ')[0]} !`, html);
-      if (ok) { state.stats.sent++; sendMerciDonateur({ email: emailDon, prenom: prenomMerciValider, montant, donateur, isStructure: infosValider.isStructure, nomStructure: infosValider.nomStructure }); addLog(`✅ Don validé → équipe ${equipeParraine}`, 'ok'); }
+      if (ok) { state.stats.sent++; sendMerciDonateur({ email: emailDon, prenom: prenomMerciValider, montant, donateur, nomEquipe: equipeParraine, contactId: paiement.contact_id, isStructure: infosValider.isStructure, nomStructure: infosValider.nomStructure }); addLog(`✅ Don validé → équipe ${equipeParraine}`, 'ok'); }
     } else { return res.json({ success: false, error: `Équipe "${equipeParraine}" introuvable` }); }
   } else {
     const s = await fetchOhmeStructureByName('Défi Enfance');
@@ -3647,3 +3669,5 @@ app.listen(PORT, () => {
 });
 
 initFromRedis();
+// Construire l'index équipes après init Redis (délai pour laisser Redis se connecter)
+setTimeout(() => buildEquipeIndex().catch(e => addLog(`⚠️ buildEquipeIndex erreur : ${e.message}`, 'warn')), 5000);
