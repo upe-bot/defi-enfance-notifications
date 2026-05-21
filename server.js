@@ -1258,6 +1258,10 @@ ${BLOC_RECUS_FISCAUX}${BLOC_IFI}
 function tplGroupeJ1Angers({ prenom, numeroDossard, urlPageCoureur, urlPromesseCoureur }) {
   const urlDon  = urlPageCoureur     || 'https://defienfance.fr/faire-un-don/';
   const urlProm = urlPromesseCoureur || 'https://defienfance.fr/suivre-la-collecte-defi-enfance/?de_promise=1';
+  const blocDossard = numeroDossard
+    ? `<div style="background:linear-gradient(135deg,#fff0f8,#fff5ef);border:2px solid #fb0089;border-radius:14px;padding:16px 22px;margin-bottom:20px;text-align:center"><div style="font-size:.72rem;font-weight:700;color:#fb0089;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">&#127965;&#65039; Votre num&eacute;ro de dossard</div><div style="font-family:Arial,sans-serif;font-size:3rem;color:#fb0089;font-weight:700;line-height:1">${numeroDossard}</div><div style="font-size:.75rem;color:#3d1830;margin-top:6px">A r&eacute;cup&eacute;rer sur place d&egrave;s 8h30</div></div>`
+    : '';
+
   return `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Antonio:wght@700&display=swap" rel="stylesheet"><style>${CSS_COMMUN}
     .checklist-item{display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid #f5dced;font-size:.84rem;color:#3d1830;text-align:left}
     .checklist-item:last-child{border-bottom:none}
@@ -1277,7 +1281,7 @@ function tplGroupeJ1Angers({ prenom, numeroDossard, urlPageCoureur, urlPromesseC
 <div class="body">
 <div style="font-size:1rem;font-weight:600;color:#3d1830;margin-bottom:12px;text-align:left">Bonjour ${prenom} 👋</div>
 <div style="font-size:.85rem;color:#3d1830;line-height:1.7;margin-bottom:20px;text-align:left">Demain matin, vous serez sur la ligne de départ du Défi Enfance. <strong>On est fiers de vous avoir parmi nous.</strong> Voici tout ce qu'il faut savoir pour arriver prêt(e) et serein(e) !</div>
-${numeroDossard ? `<div style="background:linear-gradient(135deg,#fff0f8,#fff5ef);border:2px solid #fb0089;border-radius:14px;padding:16px 22px;margin-bottom:20px;text-align:center"><div style="font-size:.72rem;font-weight:700;color:#fb0089;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">🎽 Votre numéro de dossard</div><div style="font-family:'Antonio',Arial,sans-serif;font-size:3rem;color:#fb0089;font-weight:700;line-height:1">${numeroDossard}</div><div style="font-size:.75rem;color:#3d1830;margin-top:6px">À récupérer sur place dès 8h30</div></div>` : ''}
+${blocDossard}
 <div class="card" style="margin-bottom:20px">
   <h3>✅ Votre check-list</h3>
   <div class="checklist-item"><span>👕</span><div>Tenue de sport + T-Shirt de votre organisation</div></div>
@@ -3007,9 +3011,14 @@ async function fetchDestinataires({ typeDestinataire, filtreEquipe, depuisFrance
           const nom    = contact.lastname  || contact.last_name  || '';
           const cfContact = contact.custom_fields || contact;
           const isAngers = eventNom.toUpperCase().includes('ANGERS');
-          const numeroDossard = isAngers
-            ? (cfContact.numero_dossard_angers_2026 || contact.numero_dossard_angers_2026 || '')
-            : (cfContact.numero_de_dossard_joue2026 || contact.numero_de_dossard_joue2026 || '');
+          const dossardRaw = isAngers
+            ? (cfContact.numero_dossard_angers_2026 ?? contact.numero_dossard_angers_2026 ?? '')
+            : (cfContact.numero_de_dossard_joue2026 ?? contact.numero_de_dossard_joue2026 ?? '');
+          // Champ numérique : 0 = non attribué, on garde les valeurs > 0
+          const numeroDossard = (dossardRaw !== null && dossardRaw !== undefined && dossardRaw !== '' && dossardRaw !== 0 && dossardRaw !== '0')
+            ? String(dossardRaw)
+            : '';
+          addLog(`🎽 Dossard ${prenom} ${nom} : raw=${JSON.stringify(dossardRaw)} → "${numeroDossard}"`, 'info');
           destinataires.push({
             prenom:        prenom || 'Participant',
             nom,
@@ -3019,7 +3028,7 @@ async function fetchDestinataires({ typeDestinataire, filtreEquipe, depuisFrance
             nomEquipe:     (cf.equipe || '').trim(),
             eventName:     eventNom,
             datePaiement:  p.created_at || p.date,
-            numeroDossard: String(numeroDossard || ''),
+            numeroDossard,
           });
         }
 
