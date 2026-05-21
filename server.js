@@ -3772,6 +3772,10 @@ app.post('/api/campagnes/:id/test', async (req, res) => {
       urlPageCoureur: URL_COUREURS,
       urlPromesseCoureur: URL_PROMESSE_FALLBACK,
       urlPageEquipe: URL_EQUIPES,
+      numeroDossard: '42',
+      historiqueHtml: '',
+      urlDon: URL_COUREURS,
+      urlProm: URL_PROMESSE_FALLBACK,
     } : null;
     const html = campagne.template('Victor', nbJoursTest, extraTest);
     const sujetTest = nbJoursTest
