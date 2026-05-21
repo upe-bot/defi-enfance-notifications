@@ -154,7 +154,7 @@ async function saveCurrentVersion() {
 // ══════════════════════════════════════════════════════
 //  VERSION
 // ══════════════════════════════════════════════════════
-const SERVER_VERSION = '123';
+const SERVER_VERSION = '124';
 
 // ══════════════════════════════════════════════════════
 //  ÉTAT SERVEUR
@@ -262,11 +262,19 @@ async function initFromRedis() {
   console.log(`[INIT] ${state.donsEnAttente.length} don(s) en attente chargés`);
   const lastVersion = await getLastVersion();
   premierPoll = lastVersion !== SERVER_VERSION;
-  if (premierPoll) {
+
+  // ── Sécurité critique : si Redis est vide (0 IDs) → forcer mode validation manuelle
+  // même si la version est identique, pour éviter tout envoi accidentel
+  if (!premierPoll && state.processedIds.size === 0) {
+    premierPoll = true;
+    console.log(`[INIT] ⚠️ Redis vide (0 IDs) — mode validation manuelle forcé par sécurité`);
+    addLog('⚠️ Redis vide — mode validation manuelle forcé par sécurité', 'warn');
+    await saveCurrentVersion();
+  } else if (premierPoll) {
     console.log(`[INIT] 🆕 Nouvelle version (${lastVersion || 'aucune'} → ${SERVER_VERSION}) — mode validation manuelle`);
     await saveCurrentVersion();
   } else {
-    console.log(`[INIT] ✅ Même version (${SERVER_VERSION}) — mode automatique`);
+    console.log(`[INIT] ✅ Même version (${SERVER_VERSION}) — ${state.processedIds.size} IDs Redis — mode automatique`);
   }
   state.ready = true;
   startPolling();
