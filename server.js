@@ -2688,8 +2688,9 @@ const CAMPAGNES = {
     label: 'J-1 Angers — Coureurs',
     event: 'Défi Enfance #Course #Angers2026',
     destinataires: ['coureur'],
-    sujet: '🌟 Demain, c\'est le jour J — Défi Enfance Angers !',
-    template: (prenom, nbJours) => tplGroupePlaceholder({ prenom, nbJours, nomTemplate: 'J-1 Coureurs Angers' }),
+    sujet: '🎽 Demain, c\'est le jour J ! 🎽',
+    template: (prenom, nbJours, extra) => tplGroupeJ1Angers({ prenom, numeroDossard: extra?.numeroDossard || '', urlPageCoureur: extra?.urlPageCoureur, urlPromesseCoureur: extra?.urlPromesseCoureur }),
+    personnalise: true,
   },
   'angers_jourj_coureurs': {
     label: 'Jour J Angers — Coureurs',
