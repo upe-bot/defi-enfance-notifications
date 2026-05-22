@@ -154,7 +154,7 @@ async function saveCurrentVersion() {
 // ══════════════════════════════════════════════════════
 //  VERSION
 // ══════════════════════════════════════════════════════
-const SERVER_VERSION = '127';
+const SERVER_VERSION = '129';
 
 // ══════════════════════════════════════════════════════
 //  ÉTAT SERVEUR
@@ -1175,6 +1175,828 @@ ${BLOC_TEMOIGNAGES}${BLOC_SOCIAUX}${BLOC_IFI}${BLOC_RECUS_FISCAUX}
 <div class="divider"></div>
 <div style="font-size:.86rem;color:#3d1830;text-align:center;font-style:italic;margin-bottom:8px">Merci du fond du cœur pour votre engagement.<br>Grâce à vous, chaque enfant a une chance. 🤝</div>
 <div style="font-size:.82rem;color:#fb0089;font-weight:600;text-align:center">— Team Défi Enfance</div>
+
+</div></td></tr></table></body></html>`;
+}
+
+
+
+// ── Classements Défi Enfance Angers 2026 (intégrés)
+const CLASSEMENT_INDIVIDUEL = {
+  545: { classement: 1, nbTours: 29, nom: "GAUDY Wilfried", equipe: "AXA Prévoyance et Patrimoine", kms: 23.78 },
+  532: { classement: 2, nbTours: 29, nom: "LEBRETON Victor", equipe: "Pas à Pas 49", kms: 23.78 },
+  181: { classement: 3, nbTours: 26, nom: "LEGUY Emmanuel", equipe: "Becouze", kms: 21.32 },
+  460: { classement: 4, nbTours: 26, nom: "BOISNEAU Pierre", equipe: "6e Régiment du Génie d\'Angers", kms: 21.32 },
+  75: { classement: 5, nbTours: 26, nom: "DELORME Aurélien", equipe: "Becouze", kms: 21.32 },
+  57: { classement: 6, nbTours: 26, nom: "DUBAIL Arthur", equipe: "Cours Bienheureux Charles d\'Autriche", kms: 21.32 },
+  317: { classement: 7, nbTours: 26, nom: "LEBORGNE Léopold", equipe: "Cours Bienheureux Charles d\'Autriche", kms: 21.32 },
+  567: { classement: 8, nbTours: 26, nom: "GENET DE CHATENAY Baptiste", equipe: "Les pompiers du SDIS 49", kms: 21.32 },
+  605: { classement: 9, nbTours: 26, nom: "LAFLEUR Marc", equipe: "Les pompiers du SDIS 49", kms: 21.32 },
+  109: { classement: 10, nbTours: 26, nom: "DUFRÊNE Camille", equipe: "Pause Angevine - UPE", kms: 21.32 },
+  406: { classement: 11, nbTours: 26, nom: "SOURISSEAU Mélissa", equipe: "Campus Coach Angers", kms: 21.32 },
+  552: { classement: 12, nbTours: 25, nom: "(COLIBRI) Yoan", equipe: "Colibri", kms: 20.5 },
+  471: { classement: 13, nbTours: 25, nom: "LUISIER Rémy", equipe: "LE JARDIN DE COCAGNE ANGEVIN", kms: 20.5 },
+  176: { classement: 14, nbTours: 25, nom: "MIRET Eloi", equipe: "Nameshield", kms: 20.5 },
+  193: { classement: 15, nbTours: 25, nom: "PETIT Étienne", equipe: "Cours Bienheureux Charles d\'Autriche", kms: 20.5 },
+  436: { classement: 16, nbTours: 25, nom: "VESNIER Paola", equipe: "Paola Vesnier", kms: 20.5 },
+  194: { classement: 17, nbTours: 25, nom: "SUBRA Étienne", equipe: "Cours Bienheureux Charles d\'Autriche", kms: 20.5 },
+  137: { classement: 18, nbTours: 25, nom: "ROCHE Christophe", equipe: "Octopus Patrimoine", kms: 20.5 },
+  336: { classement: 19, nbTours: 24, nom: "MALLET LOUIS", equipe: "Ecole Saint Serge", kms: 19.68 },
+  383: { classement: 20, nbTours: 24, nom: "SOULARD Marion", equipe: "Marie Durand", kms: 19.68 },
+  302: { classement: 21, nbTours: 24, nom: "DE LA ROUSSERIE Lancelot", equipe: "Cours Bienheureux Charles d\'Autriche", kms: 19.68 },
+  229: { classement: 22, nbTours: 24, nom: "KOFFI Guillaume", equipe: "Guillaume KOFFI", kms: 19.68 },
+  59: { classement: 23, nbTours: 24, nom: "ROUSSEAU Arthur", equipe: "AXA Prévoyance et Patrimoine", kms: 19.68 },
+  415: { classement: 24, nbTours: 24, nom: "DEVOS Muriel", equipe: "FSDV", kms: 19.68 },
+  29: { classement: 25, nbTours: 24, nom: "JACQUET Alix", equipe: "Cours Bienheureux Charles d\'Autriche", kms: 19.68 },
+  97: { classement: 26, nbTours: 23, nom: "MAÏSTO Benoît", equipe: "6e Régiment du Génie d\'Angers", kms: 18.86 },
+  17: { classement: 27, nbTours: 23, nom: "MILLE Alexandre", equipe: "Nameshield", kms: 18.86 },
+  163: { classement: 28, nbTours: 23, nom: "COSNEAU Dom", equipe: "Réseau Entreprendre Maine et Loire", kms: 18.86 },
+  129: { classement: 29, nbTours: 23, nom: "RAYNAUD DE FITTE Charles", equipe: "Saint Jean Espérance", kms: 18.86 },
+  222: { classement: 30, nbTours: 23, nom: "GERBIER Gaspard", equipe: "Cours Bienheureux Charles d\'Autriche", kms: 18.86 },
+  257: { classement: 31, nbTours: 23, nom: "ROLAND Jean", equipe: "Cours Bienheureux Charles d\'Autriche", kms: 18.86 },
+  344: { classement: 32, nbTours: 22, nom: "LE PERRU Lucille", equipe: "Becouze", kms: 18.04 },
+  634: { classement: 33, nbTours: 22, nom: "MOUSSA Konate", equipe: "Agapè Anjou", kms: 18.04 },
+  39: { classement: 34, nbTours: 22, nom: "CHAMPION Amélie", equipe: "FSDV", kms: 18.04 },
+  432: { classement: 35, nbTours: 22, nom: "TETARD Olivier", equipe: "Angers Technopole", kms: 18.04 },
+  113: { classement: 36, nbTours: 22, nom: "CHALET Candice", equipe: "Candice Chalet", kms: 18.04 },
+  7: { classement: 37, nbTours: 22, nom: "(COLIBRI) Adrien", equipe: "Colibri", kms: 18.04 },
+  547: { classement: 38, nbTours: 22, nom: "LEGUEN Xavier", equipe: "FSDV", kms: 18.04 },
+  519: { classement: 39, nbTours: 22, nom: "PATTYN Thomas", equipe: "AXA Prévoyance et Patrimoine", kms: 18.04 },
+  110: { classement: 40, nbTours: 22, nom: "DUVEAU Camille", equipe: "Becouze", kms: 18.04 },
+  521: { classement: 41, nbTours: 22, nom: "BONHOURE Timothée", equipe: "Cours Bienheureux Charles d\'Autriche", kms: 18.04 },
+  409: { classement: 42, nbTours: 22, nom: "BOUTIN Michel", equipe: "123 Cessions", kms: 18.04 },
+  542: { classement: 43, nbTours: 22, nom: "MOLS VIVIANE Viviane", equipe: "Réseau Entreprendre Maine et Loire", kms: 18.04 },
+  326: { classement: 44, nbTours: 22, nom: "MALET Loïc", equipe: "LE JARDIN DE COCAGNE ANGEVIN", kms: 18.04 },
+  98: { classement: 45, nbTours: 21, nom: "TERTRAIS Bertrand", equipe: "AXA Prévoyance et Patrimoine", kms: 17.22 },
+  370: { classement: 46, nbTours: 21, nom: "THOMAS Manon", equipe: "LE JARDIN DE COCAGNE ANGEVIN", kms: 17.22 },
+  368: { classement: 47, nbTours: 21, nom: "MICHENEAU Manon", equipe: "Marie Durand", kms: 17.22 },
+  43: { classement: 48, nbTours: 21, nom: "HIRON Anaïs", equipe: "Anaïs Hiron", kms: 17.22 },
+  335: { classement: 49, nbTours: 21, nom: "DE LA ROUSSERIE Louis", equipe: "Cours Bienheureux Charles d\'Autriche", kms: 17.22 },
+  402: { classement: 50, nbTours: 21, nom: "DE ROECK Mayeul", equipe: "Cours Bienheureux Charles d\'Autriche", kms: 17.22 },
+  581: { classement: 51, nbTours: 21, nom: "TOUCHET Damien", equipe: "Les pompiers du SDIS 49", kms: 17.22 },
+  311: { classement: 52, nbTours: 21, nom: "ROUGER Léandre", equipe: "Cours Bienheureux Charles d\'Autriche", kms: 17.22 },
+  287: { classement: 53, nbTours: 20, nom: "HAVARD Julien", equipe: "6e Régiment du Génie d\'Angers", kms: 16.4 },
+  182: { classement: 54, nbTours: 20, nom: "PARMENTIER Emmanuel", equipe: "AXA Prévoyance et Patrimoine", kms: 16.4 },
+  27: { classement: 55, nbTours: 20, nom: "FLAMA Alix", equipe: "Cours Bienheureux Charles d\'Autriche", kms: 16.4 },
+  510: { classement: 56, nbTours: 20, nom: "RAMÉ Théodore", equipe: "FSDV", kms: 16.4 },
+  65: { classement: 57, nbTours: 20, nom: "ROMBOUT AUBIN", equipe: "Pause Angevine - UPE", kms: 16.4 },
+  274: { classement: 58, nbTours: 20, nom: "RENOUL Joseph", equipe: "Saint Jean Espérance", kms: 16.4 },
+  423: { classement: 59, nbTours: 20, nom: "RAMÉ Nicolas", equipe: "FSDV", kms: 16.4 },
+  63: { classement: 60, nbTours: 20, nom: "ER RAMACH Atimad", equipe: "N.I.A.H.", kms: 16.4 },
+  127: { classement: 61, nbTours: 20, nom: "DE MOLLANS Charles", equipe: "Cours Bienheureux Charles d\'Autriche", kms: 16.4 },
+  185: { classement: 62, nbTours: 20, nom: "GABORY Enzo", equipe: "SDEL Energis Angers", kms: 16.4 },
+  543: { classement: 63, nbTours: 20, nom: "GAZOUM Wahid", equipe: "Wahid Gazoum", kms: 16.4 },
+  143: { classement: 64, nbTours: 20, nom: "JACQUET Clémence", equipe: "Cours Bienheureux Charles d\'Autriche", kms: 16.4 },
+  602: { classement: 65, nbTours: 20, nom: "JARRY Ludovic", equipe: "Les pompiers du SDIS 49", kms: 16.4 },
+  474: { classement: 66, nbTours: 19, nom: "BERTHET Robinson", equipe: "Campus ESPL", kms: 15.58 },
+  51: { classement: 67, nbTours: 19, nom: "BOURSIN Anthony", equipe: "Becouze", kms: 15.58 },
+  501: { classement: 68, nbTours: 19, nom: "VERARDO Sylvain", equipe: "Sylvain Verardo", kms: 15.58 },
+  283: { classement: 69, nbTours: 19, nom: "ROY JULES", equipe: "Ecole Saint Serge", kms: 15.58 },
+  452: { classement: 70, nbTours: 19, nom: "BEAUDOIN Pavel", equipe: "AFOCAL", kms: 15.58 },
+  220: { classement: 71, nbTours: 19, nom: "TEPA Gaël", equipe: "6e Régiment du Génie d\'Angers", kms: 15.58 },
+  238: { classement: 72, nbTours: 19, nom: "PEZET HELIO", equipe: "Ecole Saint Serge", kms: 15.58 },
+  14: { classement: 73, nbTours: 19, nom: "AUTIN alexandre", equipe: "6e Régiment du Génie d\'Angers", kms: 15.58 },
+  175: { classement: 74, nbTours: 19, nom: "BAUMARD Eloi", equipe: "Ecole Saint Serge", kms: 15.58 },
+  380: { classement: 75, nbTours: 19, nom: "DE LA VILLESBOISNET Marie-Liesse", equipe: "Marie-Liesse de La Villesboisnet", kms: 15.58 },
+  150: { classement: 76, nbTours: 19, nom: "BELLIN Coralie", equipe: "Coralie Belin", kms: 15.58 },
+  189: { classement: 77, nbTours: 19, nom: "MARIAS Erin", equipe: "Marie Durand", kms: 15.58 },
+  600: { classement: 78, nbTours: 19, nom: "LARDEUX Louann", equipe: "Les pompiers du SDIS 49", kms: 15.58 },
+  608: { classement: 79, nbTours: 19, nom: "HUMEAU Marine", equipe: "Les pompiers du SDIS 49", kms: 15.58 },
+  19: { classement: 80, nbTours: 19, nom: "CHATELIER Alexis", equipe: "FSDV", kms: 15.58 },
+  11: { classement: 81, nbTours: 18, nom: "MACKAY Alasdair", equipe: "Cours Bienheureux Charles d\'Autriche", kms: 14.76 },
+  524: { classement: 82, nbTours: 18, nom: "PAHI Tiurai", equipe: "6e Régiment du Génie d\'Angers", kms: 14.76 },
+  523: { classement: 83, nbTours: 18, nom: "ARAI Tita", equipe: "6e Régiment du Génie d\'Angers", kms: 14.76 },
+  174: { classement: 84, nbTours: 18, nom: "SAIVRE Elodie", equipe: "Solar Bird", kms: 14.76 },
+  494: { classement: 85, nbTours: 18, nom: "POULAIN stanislas", equipe: "Solar Bird", kms: 14.76 },
+  205: { classement: 86, nbTours: 18, nom: "DES JAMONIERES Félicie", equipe: "Cours Bienheureux Charles d\'Autriche", kms: 14.76 },
+  546: { classement: 87, nbTours: 18, nom: "MICHEL WILLIAM", equipe: "Marie Durand", kms: 14.76 },
+  214: { classement: 88, nbTours: 18, nom: "LE GRELLE Fr Eric", equipe: "Saint Jean Espérance", kms: 14.76 },
+  343: { classement: 89, nbTours: 18, nom: "DE MAS LATRIE Lucile", equipe: "Cours Bienheureux Charles d\'Autriche", kms: 14.76 },
+  55: { classement: 90, nbTours: 18, nom: "JOLIVET Arnaud", equipe: "Nameshield", kms: 14.76 },
+  403: { classement: 91, nbTours: 18, nom: "PELÉ Mélanie", equipe: "FSDV", kms: 14.76 },
+  112: { classement: 92, nbTours: 18, nom: "MOREAU Camille", equipe: "FSDV", kms: 14.76 },
+  367: { classement: 93, nbTours: 18, nom: "MÊME Manon", equipe: "FSDV", kms: 14.76 },
+  341: { classement: 94, nbTours: 18, nom: "CASTAY Lucie", equipe: "FSDV", kms: 14.76 },
+  149: { classement: 95, nbTours: 18, nom: "LAMALLE Côme", equipe: "Cours Bienheureux Charles d\'Autriche", kms: 14.76 },
+  288: { classement: 96, nbTours: 18, nom: "LEMARCHAND Julien", equipe: "LE JARDIN DE COCAGNE ANGEVIN", kms: 14.76 },
+  446: { classement: 97, nbTours: 18, nom: "POUPON Paul", equipe: "Cours Bienheureux Charles d\'Autriche", kms: 14.76 },
+  4: { classement: 98, nbTours: 18, nom: "RAMÉ Adélaïde", equipe: "FSDV", kms: 14.76 },
+  240: { classement: 99, nbTours: 18, nom: "PEDERSEN Héloïse", equipe: "Cours Bienheureux Charles d\'Autriche", kms: 14.76 },
+  83: { classement: 100, nbTours: 18, nom: "MARIE-JEANNE Aymeric", equipe: "Cours Bienheureux Charles d\'Autriche", kms: 14.76 },
+  70: { classement: 101, nbTours: 18, nom: "DE BAGNEAUX Augustin", equipe: "Cours Bienheureux Charles d\'Autriche", kms: 14.76 },
+  177: { classement: 102, nbTours: 18, nom: "CHATIN DE CHASTAING Elvire", equipe: "Cours Bienheureux Charles d\'Autriche", kms: 14.76 },
+  431: { classement: 103, nbTours: 18, nom: "CHEVILLARD Olivier", equipe: "Cours Bienheureux Charles d\'Autriche", kms: 14.76 },
+  306: { classement: 104, nbTours: 18, nom: "ROCHAIS Laurie", equipe: "Marie Durand", kms: 14.76 },
+  458: { classement: 105, nbTours: 18, nom: "DE MAS LATRIE Pia", equipe: "Cours Bienheureux Charles d\'Autriche", kms: 14.76 },
+  272: { classement: 106, nbTours: 18, nom: "DE QUATREBARBES Joseph", equipe: "Cours Bienheureux Charles d\'Autriche", kms: 14.76 },
+  299: { classement: 107, nbTours: 17, nom: "MITTON KEVIN", equipe: "Assureurs associés", kms: 13.94 },
+  633: { classement: 108, nbTours: 17, nom: "LYLIA Sieger", equipe: "6e Régiment du Génie d\'Angers", kms: 13.94 },
+  316: { classement: 109, nbTours: 17, nom: "BOLO Léopold", equipe: "Cours Bienheureux Charles d\'Autriche", kms: 13.94 },
+  87: { classement: 110, nbTours: 17, nom: "REYNARD BAPTISTE", equipe: "Ecole Saint Serge", kms: 13.94 },
+  442: { classement: 111, nbTours: 17, nom: "BLANDIN Paul", equipe: "Ecole Saint Serge", kms: 13.94 },
+  128: { classement: 112, nbTours: 17, nom: "GASCOGNE Charles", equipe: "Octopus Patrimoine", kms: 13.94 },
+  466: { classement: 113, nbTours: 17, nom: "MOREAU Quentin", equipe: "Solar Bird", kms: 13.94 },
+  506: { classement: 114, nbTours: 17, nom: "BABOU Teo", equipe: "Saint Jean Espérance", kms: 13.94 },
+  187: { classement: 115, nbTours: 17, nom: "MEDARD Enzo", equipe: "Enzo Medard", kms: 13.94 },
+  437: { classement: 116, nbTours: 17, nom: "YOU Pascale", equipe: "Saint Jean Espérance", kms: 13.94 },
+  102: { classement: 117, nbTours: 17, nom: "DE MOLLANS Blandine", equipe: "Cours Bienheureux Charles d\'Autriche", kms: 13.94 },
+  221: { classement: 118, nbTours: 17, nom: "BRANCOUR Gaëtane", equipe: "Cours Bienheureux Charles d\'Autriche", kms: 13.94 },
+  201: { classement: 119, nbTours: 17, nom: "MAILLET Evelyne", equipe: "Angers Technopole", kms: 13.94 },
+  282: { classement: 120, nbTours: 17, nom: "HERIDEL Jules", equipe: "Réseau Entreprendre Maine et Loire", kms: 13.94 },
+  269: { classement: 121, nbTours: 17, nom: "JAMIN Joffrey", equipe: "FSDV", kms: 13.94 },
+  186: { classement: 122, nbTours: 17, nom: "LAVAUD Enzo", equipe: "Campus ESPL", kms: 13.94 },
+  329: { classement: 123, nbTours: 17, nom: "GODINEAU Lolita", equipe: "Marie Durand", kms: 13.94 },
+  618: { classement: 124, nbTours: 17, nom: "POLLET Scarlett", equipe: "ANJOU LOIRE TERRITOIRE", kms: 13.94 },
+  262: { classement: 125, nbTours: 17, nom: "KUN-DARBOIS Jeanne", equipe: "Cours Bienheureux Charles d\'Autriche", kms: 13.94 },
+  404: { classement: 126, nbTours: 17, nom: "BONHOURE Melchior", equipe: "Cours Bienheureux Charles d\'Autriche", kms: 13.94 },
+  90: { classement: 127, nbTours: 17, nom: "BOUSQUET Baudouin", equipe: "Cours Bienheureux Charles d\'Autriche", kms: 13.94 },
+  484: { classement: 128, nbTours: 17, nom: "HERUBEL Sixtine", equipe: "Cours Bienheureux Charles d\'Autriche", kms: 13.94 },
+  630: { classement: 129, nbTours: 17, nom: "QUEINNEC Tanguy", equipe: "Marie Durand", kms: 13.94 },
+  580: { classement: 130, nbTours: 17, nom: "THOMY Cyrille", equipe: "Les pompiers du SDIS 49", kms: 13.94 },
+  145: { classement: 131, nbTours: 17, nom: "JERRO Clement", equipe: "Saint Jean Espérance", kms: 13.94 },
+  325: { classement: 132, nbTours: 17, nom: "CHAUVIN Lise", equipe: "FSDV", kms: 13.94 },
+  429: { classement: 133, nbTours: 17, nom: "DE VILLELE Olga", equipe: "Cours Bienheureux Charles d\'Autriche", kms: 13.94 },
+  492: { classement: 134, nbTours: 16, nom: "LEROUX Sophie", equipe: "La Rose Fraternelle", kms: 13.12 },
+  505: { classement: 135, nbTours: 16, nom: "GIRMAY Teame", equipe: "LE JARDIN DE COCAGNE ANGEVIN", kms: 13.12 },
+  556: { classement: 136, nbTours: 16, nom: "GOMIS FOURNIER Youri", equipe: "Ecole Saint Serge", kms: 13.12 },
+  217: { classement: 137, nbTours: 16, nom: "CLABAU Frédéric", equipe: "Angers Technopole", kms: 13.12 },
+  359: { classement: 138, nbTours: 16, nom: "AMARI LEGOT Malek", equipe: "Ecole Saint Serge", kms: 13.12 },
+  192: { classement: 139, nbTours: 16, nom: "DELETANG Ethan", equipe: "Agapè Anjou", kms: 13.12 },
+  58: { classement: 140, nbTours: 16, nom: "DUBOIS STOYANOV Arthur", equipe: "Ecole Saint Serge", kms: 13.12 },
+  365: { classement: 141, nbTours: 16, nom: "CARRÉ Manon", equipe: "Octopus Patrimoine", kms: 13.12 },
+  54: { classement: 142, nbTours: 16, nom: "BOULERY Arnaud", equipe: "Octopus Patrimoine", kms: 13.12 },
+  337: { classement: 143, nbTours: 16, nom: "RICHER Louis", equipe: "Solar Bird", kms: 13.12 },
+  650: { classement: 144, nbTours: 16, nom: "ALEXANDRA Dubois", equipe: "Ecole Saint Serge", kms: 13.12 },
+  563: { classement: 145, nbTours: 16, nom: "HERAULT Antoine", equipe: "Les pompiers du SDIS 49", kms: 13.12 },
+  467: { classement: 146, nbTours: 16, nom: "PERCHAIS Quitterie", equipe: "Quitterie Perchais", kms: 13.12 },
+  374: { classement: 147, nbTours: 16, nom: "FURET Marie", equipe: "Marie Furet", kms: 13.12 },
+  465: { classement: 148, nbTours: 16, nom: "FRESNAIS Quentin", equipe: "Solar Bird", kms: 13.12 },
+  197: { classement: 149, nbTours: 16, nom: "KUN-DARBOIS Eugénie", equipe: "Cours Bienheureux Charles d\'Autriche", kms: 13.12 },
+  156: { classement: 150, nbTours: 16, nom: "OSMAN MADHI Deka", equipe: "LE JARDIN DE COCAGNE ANGEVIN", kms: 13.12 },
+  6: { classement: 151, nbTours: 16, nom: "BERGEROT Adèle", equipe: "Cours Bienheureux Charles d\'Autriche", kms: 13.12 },
+  332: { classement: 152, nbTours: 16, nom: "MORIANCOURT Lou", equipe: "Réseau Entreprendre Maine et Loire", kms: 13.12 },
+  256: { classement: 153, nbTours: 16, nom: "FEYBESSE Jade", equipe: "Jade feybesse", kms: 13.12 },
+  652: { classement: 154, nbTours: 16, nom: "LOICE Dureau", equipe: "Marie Durand", kms: 13.12 },
+  226: { classement: 155, nbTours: 16, nom: "THOMAS Gregory", equipe: "Marie Durand", kms: 13.12 },
+  86: { classement: 156, nbTours: 16, nom: "MOCQUET Baptiste", equipe: "ANJOU LOIRE TERRITOIRE", kms: 13.12 },
+  234: { classement: 157, nbTours: 16, nom: "EL QASSIMI Haitam", equipe: "Campus ESPL", kms: 13.12 },
+  334: { classement: 158, nbTours: 16, nom: "COLLOT Louis", equipe: "Cours Bienheureux Charles d\'Autriche", kms: 13.12 },
+  470: { classement: 159, nbTours: 16, nom: "MARIAS Rebecca", equipe: "Marie Durand", kms: 13.12 },
+  509: { classement: 160, nbTours: 16, nom: "D\'OYSONVILLE Théodore", equipe: "Cours Bienheureux Charles d\'Autriche", kms: 13.12 },
+  216: { classement: 161, nbTours: 16, nom: "PETIT François", equipe: "Cours Bienheureux Charles d\'Autriche", kms: 13.12 },
+  576: { classement: 162, nbTours: 16, nom: "HERVE Corentin", equipe: "Les pompiers du SDIS 49", kms: 13.12 },
+  612: { classement: 163, nbTours: 16, nom: "VIDREQUIN Mickael", equipe: "Les pompiers du SDIS 49", kms: 13.12 },
+  598: { classement: 164, nbTours: 16, nom: "RETHORE Kevin", equipe: "Les pompiers du SDIS 49", kms: 13.12 },
+  40: { classement: 165, nbTours: 16, nom: "RAMÉ Amicie", equipe: "FSDV", kms: 13.12 },
+  104: { classement: 166, nbTours: 15, nom: "DIALLO Boubacar", equipe: "T\'CAP-T\'PRO", kms: 12.3 },
+  243: { classement: 167, nbTours: 15, nom: "CROCOMBETTE Hilaire", equipe: "Excellence Ruralités", kms: 12.3 },
+  611: { classement: 168, nbTours: 15, nom: "CHALLET Maxime", equipe: "ANJOU LOIRE TERRITOIRE", kms: 12.3 },
+  388: { classement: 169, nbTours: 15, nom: "AIGRON Mathéo", equipe: "La Rose Fraternelle", kms: 12.3 },
+  277: { classement: 170, nbTours: 15, nom: "YLEND Joy", equipe: "Ecole Saint Serge", kms: 12.3 },
+  165: { classement: 171, nbTours: 15, nom: "MARTINET EDGAR", equipe: "Ecole Saint Serge", kms: 12.3 },
+  190: { classement: 172, nbTours: 15, nom: "CHENE Estéban", equipe: "Ecole Saint Serge", kms: 12.3 },
+  232: { classement: 173, nbTours: 15, nom: "TRIN Guillaume", equipe: "Octopus Patrimoine", kms: 12.3 },
+  358: { classement: 174, nbTours: 15, nom: "CHIFFOLEAU Maia", equipe: "Ecole Saint Serge", kms: 12.3 },
+  472: { classement: 175, nbTours: 15, nom: "QIAL Riad", equipe: "Ecole Saint Serge", kms: 12.3 },
+  445: { classement: 176, nbTours: 15, nom: "MILLAN Paul", equipe: "Saint Jean Espérance", kms: 12.3 },
+  89: { classement: 177, nbTours: 15, nom: "MAUSSION Bastien", equipe: "FSDV", kms: 12.3 },
+  296: { classement: 178, nbTours: 15, nom: "PERREAULT Karine", equipe: "FSDV", kms: 12.3 },
+  541: { classement: 179, nbTours: 15, nom: "PAYRAUDEAU Virginie", equipe: "FSDV", kms: 12.3 },
+  157: { classement: 180, nbTours: 15, nom: "DELOBELLE Delphine", equipe: "Agapè Anjou", kms: 12.3 },
+  270: { classement: 181, nbTours: 15, nom: "AUPIAIS Johann", equipe: "FSDV", kms: 12.3 },
+  462: { classement: 182, nbTours: 15, nom: "LEUYET Pierre", equipe: "Saint Jean Espérance", kms: 12.3 },
+  121: { classement: 183, nbTours: 15, nom: "LEMALE Célestin", equipe: "AFOCAL", kms: 12.3 },
+  289: { classement: 184, nbTours: 15, nom: "LORAND Juliette", equipe: "AFOCAL", kms: 12.3 },
+  107: { classement: 185, nbTours: 15, nom: "BOISSEAU Camille", equipe: "Campus Coach Angers", kms: 12.3 },
+  515: { classement: 186, nbTours: 15, nom: "SUBRANNE Thierry", equipe: "Thierry Subranne", kms: 12.3 },
+  88: { classement: 187, nbTours: 15, nom: "BENAYAD Basma", equipe: "N.I.A.H.", kms: 12.3 },
+  133: { classement: 188, nbTours: 15, nom: "PITON chloé", equipe: "chloé piton", kms: 12.3 },
+  198: { classement: 189, nbTours: 15, nom: "VINCENT Eugénie", equipe: "ARIFTS", kms: 12.3 },
+  303: { classement: 190, nbTours: 15, nom: "BRILLET Laura", equipe: "Réseau Entreprendre Maine et Loire", kms: 12.3 },
+  258: { classement: 191, nbTours: 15, nom: "BEUQUE Jean-Lin", equipe: "Cours Bienheureux Charles d\'Autriche", kms: 12.3 },
+  427: { classement: 192, nbTours: 15, nom: "FOURNIER Océane", equipe: "Réseau Entreprendre Maine et Loire", kms: 12.3 },
+  557: { classement: 193, nbTours: 15, nom: "ANTHONIOZ Yves", equipe: "Saint Jean Espérance", kms: 12.3 },
+  397: { classement: 194, nbTours: 15, nom: "MELIN Maxime", equipe: "SDEL Energis Angers", kms: 12.3 },
+  2: { classement: 195, nbTours: 15, nom: "LAHROU Abla", equipe: "N.I.A.H.", kms: 12.3 },
+  339: { classement: 196, nbTours: 15, nom: "TESSIER Louise", equipe: "Cours Bienheureux Charles d\'Autriche", kms: 12.3 },
+  517: { classement: 197, nbTours: 15, nom: "DE FLAUJAC Thomas", equipe: "Saint Jean Espérance", kms: 12.3 },
+  242: { classement: 198, nbTours: 14, nom: "(COLIBRI) Hermann", equipe: "Colibri", kms: 11.48 },
+  224: { classement: 199, nbTours: 14, nom: "CHATIN DE CHASTAING Gladys", equipe: "Cours Bienheureux Charles d\'Autriche", kms: 11.48 },
+  233: { classement: 200, nbTours: 14, nom: "MARY Gwen", equipe: "Département de Maine-et-Loire", kms: 11.48 },
+  440: { classement: 201, nbTours: 14, nom: "JANNIN Patricia", equipe: "Yendouboame", kms: 11.48 },
+  482: { classement: 202, nbTours: 14, nom: "LEDROIT Sarah", equipe: "6e Régiment du Génie d\'Angers", kms: 11.48 },
+  119: { classement: 203, nbTours: 14, nom: "DIEPPEDALLE Cécile", equipe: "Becouze", kms: 11.48 },
+  401: { classement: 204, nbTours: 14, nom: "BEUQUE Mayeul", equipe: "Cours Bienheureux Charles d\'Autriche", kms: 11.48 },
+  461: { classement: 205, nbTours: 14, nom: "COTTREAU Pierre", equipe: "Nameshield", kms: 11.48 },
+  292: { classement: 206, nbTours: 14, nom: "MARTINIS Justine", equipe: "Nameshield", kms: 11.48 },
+  516: { classement: 207, nbTours: 14, nom: "DABOUT Thomas", equipe: "Nameshield", kms: 11.48 },
+  223: { classement: 208, nbTours: 14, nom: "BOUSQUET Gauthier", equipe: "Le Gouvernail", kms: 11.48 },
+  152: { classement: 209, nbTours: 14, nom: "GESLIN Cyriaque", equipe: "Le Gouvernail", kms: 11.48 },
+  246: { classement: 210, nbTours: 14, nom: "ZENAINI Ilias", equipe: "La Rose Fraternelle", kms: 11.48 },
+  166: { classement: 211, nbTours: 14, nom: "APALONE Efraim", equipe: "La Rose Fraternelle", kms: 11.48 },
+  398: { classement: 212, nbTours: 14, nom: "POUILLART MAXIME", equipe: "Ecole Saint Serge", kms: 11.48 },
+  384: { classement: 213, nbTours: 14, nom: "GOURDON Marley", equipe: "Ecole Saint Serge", kms: 11.48 },
+  638: { classement: 214, nbTours: 14, nom: "NOA Motteau", equipe: "Agapè Anjou", kms: 11.48 },
+  211: { classement: 215, nbTours: 14, nom: "LABRUT Florian", equipe: "FSDV", kms: 11.48 },
+  140: { classement: 216, nbTours: 14, nom: "ALLAIS Claude", equipe: "La cravate solidaire", kms: 11.48 },
+  392: { classement: 217, nbTours: 14, nom: "GAUMER Maud", equipe: "Maud GAUMER", kms: 11.48 },
+  488: { classement: 218, nbTours: 14, nom: "ROBERT Solene", equipe: "Solene ROBERT", kms: 11.48 },
+  84: { classement: 219, nbTours: 14, nom: "BEILLARD Baptiste", equipe: "LVA Le Logis", kms: 11.48 },
+  85: { classement: 220, nbTours: 14, nom: "BOLO Baptiste", equipe: "Cours Bienheureux Charles d\'Autriche", kms: 11.48 },
+  148: { classement: 221, nbTours: 14, nom: "DE LA VOLPILIERE Clotilde", equipe: "Cours Bienheureux Charles d\'Autriche", kms: 11.48 },
+  356: { classement: 222, nbTours: 14, nom: "SCOFFIER Maguelone", equipe: "Cours Bienheureux Charles d\'Autriche", kms: 11.48 },
+  421: { classement: 223, nbTours: 14, nom: "ATONATTY Nicolas", equipe: "AXA Prévoyance et Patrimoine", kms: 11.48 },
+  441: { classement: 224, nbTours: 14, nom: "GUENANTEN Patrick", equipe: "AXA Prévoyance et Patrimoine", kms: 11.48 },
+  450: { classement: 225, nbTours: 14, nom: "LAROCHE Pauline", equipe: "Marie Durand", kms: 11.48 },
+  405: { classement: 226, nbTours: 14, nom: "JUDEE Melie", equipe: "Marie Durand", kms: 11.48 },
+  613: { classement: 227, nbTours: 14, nom: "BENDCOR Nelwel", equipe: "ETHIK KEHF", kms: 11.48 },
+  577: { classement: 228, nbTours: 14, nom: "PRAMPART Corentin", equipe: "ETHIK KEHF", kms: 11.48 },
+  310: { classement: 229, nbTours: 14, nom: "LEMASSON Léa", equipe: "SDEL Energis Angers", kms: 11.48 },
+  559: { classement: 230, nbTours: 14, nom: "DE LA CROIX Zita", equipe: "Cours Bienheureux Charles d\'Autriche", kms: 11.48 },
+  586: { classement: 231, nbTours: 14, nom: "BOUCHET Fabien", equipe: "Les pompiers du SDIS 49", kms: 11.48 },
+  497: { classement: 232, nbTours: 13, nom: "CHAVANES Suzanne", equipe: "Le Gouvernail", kms: 10.66 },
+  375: { classement: 233, nbTours: 13, nom: "THIBIERGE marie", equipe: "La Tilma", kms: 10.66 },
+  419: { classement: 234, nbTours: 13, nom: "DARRAS Nathalie", equipe: "La Tilma", kms: 10.66 },
+  535: { classement: 235, nbTours: 13, nom: "WILLOTEAUX Victor", equipe: "Campus ESPL", kms: 10.66 },
+  263: { classement: 236, nbTours: 13, nom: "BLOT Jean-Philippe", equipe: "SDEL Energis Angers", kms: 10.66 },
+  96: { classement: 237, nbTours: 13, nom: "MESSIE Benoit", equipe: "Assureurs associés", kms: 10.66 },
+  530: { classement: 238, nbTours: 13, nom: "DE BAGNEAUX Vianney", equipe: "Vianney de Bagneaux", kms: 10.66 },
+  381: { classement: 239, nbTours: 13, nom: "TEVENINO Marie-rose", equipe: "6e Régiment du Génie d\'Angers", kms: 10.66 },
+  417: { classement: 240, nbTours: 13, nom: "MYRIAM LUISIER Myriam", equipe: "La Rose Fraternelle", kms: 10.66 },
+  92: { classement: 241, nbTours: 13, nom: "FRIA Baya", equipe: "Agapè Anjou", kms: 10.66 },
+  568: { classement: 242, nbTours: 13, nom: "PICARD Béatrice", equipe: "Les pompiers du SDIS 49", kms: 10.66 },
+  78: { classement: 243, nbTours: 13, nom: "VERNIER-ESNAULT Aurore", equipe: "ALDEV", kms: 10.66 },
+  61: { classement: 244, nbTours: 13, nom: "LE PICART Asaël-Néhémie", equipe: "Ecole Saint Serge", kms: 10.66 },
+  47: { classement: 245, nbTours: 13, nom: "TESSON Anne-Sophie", equipe: "Anne-Sophie Tesson", kms: 10.66 },
+  276: { classement: 246, nbTours: 13, nom: "BILLOUIN Joulia", equipe: "Ecole Saint Serge", kms: 10.66 },
+  26: { classement: 247, nbTours: 13, nom: "BOUVIER ALIX", equipe: "Ecole Saint Serge", kms: 10.66 },
+  321: { classement: 248, nbTours: 13, nom: "DOUCET-BLIN LILOU", equipe: "Ecole Saint Serge", kms: 10.66 },
+  447: { classement: 249, nbTours: 13, nom: "PROVOST PAUL", equipe: "Octopus Patrimoine", kms: 10.66 },
+  72: { classement: 250, nbTours: 13, nom: "GAUD Aurélie", equipe: "Aurélie Gaud", kms: 10.66 },
+  304: { classement: 251, nbTours: 13, nom: "ZASSO Lauren", equipe: "Lauren Zasso", kms: 10.66 },
+  378: { classement: 252, nbTours: 13, nom: "ANSCUTTER Marieke", equipe: "FSDV", kms: 10.66 },
+  315: { classement: 253, nbTours: 13, nom: "DE FOUGEROUX Léontine", equipe: "Cours Bienheureux Charles d\'Autriche", kms: 10.66 },
+  639: { classement: 254, nbTours: 13, nom: "ELVINA Jacquet", equipe: "Agapè Anjou", kms: 10.66 },
+  549: { classement: 255, nbTours: 13, nom: "SCHNABEL Yann", equipe: "Saint Jean Espérance", kms: 10.66 },
+  433: { classement: 256, nbTours: 13, nom: "BESNIER Ombline", equipe: "Cours Bienheureux Charles d\'Autriche", kms: 10.66 },
+  23: { classement: 257, nbTours: 13, nom: "RIVIERE Alice", equipe: "Cours Bienheureux Charles d\'Autriche", kms: 10.66 },
+  588: { classement: 258, nbTours: 13, nom: "ADOUM IDRISS Fatimé", equipe: "ETHIK KEHF", kms: 10.66 },
+  235: { classement: 259, nbTours: 13, nom: "JOUSSEAUME PETIT Héléna", equipe: "AXA Prévoyance et Patrimoine", kms: 10.66 },
+  411: { classement: 260, nbTours: 13, nom: "POTTIER Mickael", equipe: "SDEL Energis Angers", kms: 10.66 },
+  322: { classement: 261, nbTours: 13, nom: "NEDELCHEVA Lina", equipe: "Nameshield", kms: 10.66 },
+  486: { classement: 262, nbTours: 13, nom: "LECOQ-VALLON Sixtine", equipe: "Cours Bienheureux Charles d\'Autriche", kms: 10.66 },
+  408: { classement: 263, nbTours: 13, nom: "PAPIN Menehould", equipe: "Cours Bienheureux Charles d\'Autriche", kms: 10.66 },
+  475: { classement: 264, nbTours: 13, nom: "DE QUATREBARBES Roch", equipe: "Cours Bienheureux Charles d\'Autriche", kms: 10.66 },
+  81: { classement: 265, nbTours: 13, nom: "(COLIBRI) Ayaan", equipe: "Colibri", kms: 10.66 },
+  122: { classement: 266, nbTours: 13, nom: "PUEL Célestin", equipe: "LE JARDIN DE COCAGNE ANGEVIN", kms: 10.66 },
+  512: { classement: 267, nbTours: 12, nom: "GALLOUEDEC Thibault", equipe: "À Deux Mains", kms: 9.84 },
+  520: { classement: 268, nbTours: 12, nom: "ROBIN Timéo", equipe: "T\'CAP-T\'PRO", kms: 9.84 },
+  361: { classement: 269, nbTours: 12, nom: "DIALLO Mamadou Aliou", equipe: "T\'CAP-T\'PRO", kms: 9.84 },
+  544: { classement: 270, nbTours: 12, nom: "CESBRON Wilfried", equipe: "Wilfried Cesbron", kms: 9.84 },
+  617: { classement: 271, nbTours: 12, nom: "DEGUIL Sarah", equipe: "ANJOU LOIRE TERRITOIRE", kms: 9.84 },
+  366: { classement: 272, nbTours: 12, nom: "CHEDET Manon", equipe: "Campus ESPL", kms: 9.84 },
+  513: { classement: 273, nbTours: 12, nom: "ROYER thibault", equipe: "ADEPAPE-Repairs! 49", kms: 9.84 },
+  24: { classement: 274, nbTours: 12, nom: "PEHU Alicia", equipe: "Assureurs associés", kms: 9.84 },
+  105: { classement: 275, nbTours: 12, nom: "PROSPER BRIEUC", equipe: "Ecole Saint Serge", kms: 9.84 },
+  1: { classement: 276, nbTours: 12, nom: "LE PICART AAINA ANGE", equipe: "Ecole Saint Serge", kms: 9.84 },
+  298: { classement: 277, nbTours: 12, nom: "DIA Karl", equipe: "Ecole Saint Serge", kms: 9.84 },
+  579: { classement: 278, nbTours: 12, nom: "CROUZET Cyril", equipe: "ANJOU LOIRE TERRITOIRE", kms: 9.84 },
+  154: { classement: 279, nbTours: 12, nom: "AUGUSTUS Danicia", equipe: "La Rose Fraternelle", kms: 9.84 },
+  451: { classement: 280, nbTours: 12, nom: "TEKLE Paulos", equipe: "La Rose Fraternelle", kms: 9.84 },
+  155: { classement: 281, nbTours: 12, nom: "BERRANGER ESCAR Daphné", equipe: "Ecole Saint Serge", kms: 9.84 },
+  364: { classement: 282, nbTours: 12, nom: "BROSSET Manon", equipe: "AFOCAL", kms: 9.84 },
+  531: { classement: 283, nbTours: 12, nom: "BOUREZ Victoire", equipe: "Le Gouvernail", kms: 9.84 },
+  313: { classement: 284, nbTours: 12, nom: "PAROIS Lénaïc", equipe: "AFOCAL", kms: 9.84 },
+  188: { classement: 285, nbTours: 12, nom: "REVEILLANT Eric", equipe: "Le Gouvernail", kms: 9.84 },
+  518: { classement: 286, nbTours: 12, nom: "NGUYEN Thomas", equipe: "Campus ESPL", kms: 9.84 },
+  525: { classement: 287, nbTours: 12, nom: "GUENNEC TOAN", equipe: "Ecole Saint Serge", kms: 9.84 },
+  118: { classement: 288, nbTours: 12, nom: "CLEMENCEAU Cecile", equipe: "Cecile Clemenceau", kms: 9.84 },
+  338: { classement: 289, nbTours: 12, nom: "HARDY LOUISE", equipe: "Ecole Saint Serge", kms: 9.84 },
+  635: { classement: 290, nbTours: 12, nom: "NATHANAEL Godard", equipe: "Agapè Anjou", kms: 9.84 },
+  135: { classement: 291, nbTours: 12, nom: "LAUDE Christiane", equipe: "La cravate solidaire", kms: 9.84 },
+  170: { classement: 292, nbTours: 12, nom: "CADIOU Elise", equipe: "FSDV", kms: 9.84 },
+  489: { classement: 293, nbTours: 12, nom: "LE MARCHAND Solène", equipe: "FSDV", kms: 9.84 },
+  208: { classement: 294, nbTours: 12, nom: "BOPP Florence", equipe: "PARRAINS PAR MILLE", kms: 9.84 },
+  624: { classement: 295, nbTours: 12, nom: "PIET pauline", equipe: "pauline piet", kms: 9.84 },
+  312: { classement: 296, nbTours: 12, nom: "BARKALLAH LENA", equipe: "Ecole Saint Serge", kms: 9.84 },
+  44: { classement: 297, nbTours: 12, nom: "MAGHERBI ANAS", equipe: "Ecole Saint Serge", kms: 9.84 },
+  449: { classement: 298, nbTours: 12, nom: "CHEVRINAIS Pauline", equipe: "FSDV", kms: 9.84 },
+  209: { classement: 299, nbTours: 12, nom: "MOURAIT Florence", equipe: "FSDV", kms: 9.84 },
+  281: { classement: 300, nbTours: 12, nom: "BAREAU MAHAZA Jules", equipe: "Ecole Saint Serge", kms: 9.84 },
+  144: { classement: 301, nbTours: 12, nom: "LEPLOMB Clémence", equipe: "FSDV", kms: 9.84 },
+  539: { classement: 302, nbTours: 12, nom: "SCHOT Violette", equipe: "La cravate solidaire", kms: 9.84 },
+  454: { classement: 303, nbTours: 12, nom: "LEBEAU Pénélope", equipe: "La cravate solidaire", kms: 9.84 },
+  106: { classement: 304, nbTours: 12, nom: "BERGE Camille", equipe: "La cravate solidaire", kms: 9.84 },
+  485: { classement: 305, nbTours: 12, nom: "LABORDE Sixtine", equipe: "Cours Bienheureux Charles d\'Autriche", kms: 9.84 },
+  248: { classement: 306, nbTours: 12, nom: "(COLIBRI) Ines", equipe: "Colibri", kms: 9.84 },
+  173: { classement: 307, nbTours: 12, nom: "POIDEVIN Elodie", equipe: "Yendouboame", kms: 9.84 },
+  183: { classement: 308, nbTours: 12, nom: "COSTALAT Emmy", equipe: "Cours Bienheureux Charles d\'Autriche", kms: 9.84 },
+  91: { classement: 309, nbTours: 12, nom: "PERROUD Baudouin", equipe: "Cours Bienheureux Charles d\'Autriche", kms: 9.84 },
+  399: { classement: 310, nbTours: 12, nom: "DE BETHUNE HESDIGNEUL Maximilien", equipe: "Cours Bienheureux Charles d\'Autriche", kms: 9.84 },
+  349: { classement: 311, nbTours: 12, nom: "MARESCAUX Madeleine", equipe: "Cours Bienheureux Charles d\'Autriche", kms: 9.84 },
+  585: { classement: 312, nbTours: 12, nom: "BORHIS Evan", equipe: "ETHIK KEHF", kms: 9.84 },
+  15: { classement: 313, nbTours: 12, nom: "BIZON Alexandre", equipe: "Nameshield", kms: 9.84 },
+  626: { classement: 314, nbTours: 12, nom: "MOHAMED ALI Mahnoor", equipe: "Mahnoor Mohamed Ali", kms: 9.84 },
+  490: { classement: 315, nbTours: 12, nom: "DEHEN Solveig", equipe: "Cours Bienheureux Charles d\'Autriche", kms: 9.84 },
+  271: { classement: 316, nbTours: 11, nom: "RAULIN Jonathan", equipe: "T\'CAP-T\'PRO", kms: 9.02 },
+  641: { classement: 317, nbTours: 11, nom: "AURELIEN Bechu", equipe: "Esperancia", kms: 9.02 },
+  410: { classement: 318, nbTours: 11, nom: "DURAND Michèle", equipe: "Yendouboame", kms: 9.02 },
+  301: { classement: 319, nbTours: 11, nom: "DE MIOLLIS Laëtitia", equipe: "Les Cahutes de Louise", kms: 9.02 },
+  230: { classement: 320, nbTours: 11, nom: "MESSIÉ Guillaume", equipe: "Assureurs associés", kms: 9.02 },
+  266: { classement: 321, nbTours: 11, nom: "LE CAM Jildaz", equipe: "Cours Bienheureux Charles d\'Autriche", kms: 9.02 },
+  204: { classement: 322, nbTours: 11, nom: "DE FOUGEROUX Félicie", equipe: "Cours Bienheureux Charles d\'Autriche", kms: 9.02 },
+  305: { classement: 323, nbTours: 11, nom: "MARCHAL Laurette", equipe: "Campus ESPL", kms: 9.02 },
+  413: { classement: 324, nbTours: 11, nom: "BANCHEREAU Morgane", equipe: "Département de Maine-et-Loire", kms: 9.02 },
+  424: { classement: 325, nbTours: 11, nom: "CAM Nina", equipe: "Angers Technopole", kms: 9.02 },
+  200: { classement: 326, nbTours: 11, nom: "LE FESSANT Eve", equipe: "Angers Technopole", kms: 9.02 },
+  18: { classement: 327, nbTours: 11, nom: "BOURDAIS Alexiane", equipe: "Angers Technopole", kms: 9.02 },
+  66: { classement: 328, nbTours: 11, nom: "DUSSOT AMATO Audrey", equipe: "Le Gouvernail", kms: 9.02 },
+  241: { classement: 329, nbTours: 11, nom: "MEDAWAR hermance", equipe: "AFOCAL", kms: 9.02 },
+  599: { classement: 330, nbTours: 11, nom: "GAMRY Lèmia", equipe: "ETHIK KEHF", kms: 9.02 },
+  31: { classement: 331, nbTours: 11, nom: "KARAMOKO Aliya", equipe: "Le Gouvernail", kms: 9.02 },
+  331: { classement: 332, nbTours: 11, nom: "MONTIBERT Lou", equipe: "Ecole Saint Serge", kms: 9.02 },
+  318: { classement: 333, nbTours: 11, nom: "(COLIBRI) Liam", equipe: "Colibri", kms: 9.02 },
+  293: { classement: 334, nbTours: 11, nom: "BACAR Kaïs", equipe: "La Rose Fraternelle", kms: 9.02 },
+  307: { classement: 335, nbTours: 11, nom: "ROUAULT HOGDAY Layana", equipe: "Le Gouvernail", kms: 9.02 },
+  522: { classement: 336, nbTours: 11, nom: "DE CARVALHO Timothée", equipe: "Le Gouvernail", kms: 9.02 },
+  196: { classement: 337, nbTours: 11, nom: "DE KERGORLAY Eugénie", equipe: "Le Gouvernail", kms: 9.02 },
+  203: { classement: 338, nbTours: 11, nom: "DIAKITE Fatoumata", equipe: "LE JARDIN DE COCAGNE ANGEVIN", kms: 9.02 },
+  649: { classement: 339, nbTours: 11, nom: "AFIFA Barkallah", equipe: "Ecole Saint Serge", kms: 9.02 },
+  463: { classement: 340, nbTours: 11, nom: "PETIT Pierre", equipe: "Cours Bienheureux Charles d\'Autriche", kms: 9.02 },
+  352: { classement: 341, nbTours: 11, nom: "CHEVRIER Maelys", equipe: "Maelys Chevrier", kms: 9.02 },
+  297: { classement: 342, nbTours: 11, nom: "POIDEVIN Karine", equipe: "Yendouboame", kms: 9.02 },
+  236: { classement: 343, nbTours: 11, nom: "DURAND Hélène", equipe: "Yendouboame", kms: 9.02 },
+  284: { classement: 344, nbTours: 11, nom: "COUDRAIN Julie", equipe: "AXA Prévoyance et Patrimoine", kms: 9.02 },
+  130: { classement: 345, nbTours: 11, nom: "M\'HADHBI Chayma", equipe: "N.I.A.H.", kms: 9.02 },
+  265: { classement: 346, nbTours: 11, nom: "BONNET Jeremy", equipe: "Saint Jean Espérance", kms: 9.02 },
+  354: { classement: 347, nbTours: 11, nom: "AMITRANO Maeva", equipe: "AFOCAL", kms: 9.02 },
+  659: { classement: 348, nbTours: 11, nom: "DOSSARD 659", equipe: null, kms: 9.02 },
+  593: { classement: 349, nbTours: 11, nom: "COCHARD Joachim", equipe: "ETHIK KEHF", kms: 9.02 },
+  239: { classement: 350, nbTours: 11, nom: "MAILLET Héloïse", equipe: "Cours Bienheureux Charles d\'Autriche", kms: 9.02 },
+  207: { classement: 351, nbTours: 11, nom: "LEE Fidelis", equipe: "Saint Jean Espérance", kms: 9.02 },
+  694: { classement: 352, nbTours: 11, nom: "DOSSARD 694", equipe: null, kms: 9.02 },
+  603: { classement: 353, nbTours: 11, nom: "BEZIN Mackeal", equipe: "ETHIK KEHF", kms: 9.02 },
+  342: { classement: 354, nbTours: 11, nom: "ROLAND Lucie", equipe: "Cours Bienheureux Charles d\'Autriche", kms: 9.02 },
+  590: { classement: 355, nbTours: 11, nom: "DAUDIN Florian", equipe: "Les pompiers du SDIS 49", kms: 9.02 },
+  587: { classement: 356, nbTours: 11, nom: "GIRARDEAU Fabien", equipe: "Les pompiers du SDIS 49", kms: 9.02 },
+  357: { classement: 357, nbTours: 11, nom: "HERSART DE LA VILLEMARQUÉ Mahé", equipe: "We are lovers", kms: 9.02 },
+  117: { classement: 358, nbTours: 11, nom: "GAULT catherine", equipe: "ALDEV", kms: 9.02 },
+  439: { classement: 359, nbTours: 11, nom: "COCHIN Patricia", equipe: "ALDEV", kms: 9.02 },
+  319: { classement: 360, nbTours: 10, nom: "BELLANGER Lilas", equipe: "Campus ESPL", kms: 8.2 },
+  20: { classement: 361, nbTours: 10, nom: "VICARI Alexis", equipe: "Xilo Menuiserie", kms: 8.2 },
+  468: { classement: 362, nbTours: 10, nom: "(COLIBRI) Rachel", equipe: "Colibri", kms: 8.2 },
+  34: { classement: 363, nbTours: 10, nom: "GARNICA LEMARCHAND Amada", equipe: "Cours Bienheureux Charles d\'Autriche", kms: 8.2 },
+  180: { classement: 364, nbTours: 10, nom: "PASCO Emilien", equipe: "AFOCAL", kms: 8.2 },
+  548: { classement: 365, nbTours: 10, nom: "AITOUELHAJ Yanis", equipe: "Le Gouvernail", kms: 8.2 },
+  493: { classement: 366, nbTours: 10, nom: "ROULLOIS Stacie", equipe: "Assureurs associés", kms: 8.2 },
+  249: { classement: 367, nbTours: 10, nom: "SOTKINE Iris", equipe: "Assureurs associés", kms: 8.2 },
+  79: { classement: 368, nbTours: 10, nom: "GOULET Axel", equipe: "Ecole Saint Serge", kms: 8.2 },
+  38: { classement: 369, nbTours: 10, nom: "MANCEAU Amélia", equipe: "Angers Technopole", kms: 8.2 },
+  511: { classement: 370, nbTours: 10, nom: "JUCHET Théophile", equipe: "Le Gouvernail", kms: 8.2 },
+  275: { classement: 371, nbTours: 10, nom: "MARTIN Joséphine", equipe: "Le Gouvernail", kms: 8.2 },
+  309: { classement: 372, nbTours: 10, nom: "DROUOT Léa", equipe: "Ecole Saint Serge", kms: 8.2 },
+  261: { classement: 373, nbTours: 10, nom: "FERRANDON JEANNE", equipe: "Ecole Saint Serge", kms: 8.2 },
+  351: { classement: 374, nbTours: 10, nom: "ANGER Maelis", equipe: "AFOCAL", kms: 8.2 },
+  206: { classement: 375, nbTours: 10, nom: "MARTIN Félix", equipe: "Le Gouvernail", kms: 8.2 },
+  245: { classement: 376, nbTours: 10, nom: "YOUKOU Hyomé", equipe: "Le Gouvernail", kms: 8.2 },
+  60: { classement: 377, nbTours: 10, nom: "DE KERGORLAY Arthus", equipe: "Le Gouvernail", kms: 8.2 },
+  48: { classement: 378, nbTours: 10, nom: "BOUET Annette", equipe: "Ecole Saint Serge", kms: 8.2 },
+  93: { classement: 379, nbTours: 10, nom: "KARAMOKO Benjamin", equipe: "Le Gouvernail", kms: 8.2 },
+  252: { classement: 380, nbTours: 10, nom: "GREZELEAU DELAUNAY IZILE", equipe: "Ecole Saint Serge", kms: 8.2 },
+  558: { classement: 381, nbTours: 10, nom: "DE KERGORLAY Zélie", equipe: "Le Gouvernail", kms: 8.2 },
+  178: { classement: 382, nbTours: 10, nom: "GUERBAA Elyes", equipe: "Le Gouvernail", kms: 8.2 },
+  444: { classement: 383, nbTours: 10, nom: "KUGENER Paul", equipe: "LVA Le Logis", kms: 8.2 },
+  340: { classement: 384, nbTours: 10, nom: "COINTREAU LOUISON", equipe: "Ecole Saint Serge", kms: 8.2 },
+  280: { classement: 385, nbTours: 10, nom: "GIRAUD Judith", equipe: "Le Gouvernail", kms: 8.2 },
+  480: { classement: 386, nbTours: 10, nom: "TOURNEUX SANNA", equipe: "Ecole Saint Serge", kms: 8.2 },
+  255: { classement: 387, nbTours: 10, nom: "MARTIN Jacques", equipe: "Le Gouvernail", kms: 8.2 },
+  100: { classement: 388, nbTours: 10, nom: "SIDIBE Bintou", equipe: "Agence Kalia", kms: 8.2 },
+  285: { classement: 389, nbTours: 10, nom: "PICARD-BODARD Julie", equipe: "Agence Kalia", kms: 8.2 },
+  428: { classement: 390, nbTours: 10, nom: "PLACET Océane", equipe: "Ecole Saint Serge", kms: 8.2 },
+  159: { classement: 391, nbTours: 10, nom: "GERMOND Denis", equipe: "Département de Maine-et-Loire", kms: 8.2 },
+  476: { classement: 392, nbTours: 10, nom: "PAULMIER Romaric", equipe: "AXA Prévoyance et Patrimoine", kms: 8.2 },
+  479: { classement: 393, nbTours: 10, nom: "ELINEAU Sandra", equipe: "AXA Prévoyance et Patrimoine", kms: 8.2 },
+  213: { classement: 394, nbTours: 10, nom: "BLOND Florine", equipe: "LVA Le Logis", kms: 8.2 },
+  68: { classement: 395, nbTours: 10, nom: "ROUSVAL Audrey", equipe: "LVA Le Logis", kms: 8.2 },
+  583: { classement: 396, nbTours: 10, nom: "LANGLAIS Emilie", equipe: "AFOCAL", kms: 8.2 },
+  195: { classement: 397, nbTours: 10, nom: "DE BETUNE HESDIGNEUL Eugénie", equipe: "Cours Bienheureux Charles d\'Autriche", kms: 8.2 },
+  225: { classement: 398, nbTours: 10, nom: "ROUVRAIS Glenn", equipe: "Cours Bienheureux Charles d\'Autriche", kms: 8.2 },
+  120: { classement: 399, nbTours: 10, nom: "BARON-PLANTE Cédric", equipe: "Campus ESPL", kms: 8.2 },
+  82: { classement: 400, nbTours: 10, nom: "AMIR IBRAHIM Aymen", equipe: "LE JARDIN DE COCAGNE ANGEVIN", kms: 8.2 },
+  167: { classement: 401, nbTours: 10, nom: "JEDO OMAR Ekhlas", equipe: "LE JARDIN DE COCAGNE ANGEVIN", kms: 8.2 },
+  164: { classement: 402, nbTours: 10, nom: "(COLIBRI) Dylan", equipe: "Colibri", kms: 8.2 },
+  254: { classement: 403, nbTours: 10, nom: "GADENNE Jacques", equipe: "Cours Bienheureux Charles d\'Autriche", kms: 8.2 },
+  330: { classement: 404, nbTours: 10, nom: "ROUVRAIS Lorenn", equipe: "Cours Bienheureux Charles d\'Autriche", kms: 8.2 },
+  56: { classement: 405, nbTours: 9, nom: "TEXIER Arthis", equipe: "T\'CAP-T\'PRO", kms: 7.38 },
+  425: { classement: 406, nbTours: 9, nom: "VERDIÈRE Noé", equipe: "T\'CAP-T\'PRO", kms: 7.38 },
+  507: { classement: 407, nbTours: 9, nom: "FOUBLE Théo", equipe: "T\'CAP-T\'PRO", kms: 7.38 },
+  202: { classement: 408, nbTours: 9, nom: "ADAM Ezzedine", equipe: "SDEL Energis Angers", kms: 7.38 },
+  514: { classement: 409, nbTours: 9, nom: "CAUSSE Thibaut", equipe: "Xilo Menuiserie", kms: 7.38 },
+  373: { classement: 410, nbTours: 9, nom: "CAUSSE Marie", equipe: "Xilo Menuiserie", kms: 7.38 },
+  5: { classement: 411, nbTours: 9, nom: "VILLEMAIN Adélaïde", equipe: "À Deux Mains", kms: 7.38 },
+  126: { classement: 412, nbTours: 9, nom: "FAJARDO Charleen", equipe: "Département de Maine-et-Loire", kms: 7.38 },
+  138: { classement: 413, nbTours: 9, nom: "PASQUIER Claire", equipe: "Marie Durand", kms: 7.38 },
+  536: { classement: 414, nbTours: 9, nom: "CHAUVIGNÉ VICTORIA", equipe: "Ecole Saint Serge", kms: 7.38 },
+  168: { classement: 415, nbTours: 9, nom: "DE CARVALHO Eléonore", equipe: "Le Gouvernail", kms: 7.38 },
+  10: { classement: 416, nbTours: 9, nom: "YATERA Aïcha", equipe: "Le Gouvernail", kms: 7.38 },
+  286: { classement: 417, nbTours: 9, nom: "FLECHET-CHARNEAU Julien", equipe: "ADEPAPE-Repairs! 49", kms: 7.38 },
+  390: { classement: 418, nbTours: 9, nom: "THIERRY Mathéo", equipe: "Le Gouvernail", kms: 7.38 },
+  538: { classement: 419, nbTours: 9, nom: "FARGUE Vincent", equipe: "Le Gouvernail", kms: 7.38 },
+  615: { classement: 420, nbTours: 9, nom: "MC CLENDON Noah", equipe: "ETHIK KEHF", kms: 7.38 },
+  574: { classement: 421, nbTours: 9, nom: "GOHORE Christian", equipe: "ETHIK KEHF", kms: 7.38 },
+  114: { classement: 422, nbTours: 9, nom: "GRAEMIGER CAPUCINE", equipe: "Ecole Saint Serge", kms: 7.38 },
+  426: { classement: 423, nbTours: 9, nom: "BELLARD Noémie", equipe: "Becouze", kms: 7.38 },
+  247: { classement: 424, nbTours: 9, nom: "ROUEZ Illona", equipe: "Agence Kalia", kms: 7.38 },
+  50: { classement: 425, nbTours: 9, nom: "GADENNE Anselme", equipe: "Le Gouvernail", kms: 7.38 },
+  41: { classement: 426, nbTours: 9, nom: "ORFALI Amira", equipe: "Ecole Saint Serge", kms: 7.38 },
+  348: { classement: 427, nbTours: 9, nom: "ROUAULT-HOGDAY Lyam", equipe: "Le Gouvernail", kms: 7.38 },
+  146: { classement: 428, nbTours: 9, nom: "FORCARD Clémentine", equipe: "Ecole Saint Serge", kms: 7.38 },
+  578: { classement: 429, nbTours: 9, nom: "BOUKERROU Cyril", equipe: "ETHIK KEHF", kms: 7.38 },
+  37: { classement: 430, nbTours: 9, nom: "REVEL Amaury", equipe: "FSDV", kms: 7.38 },
+  582: { classement: 431, nbTours: 9, nom: "AZZOUG Danya", equipe: "ETHIK KEHF", kms: 7.38 },
+  9: { classement: 432, nbTours: 9, nom: "FOURNIER Agathe", equipe: "La cravate solidaire", kms: 7.38 },
+  385: { classement: 433, nbTours: 9, nom: "MILLET Marthe", equipe: "La cravate solidaire", kms: 7.38 },
+  456: { classement: 434, nbTours: 9, nom: "PAPIN Philomène", equipe: "Cours Bienheureux Charles d\'Autriche", kms: 7.38 },
+  455: { classement: 435, nbTours: 9, nom: "JACQUET Perrine", equipe: "FSDV", kms: 7.38 },
+  74: { classement: 436, nbTours: 9, nom: "RICHÉ Aurélie", equipe: "SDEL Energis Angers", kms: 7.38 },
+  625: { classement: 437, nbTours: 9, nom: "MOHAMED ALI Samar", equipe: "Samar Mohamed Ali", kms: 7.38 },
+  28: { classement: 438, nbTours: 9, nom: "GARRIGOU GRANDCHAMP Alix", equipe: "Cours Bienheureux Charles d\'Autriche", kms: 7.38 },
+  53: { classement: 439, nbTours: 9, nom: "BONY Armand", equipe: "Cours Bienheureux Charles d\'Autriche", kms: 7.38 },
+  591: { classement: 440, nbTours: 9, nom: "GROLLEAU François-Xavier", equipe: "Les pompiers du SDIS 49", kms: 7.38 },
+  422: { classement: 441, nbTours: 9, nom: "PIERRE Nicolas", equipe: "AXA Prévoyance et Patrimoine", kms: 7.38 },
+  491: { classement: 442, nbTours: 8, nom: "JOLLIVET Sophie", equipe: "Nameshield", kms: 6.56 },
+  139: { classement: 443, nbTours: 8, nom: "DELATOUR Clara", equipe: "Assureurs associés", kms: 6.56 },
+  219: { classement: 444, nbTours: 8, nom: "DEVIRIEUX Gabriel", equipe: "AFOCAL", kms: 6.56 },
+  658: { classement: 445, nbTours: 8, nom: "LUC 658", equipe: "APEX", kms: 6.56 },
+  657: { classement: 446, nbTours: 8, nom: "NATHAN 657", equipe: "APEX", kms: 6.56 },
+  328: { classement: 447, nbTours: 8, nom: "RIVAULT Lola", equipe: "AFOCAL", kms: 6.56 },
+  643: { classement: 448, nbTours: 8, nom: "TOMAS Marquis", equipe: "Esperancia", kms: 6.56 },
+  324: { classement: 449, nbTours: 8, nom: "MANARANCHE-MICHON Lisa", equipe: "ADEPAPE-Repairs! 49", kms: 6.56 },
+  654: { classement: 450, nbTours: 8, nom: "DOSSARD 654", equipe: null, kms: 6.56 },
+  147: { classement: 451, nbTours: 8, nom: "BOUREUX Clotilde", equipe: "Cours Bienheureux Charles d\'Autriche", kms: 6.56 },
+  420: { classement: 452, nbTours: 8, nom: "GOURDON Nathalie", equipe: "AFOCAL", kms: 6.56 },
+  346: { classement: 453, nbTours: 8, nom: "BRAZILLE Ludivine", equipe: "AFOCAL", kms: 6.56 },
+  46: { classement: 454, nbTours: 8, nom: "NIANGORAN Angéline", equipe: "Le Gouvernail", kms: 6.56 },
+  350: { classement: 455, nbTours: 8, nom: "MARTIN Madeleine", equipe: "Cours Bienheureux Charles d\'Autriche", kms: 6.56 },
+  527: { classement: 456, nbTours: 8, nom: "TEILLET TOM", equipe: "Ecole Saint Serge", kms: 6.56 },
+  123: { classement: 457, nbTours: 8, nom: "(COLIBRI) Céline", equipe: "Colibri", kms: 6.56 },
+  400: { classement: 458, nbTours: 8, nom: "PLANTARD ALDEBERT Maya", equipe: "Ecole Saint Serge", kms: 6.56 },
+  260: { classement: 459, nbTours: 8, nom: "BASSINAT JEANNE", equipe: "Ecole Saint Serge", kms: 6.56 },
+  502: { classement: 460, nbTours: 8, nom: "GODARD Sylvie", equipe: "ADEPAPE-Repairs! 49", kms: 6.56 },
+  571: { classement: 461, nbTours: 8, nom: "BOMPAS Bryan", equipe: "ADEPAPE-Repairs! 49", kms: 6.56 },
+  244: { classement: 462, nbTours: 8, nom: "GAUTRON-GOINEAU HYLA", equipe: "Ecole Saint Serge", kms: 6.56 },
+  529: { classement: 463, nbTours: 8, nom: "HUVELIN Véronique", equipe: "Le Gouvernail", kms: 6.56 },
+  387: { classement: 464, nbTours: 8, nom: "BONNEROT Martine", equipe: "Le Gouvernail", kms: 6.56 },
+  33: { classement: 465, nbTours: 8, nom: "AIT OUELHAJ Almes", equipe: "Le Gouvernail", kms: 6.56 },
+  443: { classement: 466, nbTours: 8, nom: "BOURGEOIS Paul", equipe: "Le Gouvernail", kms: 6.56 },
+  191: { classement: 467, nbTours: 8, nom: "LUISIER Esther", equipe: "Le Gouvernail", kms: 6.56 },
+  49: { classement: 468, nbTours: 8, nom: "GADENNE Annonciade", equipe: "Le Gouvernail", kms: 6.56 },
+  478: { classement: 469, nbTours: 8, nom: "DJABRAILOVA Salima", equipe: "La Rose Fraternelle", kms: 6.56 },
+  103: { classement: 470, nbTours: 8, nom: "GADENNE Bosco", equipe: "Le Gouvernail", kms: 6.56 },
+  640: { classement: 471, nbTours: 8, nom: "MEHDI Seghaier", equipe: "Agapè Anjou", kms: 6.56 },
+  636: { classement: 472, nbTours: 8, nom: "HAMDI Garbaa", equipe: "Agapè Anjou", kms: 6.56 },
+  560: { classement: 473, nbTours: 8, nom: "RABALLAND ZOE", equipe: "Ecole Saint Serge", kms: 6.56 },
+  651: { classement: 474, nbTours: 8, nom: "SOPHIE Graemiger", equipe: "Ecole Saint Serge", kms: 6.56 },
+  589: { classement: 475, nbTours: 8, nom: "DABO Fatoumata", equipe: "ETHIK KEHF", kms: 6.56 },
+  290: { classement: 476, nbTours: 8, nom: "BOUTRUCHE Julyano", equipe: "LVA Le Logis", kms: 6.56 },
+  134: { classement: 477, nbTours: 8, nom: "BOONE Christelle", equipe: "FSDV", kms: 6.56 },
+  637: { classement: 478, nbTours: 8, nom: "THOMAS De La Villeon", equipe: "Agapè Anjou", kms: 6.56 },
+  355: { classement: 479, nbTours: 8, nom: "GUILLET Magalie", equipe: "Campus ESPL", kms: 6.56 },
+  396: { classement: 480, nbTours: 8, nom: "DE ROBIEN Maxime", equipe: "AXA Prévoyance et Patrimoine", kms: 6.56 },
+  430: { classement: 481, nbTours: 8, nom: "BETIL Olivier", equipe: "Nameshield", kms: 6.56 },
+  171: { classement: 482, nbTours: 8, nom: "(COLIBRI) Ellyana", equipe: "Colibri", kms: 6.56 },
+  601: { classement: 483, nbTours: 8, nom: "CROCHARD Lucille", equipe: "ANJOU LOIRE TERRITOIRE", kms: 6.56 },
+  227: { classement: 484, nbTours: 7, nom: "D\'ABBADIE Guilhem", equipe: "Le Gouvernail", kms: 5.74 },
+  448: { classement: 485, nbTours: 7, nom: "RAMÉ Paul", equipe: "Xilo Menuiserie", kms: 5.74 },
+  76: { classement: 486, nbTours: 7, nom: "HARDY Aurélien", equipe: "Pas à Pas 49", kms: 5.74 },
+  259: { classement: 487, nbTours: 7, nom: "BEAUGENDRE Jean-Loic", equipe: "Saint Jean Espérance", kms: 5.74 },
+  503: { classement: 488, nbTours: 7, nom: "LUISIER Syméon", equipe: "Le Gouvernail", kms: 5.74 },
+  376: { classement: 489, nbTours: 7, nom: "FAVRE Marie-Capucine", equipe: "Le Gouvernail", kms: 5.74 },
+  80: { classement: 490, nbTours: 7, nom: "RIVAS ACOSTA Axel", equipe: "AFOCAL", kms: 5.74 },
+  369: { classement: 491, nbTours: 7, nom: "MOREAU Manon", equipe: "Marie Durand", kms: 5.74 },
+  73: { classement: 492, nbTours: 7, nom: "MEUNIER Aurélie", equipe: "Marie Durand", kms: 5.74 },
+  231: { classement: 493, nbTours: 7, nom: "PICHOT Guillaume", equipe: "Le Gouvernail", kms: 5.74 },
+  125: { classement: 494, nbTours: 7, nom: "LIGNEL Céline", equipe: "Campus ESPL", kms: 5.74 },
+  487: { classement: 495, nbTours: 7, nom: "DELESTRE sofya", equipe: "Campus ESPL", kms: 5.74 },
+  169: { classement: 496, nbTours: 7, nom: "CAYREL Éléonore", equipe: "Cours Bienheureux Charles d\'Autriche", kms: 5.74 },
+  12: { classement: 497, nbTours: 7, nom: "JUSTEAU Albane", equipe: "Le Gouvernail", kms: 5.74 },
+  300: { classement: 498, nbTours: 7, nom: "(COLIBRI) Kingley", equipe: "Colibri", kms: 5.74 },
+  372: { classement: 499, nbTours: 7, nom: "GIRAUD Mariam", equipe: "Le Gouvernail", kms: 5.74 },
+  295: { classement: 500, nbTours: 7, nom: "KOUDIAN Kamilia", equipe: "Le Gouvernail", kms: 5.74 },
+  294: { classement: 501, nbTours: 7, nom: "DIAKHABY Kaki", equipe: "Le Gouvernail", kms: 5.74 },
+  32: { classement: 502, nbTours: 7, nom: "(COLIBRI) Almedina", equipe: "Colibri", kms: 5.74 },
+  363: { classement: 503, nbTours: 7, nom: "(COLIBRI) Manon", equipe: "Colibri", kms: 5.74 },
+  504: { classement: 504, nbTours: 7, nom: "(COLIBRI) Taylor", equipe: "Colibri", kms: 5.74 },
+  508: { classement: 505, nbTours: 7, nom: "MARCHESSEAU Théo", equipe: "LVA Le Logis", kms: 5.74 },
+  52: { classement: 506, nbTours: 7, nom: "(COLIBRI) Antoine", equipe: "Colibri", kms: 5.74 },
+  279: { classement: 507, nbTours: 7, nom: "BÉCHU JP", equipe: "Esperancia", kms: 5.74 },
+  172: { classement: 508, nbTours: 7, nom: "BAILLY Elodie", equipe: "ANJOU LOIRE TERRITOIRE", kms: 5.74 },
+  619: { classement: 509, nbTours: 7, nom: "MERAND Steven", equipe: "Les pompiers du SDIS 49", kms: 5.74 },
+  609: { classement: 510, nbTours: 6, nom: "NDOUBA Marvin", equipe: "ETHIK KEHF", kms: 4.92 },
+  565: { classement: 511, nbTours: 6, nom: "GUILBAULT Arron", equipe: "ETHIK KEHF", kms: 4.92 },
+  273: { classement: 512, nbTours: 6, nom: "ESQUIER Joseph", equipe: "Solar Bird", kms: 4.92 },
+  314: { classement: 513, nbTours: 6, nom: "(COLIBRI) Léo", equipe: "Colibri", kms: 4.92 },
+  116: { classement: 514, nbTours: 6, nom: "LEGRAS Cassandre", equipe: "T\'CAP-T\'PRO", kms: 4.92 },
+  308: { classement: 515, nbTours: 6, nom: "BONNEAU Léa", equipe: "T\'CAP-T\'PRO", kms: 4.92 },
+  457: { classement: 516, nbTours: 6, nom: "AUDOYER Pia", equipe: "Cours Bienheureux Charles d\'Autriche", kms: 4.92 },
+  500: { classement: 517, nbTours: 6, nom: "MÉNORET Sylvain", equipe: "ADEPAPE-Repairs! 49", kms: 4.92 },
+  67: { classement: 518, nbTours: 6, nom: "MANATA GOMES AUDREY", equipe: "Campus ESPL", kms: 4.92 },
+  623: { classement: 519, nbTours: 6, nom: "DAGNET SOULAIGRE Youness", equipe: "ETHIK KEHF", kms: 4.92 },
+  616: { classement: 520, nbTours: 6, nom: "DE SOUSA CARREIRA Samira", equipe: "ETHIK KEHF", kms: 4.92 },
+  360: { classement: 521, nbTours: 6, nom: "DIABY Mamadou", equipe: "Le Gouvernail", kms: 4.92 },
+  184: { classement: 522, nbTours: 6, nom: "(COLIBRI) Enzo", equipe: "Colibri", kms: 4.92 },
+  551: { classement: 523, nbTours: 6, nom: "CHOUCHEN Yasmina", equipe: "Le Gouvernail", kms: 4.92 },
+  124: { classement: 524, nbTours: 6, nom: "HUNAULT Céline", equipe: "ANJOU LOIRE TERRITOIRE", kms: 4.92 },
+  35: { classement: 525, nbTours: 6, nom: "LEMEE Amance", equipe: "Cours Bienheureux Charles d\'Autriche", kms: 4.92 },
+  562: { classement: 526, nbTours: 6, nom: "GARREAU Anthony", equipe: "Les pompiers du SDIS 49", kms: 4.92 },
+  610: { classement: 527, nbTours: 5, nom: "CHANGEON MONOT Matheo", equipe: "ETHIK KEHF", kms: 4.1 },
+  435: { classement: 528, nbTours: 5, nom: "GUITTON Ophélie", equipe: "Ophélie GUITTON", kms: 4.1 },
+  62: { classement: 529, nbTours: 5, nom: "OUTIOU Atilio", equipe: "Marie Durand", kms: 4.1 },
+  95: { classement: 530, nbTours: 5, nom: "CHARRUAU Benoit", equipe: "Saint Jean Espérance", kms: 4.1 },
+  362: { classement: 531, nbTours: 5, nom: "NIANGORAN Mandine", equipe: "Le Gouvernail", kms: 4.1 },
+  253: { classement: 532, nbTours: 5, nom: "GIRAUDEAU Jacky", equipe: "T\'CAP-T\'PRO", kms: 4.1 },
+  438: { classement: 533, nbTours: 5, nom: "(COLIBRI) Patricia", equipe: "Colibri", kms: 4.1 },
+  646: { classement: 534, nbTours: 5, nom: "THÉO Keller", equipe: "La Maison commune - UPE", kms: 4.1 },
+  540: { classement: 535, nbTours: 5, nom: "RIZZI VIRGIL", equipe: "Nameshield", kms: 4.1 },
+  394: { classement: 536, nbTours: 5, nom: "RIZZI Maxence", equipe: "Nameshield", kms: 4.1 },
+  528: { classement: 537, nbTours: 5, nom: "(COLIBRI) Tonyo", equipe: "Colibri", kms: 4.1 },
+  345: { classement: 538, nbTours: 5, nom: "(COLIBRI) Lucy", equipe: "Colibri", kms: 4.1 },
+  629: { classement: 539, nbTours: 5, nom: "PONSARD Charlotte", equipe: "Esperancia", kms: 4.1 },
+  131: { classement: 540, nbTours: 5, nom: "(COLIBRI) Cheyenne", equipe: "Colibri", kms: 4.1 },
+  407: { classement: 541, nbTours: 5, nom: "(COLIBRI) Melvin", equipe: "Colibri", kms: 4.1 },
+  550: { classement: 542, nbTours: 5, nom: "GODEFROY Yannick", equipe: "Marie Durand", kms: 4.1 },
+  71: { classement: 543, nbTours: 5, nom: "MARTIN Augustin", equipe: "Le Gouvernail", kms: 4.1 },
+  483: { classement: 544, nbTours: 5, nom: "QUEVREUX GARNIER Shaina", equipe: "Marie Durand", kms: 4.1 },
+  199: { classement: 545, nbTours: 5, nom: "(COLIBRI) Eve", equipe: "Colibri", kms: 4.1 },
+  533: { classement: 546, nbTours: 5, nom: "MARÉCHAL Victor", equipe: "Cours Bienheureux Charles d\'Autriche", kms: 4.1 },
+  69: { classement: 547, nbTours: 5, nom: "BOUREUX Augustin", equipe: "Cours Bienheureux Charles d\'Autriche", kms: 4.1 },
+  333: { classement: 548, nbTours: 4, nom: "MONNIER Lou-Ann", equipe: "AFOCAL", kms: 3.28 },
+  477: { classement: 549, nbTours: 4, nom: "CIMETIÈRE Sacha", equipe: "Xilo Menuiserie", kms: 3.28 },
+  495: { classement: 550, nbTours: 4, nom: "(COLIBRI) Stéphane", equipe: "Colibri", kms: 3.28 },
+  561: { classement: 551, nbTours: 4, nom: "SAUNIER RANARISON Zyhann", equipe: "Marie Durand", kms: 3.28 },
+  291: { classement: 552, nbTours: 4, nom: "DERRIEN Justine", equipe: "Justine DERRIEN", kms: 3.28 },
+  644: { classement: 553, nbTours: 4, nom: "STYLIVEN Menard", equipe: "La Maison commune - UPE", kms: 3.28 },
+  108: { classement: 554, nbTours: 4, nom: "CHOMBART Camille", equipe: "Marraine et vous", kms: 3.28 },
+  481: { classement: 555, nbTours: 4, nom: "(COLIBRI) Sara", equipe: "Colibri", kms: 3.28 },
+  115: { classement: 556, nbTours: 4, nom: "(COLIBRI) Caroline", equipe: "Colibri", kms: 3.28 },
+  142: { classement: 557, nbTours: 4, nom: "(COLIBRI) Clémence", equipe: "Colibri", kms: 3.28 },
+  386: { classement: 558, nbTours: 4, nom: "MARTIN Martin", equipe: "Angers Technopole", kms: 3.28 },
+  647: { classement: 559, nbTours: 4, nom: "LAURA Germon", equipe: "La Maison commune - UPE", kms: 3.28 },
+  655: { classement: 560, nbTours: 4, nom: "KINDA 655", equipe: "APEX", kms: 3.28 },
+  656: { classement: 561, nbTours: 4, nom: "GHASSAN 656", equipe: "APEX", kms: 3.28 },
+  323: { classement: 562, nbTours: 4, nom: "(COLIBRI) Lino", equipe: "Colibri", kms: 3.28 },
+  498: { classement: 563, nbTours: 4, nom: "SUZANNE OUVRARD Suzanne", equipe: "PARRAINS PAR MILLE", kms: 3.28 },
+  141: { classement: 564, nbTours: 4, nom: "BIDAL CLAUDINE", equipe: "ANJOU LOIRE TERRITOIRE", kms: 3.28 },
+  469: { classement: 565, nbTours: 4, nom: "(COLIBRI) Rafael", equipe: "Colibri", kms: 3.28 },
+  653: { classement: 566, nbTours: 3, nom: "BOREL NDJOMO", equipe: "Solar Bird", kms: 2.46 },
+  371: { classement: 567, nbTours: 3, nom: "(COLIBRI) Marcellino", equipe: "Colibri", kms: 2.46 },
+  179: { classement: 568, nbTours: 3, nom: "SUTER Emérentienne", equipe: "À Deux Mains", kms: 2.46 },
+  632: { classement: 569, nbTours: 3, nom: "CAMERON REKIAN", equipe: "Pause Angevine - UPE", kms: 2.46 },
+  30: { classement: 570, nbTours: 3, nom: "(COLIBRI) Alixia", equipe: "Colibri", kms: 2.46 },
+  320: { classement: 571, nbTours: 3, nom: "(COLIBRI) Lilou", equipe: "Colibri", kms: 2.46 },
+  648: { classement: 572, nbTours: 3, nom: "MARTINE Bigot", equipe: "ALDEV", kms: 2.46 },
+  268: { classement: 573, nbTours: 3, nom: "BOURGEOIS Joachim", equipe: "Le Gouvernail", kms: 2.46 },
+  153: { classement: 574, nbTours: 3, nom: "SAUVETRE Cyril", equipe: "Marie Durand", kms: 2.46 },
+  584: { classement: 575, nbTours: 3, nom: "AMOUGOU Enzo", equipe: "ETHIK KEHF", kms: 2.46 },
+  151: { classement: 576, nbTours: 2, nom: "GENEVOIS Cybélia", equipe: "ADEPAPE-Repairs! 49", kms: 1.64 },
+  42: { classement: 577, nbTours: 2, nom: "(COLIBRI) Anais", equipe: "Colibri", kms: 1.64 },
+  621: { classement: 578, nbTours: 2, nom: "MORIN GROSBOIS Tanguy", equipe: "ETHIK KEHF", kms: 1.64 },
+  464: { classement: 579, nbTours: 2, nom: "BONAMY Pierre-Louis", equipe: "Maîtrise des Pays de la Loire", kms: 1.64 },
+  215: { classement: 580, nbTours: 2, nom: "DE LA PERRAUDIERE Francois", equipe: "Francois de La Perraudiere", kms: 1.64 },
+  162: { classement: 581, nbTours: 2, nom: "(COLIBRI) Djama", equipe: "Colibri", kms: 1.64 },
+  21: { classement: 582, nbTours: 2, nom: "DE KERGORLAY Alice", equipe: "Association EFATA - La Boussole", kms: 1.64 },
+  416: { classement: 583, nbTours: 2, nom: "LOPEZ Muriel", equipe: "Département de Maine-et-Loire", kms: 1.64 },
+  136: { classement: 584, nbTours: 2, nom: "BELLEC Christine", equipe: "Marie Durand", kms: 1.64 },
+  459: { classement: 585, nbTours: 2, nom: "(COLIBRI) Pierre", equipe: "Colibri", kms: 1.64 },
+  642: { classement: 586, nbTours: 1, nom: "DAMIEN schouteden", equipe: "Pause Angevine - UPE", kms: 0.82 },
+  379: { classement: 587, nbTours: 1, nom: "FAVRE Marie-Laure", equipe: "Le Gouvernail", kms: 0.82 },
+  45: { classement: 588, nbTours: 1, nom: "MACHINE ANGEL", equipe: "Département de Maine-et-Loire", kms: 0.82 },
+  660: { classement: 589, nbTours: 1, nom: "DOSSARD 660", equipe: null, kms: 0.82 },
+};
+
+const CLASSEMENT_EQUIPES = {
+  "Cours Bienheureux Charles d'Autriche": { classement: 1,  kms: 995.50 },
+  "Ecole Saint Serge":                    { classement: 2,  kms: 515.00 },
+  "FSDV":                                 { classement: 3,  kms: 360.80 },
+  "Le Gouvernail":                        { classement: 4,  kms: 352.60 },
+  "Les pompiers du SDIS 49":             { classement: 5,  kms: 232.10 },
+  "Marie Durand":                         { classement: 6,  kms: 210.70 },
+  "Colibri":                              { classement: 7,  kms: 204.20 },
+  "Saint Jean Espérance":                 { classement: 8,  kms: 179.60 },
+  "AXA Prévoyance et Patrimoine":         { classement: 9,  kms: 168.10 },
+  "6e Régiment du Génie d'Angers":       { classement: 10, kms: 153.30 },
+  "AFOCAL":                               { classement: 11, kms: 137.80 },
+  "ETHIK KEHF":                           { classement: 12, kms: 134.50 },
+  "LE JARDIN DE COCAGNE ANGEVIN":        { classement: 13, kms: 132.80 },
+  "Nameshield":                           { classement: 14, kms: 130.40 },
+  "Campus ESPL":                          { classement: 15, kms: 121.40 },
+  "Becouze":                              { classement: 16, kms: 113.20 },
+  "Agapè Anjou":                          { classement: 17, kms: 105.80 },
+  "La Rose Fraternelle":                  { classement: 18, kms: 94.30  },
+  "Réseau Entreprendre Maine et Loire":   { classement: 19, kms: 88.60  },
+  "Angers Technopole":                    { classement: 20, kms: 83.60  },
+  "Octopus Patrimoine":                   { classement: 21, kms: 83.60  },
+  "ANJOU LOIRE TERRITOIRE":              { classement: 22, kms: 79.50  },
+  "T'CAP-T'PRO":                         { classement: 23, kms: 77.10  },
+  "Solar Bird":                           { classement: 24, kms: 77.10  },
+  "SDEL Energis Angers":                  { classement: 25, kms: 76.30  },
+  "Assureurs associés":                   { classement: 26, kms: 66.40  },
+  "La cravate solidaire":                 { classement: 27, kms: 65.60  },
+  "N.I.A.H.":                            { classement: 28, kms: 50.00  },
+  "Yendouboame":                          { classement: 29, kms: 48.40  },
+  "LVA Le Logis":                         { classement: 30, kms: 48.40  },
+  "ADEPAPE-Repairs! 49":                  { classement: 31, kms: 43.50  },
+  "Pause Angevine - UPE":                 { classement: 32, kms: 41.00  },
+  "Département de Maine-et-Loire":        { classement: 33, kms: 38.50  },
+  "Campus Coach Angers":                  { classement: 34, kms: 33.60  },
+  "Xilo Menuiserie":                      { classement: 35, kms: 32.00  },
+  "ALDEV":                                { classement: 36, kms: 31.20  },
+  "Pas à Pas 49":                         { classement: 37, kms: 29.50  },
+  "Esperancia":                           { classement: 38, kms: 25.40  },
+  "Agence Kalia":                         { classement: 40, kms: 23.80  },
+  "La Tilma":                             { classement: 41, kms: 21.30  },
+  "Paola Vesnier":                        { classement: 42, kms: 20.50  },
+  "À Deux Mains":                         { classement: 43, kms: 19.70  },
+  "APEX":                                 { classement: 44, kms: 19.70  },
+  "Guillaume KOFFI":                      { classement: 45, kms: 19.70  },
+  "Candice Chalet":                       { classement: 46, kms: 18.00  },
+  "123 Cessions":                         { classement: 47, kms: 18.00  },
+  "Anaïs Hiron":                          { classement: 48, kms: 17.20  },
+  "Wahid Gazoum":                         { classement: 49, kms: 16.40  },
+  "Sylvain Verardo":                      { classement: 50, kms: 15.60  },
+  "Marie-Liesse de La Villesboisnet":     { classement: 51, kms: 15.60  },
+  "Coralie Belin":                        { classement: 52, kms: 15.60  },
+  "Enzo Medard":                          { classement: 53, kms: 13.90  },
+  "PARRAINS PAR MILLE":                   { classement: 54, kms: 13.10  },
+  "Quitterie Perchais":                   { classement: 55, kms: 13.10  },
+  "Marie Furet":                          { classement: 56, kms: 13.10  },
+  "Jade feybesse":                        { classement: 57, kms: 13.10  },
+  "Excellence Ruralités":                 { classement: 58, kms: 12.30  },
+  "Thierry Subranne":                     { classement: 59, kms: 12.30  },
+  "chloé piton":                          { classement: 60, kms: 12.30  },
+  "ARIFTS":                               { classement: 61, kms: 12.30  },
+  "Maud GAUMER":                          { classement: 62, kms: 11.50  },
+  "Solene ROBERT":                        { classement: 63, kms: 11.50  },
+  "La Maison commune - UPE":              { classement: 64, kms: 10.70  },
+  "Vianney de Bagneaux":                  { classement: 65, kms: 10.70  },
+  "Anne-Sophie Tesson":                   { classement: 66, kms: 10.70  },
+  "Aurélie Gaud":                         { classement: 67, kms: 10.70  },
+  "Lauren Zasso":                         { classement: 68, kms: 10.70  },
+  "Wilfried Cesbron":                     { classement: 69, kms: 9.80   },
+  "Cecile Clemenceau":                    { classement: 70, kms: 9.80   },
+  "pauline piet":                         { classement: 71, kms: 9.80   },
+  "Mahnoor Mohamed Ali":                  { classement: 72, kms: 9.80   },
+  "Les Cahutes de Louise":                { classement: 73, kms: 9.00   },
+  "Maelys Chevrier":                      { classement: 74, kms: 9.00   },
+  "We are lovers":                        { classement: 75, kms: 9.00   },
+  "Samar Mohamed Ali":                    { classement: 76, kms: 7.40   },
+  "Ophélie GUITTON":                      { classement: 77, kms: 4.10   },
+  "Justine DERRIEN":                      { classement: 78, kms: 3.30   },
+  "Marraine et vous":                     { classement: 79, kms: 3.30   },
+  "Maîtrise des Pays de la Loire":        { classement: 80, kms: 1.60   },
+  "Francois de La Perraudiere":           { classement: 81, kms: 1.60   },
+  "Association EFATA - La Boussole":      { classement: 82, kms: 1.60   },
+};
+
+const NB_COUREURS_ANGERS = 589;
+const NB_EQUIPES_ANGERS  = 82;
+
+
+function tplGroupeMerciCoureurAngers({ prenom, dossard, nomCoureur, equipe, kmsPerso, classementPerso, kmsEquipe, classementEquipe, estSolo }) {
+  const infoPerso   = CLASSEMENT_INDIVIDUEL[parseInt(dossard)] || {};
+  const infoEquipe  = CLASSEMENT_EQUIPES[equipe] || {};
+  const kmsP        = infoPerso.kms       || kmsPerso       || 0;
+  const classP      = infoPerso.classement || classementPerso || '?';
+  const kmsE        = infoEquipe.kms      || kmsEquipe      || 0;
+  const classE      = infoEquipe.classement || classementEquipe || '?';
+
+  const IMG1 = 'https://defi-enfance-notifications.onrender.com/WhatsApp%20Image%202026-05-22%20at%2016.52.36.jpeg';
+  const IMG2 = 'https://defi-enfance-notifications.onrender.com/WhatsApp%20Image%202026-05-22%20at%2016.53.42.jpeg';
+  const IMG3 = 'https://defi-enfance-notifications.onrender.com/WhatsApp%20Image%202026-05-22%20at%2016.54.49.jpeg';
+
+  const blocPerso = `<table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:16px"><tr>
+    <td width="48%" align="center" bgcolor="#fff0f8" style="background-color:#fff0f8;border:2px solid #fb0089;border-radius:12px;padding:14px 10px">
+      <div style="font-size:.65rem;font-weight:700;color:#fb0089;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">🏁 Votre distance</div>
+      <div style="font-family:Arial,sans-serif;font-size:1.8rem;color:#fb0089;font-weight:700;line-height:1.1">${kmsP.toFixed(1)} km</div>
+      <div style="font-size:.72rem;color:#3d1830;margin-top:4px">🏅 ${classP}e / ${NB_COUREURS_ANGERS} coureurs</div>
+    </td>
+    <td width="4%"></td>
+    ${!estSolo ? `<td width="48%" align="center" bgcolor="#fff5ef" style="background-color:#fff5ef;border:2px solid #ef6135;border-radius:12px;padding:14px 10px">
+      <div style="font-size:.65rem;font-weight:700;color:#ef6135;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">🏆 Votre équipe</div>
+      <div style="font-family:Arial,sans-serif;font-size:1.8rem;color:#ef6135;font-weight:700;line-height:1.1">${kmsE.toFixed(1)} km</div>
+      <div style="font-size:.72rem;color:#3d1830;margin-top:4px">🥇 ${classE}e / ${NB_EQUIPES_ANGERS} équipes</div>
+    </td>` : `<td width="48%" align="center" bgcolor="#f5f0ff" style="background-color:#f5f0ff;border:2px solid #7c3aed;border-radius:12px;padding:14px 10px">
+      <div style="font-size:.65rem;font-weight:700;color:#7c3aed;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">🏃 Coureur solo</div>
+      <div style="font-family:Arial,sans-serif;font-size:1.1rem;color:#7c3aed;font-weight:700;line-height:1.3">Vous avez couru<br>pour l'enfance !</div>
+    </td>`}
+  </tr></table>`;
+
+  return `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Antonio:wght@700&display=swap" rel="stylesheet"><style>${CSS_COMMUN}</style></head><body bgcolor="#f5f0f3" style="background-color:#f5f0f3;margin:0;padding:0"><table class="bg-wrap" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#f5f0f3" style="background-color:#f5f0f3"><tr><td align="center" bgcolor="#f5f0f3" style="background-color:#f5f0f3"><div class="outer">
+
+<div class="logo-header"><div class="logo-text">🤝 Défi Enfance</div><div class="logo-sub">Générateur de victoires pour l'enfance</div></div>
+<div class="header mixed"><h1>🏁 Merci ${prenom} !<br>Vous avez couru pour l'enfance !</h1><p>Défi Enfance · Angers · 22 mai 2026</p></div>
+
+<div class="body">
+<div style="font-size:1rem;font-weight:600;color:#3d1830;margin-bottom:12px;text-align:left">Bonjour ${prenom} 👋</div>
+<div style="font-size:.85rem;color:#3d1830;line-height:1.7;margin-bottom:20px;text-align:left">Aujourd'hui vous avez relevé le défi — et quelle journée ! <strong>650 coureurs, 100 supporters, 30 bénévoles</strong> ont transformé le Parc Saint-Serge en élan collectif pour l'enfance. Cette <strong>2e édition est une transformation réussie</strong> — le Défi Enfance s'est installé durablement à Angers.</div>
+
+${blocPerso}
+
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:20px"><tr>
+  <td width="49%" style="padding-right:6px"><img src="${IMG1}" alt="Défi Enfance Angers 2026" width="100%" style="border-radius:10px;display:block"></td>
+  <td width="49%" style="padding-left:6px"><img src="${IMG2}" alt="Défi Enfance Angers 2026" width="100%" style="border-radius:10px;display:block"></td>
+</tr></table>
+
+<div style="background-color:#fff0f8;border-left:3px solid #fb0089;border-radius:0 10px 10px 0;padding:14px 18px;margin-bottom:20px;font-size:.84rem;color:#3d1830;font-style:italic;text-align:left">
+  💬 <strong>Témoignage d'un chef d'entreprise :</strong><br>
+  "Course incroyable. Moment super avec les équipes. On a déjà motivé une entreprise partenaire de venir l'année prochaine !"
+</div>
+
+<div style="font-size:.85rem;color:#3d1830;line-height:1.7;margin-bottom:20px;text-align:left">Des dizaines d'équipes d'<strong>entreprises, d'écoles, d'associations et d'institutions</strong> ont couru côte à côte. <strong>Cette aventure humaine est une ligne de départ.</strong> Nous avons tous quelque chose à faire pour l'enfance. Merci d'en faire partie.</div>
+
+<img src="${IMG3}" alt="Défi Enfance Angers 2026" width="100%" style="border-radius:10px;display:block;margin-bottom:20px">
+
+${!estSolo && kmsE > 0 ? `<div style="background-color:#fff5ef;border:1.5px solid rgba(239,97,53,0.3);border-radius:12px;padding:14px 18px;margin-bottom:20px;text-align:left"><div style="font-size:.72rem;font-weight:700;color:#ef6135;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">🏆 Votre équipe — ${equipe}</div><div style="font-size:.84rem;color:#3d1830;line-height:1.6">Votre équipe a parcouru <strong>${kmsE.toFixed(1)} km</strong> au total — <strong>${classE}e</strong> au classement des équipes sur ${NB_EQUIPES_ANGERS}. Bravo à toute l'équipe !</div></div>` : ''}
+
+${BLOC_TEMOIGNAGES}${BLOC_SOCIAUX}${BLOC_RECUS_FISCAUX}${BLOC_IFI}
+<div class="divider"></div>
+<div style="font-size:.86rem;color:#3d1830;text-align:center;font-style:italic;margin-bottom:8px">Chaque foulée compte. Chaque km parcouru fait la différence.<br><strong style="color:#fb0089">Merci d'avoir couru pour l'enfance ! 🏁</strong></div>
+<div style="font-size:.82rem;color:#fb0089;font-weight:600;text-align:center">— Team Défi Enfance 🤝</div>
+</div></td></tr></table></body></html>`;
+}
+
+function tplGroupeJourJPromesses({ prenom, promesses }) {
+  // promesses = [{ type: 'coureur'|'equipe', nom, montantKm, kmParcourus, montantDu, urlDon }]
+  const totalDu = promesses.reduce((s, p) => s + (p.montantDu || 0), 0);
+
+  const blocPromesses = promesses.map((p, i) => {
+    const label = p.type === 'coureur' ? `${p.nom}` : `l'équipe ${p.nom}`;
+    const montantAffiche = p.montantDu > 0
+      ? `<strong style="color:#fb0089;font-size:1.1rem">${p.montantDu.toFixed(2)} €</strong>`
+      : `<span style="color:#888;font-size:.84rem">km non encore saisis</span>`;
+
+    return `<div style="background:#fff;border:1.5px solid rgba(251,0,137,0.2);border-radius:12px;padding:16px 20px;margin-bottom:14px">
+  <div style="font-size:.72rem;font-weight:700;color:#fb0089;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">${p.type === 'coureur' ? '🏃 Coureur parrainé' : '🏆 Équipe parrainée'}</div>
+  <div style="font-size:.95rem;font-weight:700;color:#3d1830;margin-bottom:8px">${p.nom}</div>
+  <div style="display:flex;gap:20px;flex-wrap:wrap;margin-bottom:12px">
+    <div style="font-size:.82rem;color:#3d1830">🏅 <strong>${p.montantKm} €/km</strong> promis</div>
+    ${p.kmParcourus ? `<div style="font-size:.82rem;color:#3d1830">🏁 <strong>${p.kmParcourus} km</strong> parcourus</div>` : ''}
+    <div style="font-size:.82rem;color:#3d1830">💰 Don calculé : ${montantAffiche}</div>
+  </div>
+  <a href="${p.urlDon}" style="display:inline-block;background-color:#fb0089;color:#ffffff;text-decoration:none;padding:10px 22px;border-radius:99px;font-weight:700;font-size:.82rem;font-family:Arial,sans-serif">
+    ❤️ Je concrétise ma promesse pour ${label}
+  </a>
+</div>`;
+  }).join('');
+
+  const IMG1 = 'https://defi-enfance-notifications.onrender.com/WhatsApp%20Image%202026-05-22%20at%2016.52.36.jpeg';
+  const IMG2 = 'https://defi-enfance-notifications.onrender.com/WhatsApp%20Image%202026-05-22%20at%2016.53.42.jpeg';
+  const IMG3 = 'https://defi-enfance-notifications.onrender.com/WhatsApp%20Image%202026-05-22%20at%2016.54.49.jpeg';
+
+  return `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Antonio:wght@700&display=swap" rel="stylesheet"><style>${CSS_COMMUN}</style></head><body bgcolor="#f5f0f3" style="background-color:#f5f0f3;margin:0;padding:0"><table class="bg-wrap" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#f5f0f3" style="background-color:#f5f0f3"><tr><td align="center" bgcolor="#f5f0f3" style="background-color:#f5f0f3"><div class="outer">
+
+<div class="logo-header"><div class="logo-text">🤝 Défi Enfance</div><div class="logo-sub">Générateur de victoires pour l'enfance</div></div>
+<div class="header mixed"><h1>🏁 Le Défi Enfance Angers 2026<br>s'est élancé — merci pour vos promesses !</h1><p>Défi Enfance · Angers · 22 mai 2026</p></div>
+
+<div class="body">
+<div style="font-size:1rem;font-weight:600;color:#3d1830;margin-bottom:12px;text-align:left">Bonjour ${prenom} 👋</div>
+<div style="font-size:.85rem;color:#3d1830;line-height:1.7;margin-bottom:20px;text-align:left">Aujourd'hui, <strong>Près de 600 coureurs participants, des centaines de supporters</strong> se sont réunis au Parc Saint-Serge d'Angers pour cette 2e édition du Défi Enfance. Une transformation réussie — <strong>le Défi Enfance s'est installé durablement à Angers !</strong></div>
+
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:20px"><tr>
+  <td width="49%" style="padding-right:6px"><img src="${IMG1}" alt="Défi Enfance Angers 2026" width="100%" style="border-radius:10px;display:block"></td>
+  <td width="49%" style="padding-left:6px"><img src="${IMG2}" alt="Défi Enfance Angers 2026" width="100%" style="border-radius:10px;display:block"></td>
+</tr></table>
+
+<div style="background:linear-gradient(135deg,#fff0f8,#fff5ef);border-left:3px solid #fb0089;border-radius:0 10px 10px 0;padding:14px 18px;margin-bottom:20px;font-size:.84rem;color:#3d1830;font-style:italic;text-align:left">
+  💬 <strong>Témoignage d'un chef d'entreprise :</strong><br>
+  "Course incroyable. Moment super avec les équipes. On a déjà motivé une entreprise partenaire de venir l'année prochaine !"
+</div>
+
+<div style="font-size:.85rem;color:#3d1830;line-height:1.7;margin-bottom:20px;text-align:left">Des dizaines d'équipes d'<strong>entreprises, d'écoles, d'associations et d'institutions</strong> ont couru côte à côte pour l'enfance. <strong>Cette aventure humaine à laquelle vous participez en tant que donateur est une ligne de départ.</strong> Nous avons tous quelque chose à faire pour l'enfance.</div>
+
+<img src="${IMG3}" alt="Défi Enfance Angers 2026" width="100%" style="border-radius:10px;display:block;margin-bottom:20px">
+
+<div style="background-color:#fff0f8;border:2px solid #fb0089;border-radius:14px;padding:18px 22px;margin-bottom:20px;text-align:center">
+  <div style="font-size:.72rem;font-weight:700;color:#fb0089;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">💰 Total de vos promesses</div>
+  <div style="font-family:Arial,sans-serif;font-size:2.5rem;color:#fb0089;font-weight:700;line-height:1.2">${totalDu > 0 ? totalDu.toFixed(2) + ' €' : 'À calculer'}</div>
+  <div style="font-size:.75rem;color:#3d1830;margin-top:6px">Selon les km réellement parcourus</div>
+</div>
+
+<div style="font-size:.88rem;font-weight:700;color:#3d1830;margin-bottom:14px;text-align:left">🏅 Vos promesses de don — concrétisez-les ce soir !</div>
+
+${blocPromesses}
+
+<div style="background-color:#fff8f0;border-left:3px solid #ef6135;border-radius:0 10px 10px 0;padding:14px 18px;margin-bottom:20px;font-size:.84rem;color:#3d1830;text-align:left">
+  ✨ <strong>Envie d'aller encore plus loin ?</strong> Si l'énergie de cette journée vous a touché, vous pouvez donner davantage que votre promesse. Chaque euro supplémentaire fait une vraie différence pour les enfants.
+  <div style="margin-top:12px"><a href="https://defienfance.fr/faire-un-don/" style="display:inline-block;background-color:#ef6135;color:#ffffff;text-decoration:none;padding:9px 20px;border-radius:99px;font-weight:700;font-size:.78rem;font-family:Arial,sans-serif">❤️ Faire un don supplémentaire</a></div>
+</div>
+
+<div style="font-size:.85rem;color:#3d1830;line-height:1.7;margin-bottom:20px;text-align:left">Un immense <strong>merci pour votre engagement</strong> — votre promesse de don a donné de l'élan à nos coureurs aujourd'hui. Grâce à vous et à tous les donateurs, le Défi Enfance 2026 est une nouvelle victoire pour l'enfance. 🤝</div>
+
+${BLOC_RECUS_FISCAUX}${BLOC_IFI}
+<div class="divider"></div>
+<div style="font-size:.86rem;color:#3d1830;text-align:center;font-style:italic;margin-bottom:8px">Merci d'avoir cru en nous. On continue ensemble. 🏁</div>
+<div style="font-size:.82rem;color:#fb0089;font-weight:600;text-align:center">— Team Défi Enfance 🤝</div>
 
 </div></td></tr></table></body></html>`;
 }
@@ -2973,6 +3795,8 @@ const TEMPLATES_SUJETS = {
   'groupe_j10_joue_coureurs':      '🎽 Dans ${j} jours, on court pour l\'enfance à Joué-lès-Tours — tout ce qu\'il faut savoir !',
   'groupe_j1_angers_coureurs':    '🎽 Demain, c\'est le jour J ! 🎽',
   'groupe_j1_donateurs':          '❤️ Merci pour votre soutien — demain c\'est le grand jour !',
+  'groupe_jourj_promesses':        '🏁 Vos promesses de don — le Défi Enfance a couru pour l\'enfance !',
+  'groupe_merci_coureurs_angers':   null, // sujet dynamique par coureur
   'inscription_coureur':          'Heureux de votre inscription au Défi Enfance !',
   'inscription_supporter':        'Heureux de votre inscription au Défi Enfance !',
   'inscription_asso':             '🏃 Nouveau coureur — Défi Enfance !',
@@ -2991,6 +3815,8 @@ function getTemplateFunction(templateId) {
     'groupe_j10_joue_coureurs':    (prenom, nbJours, extra) => tplGroupeJ10Joue({ prenom, nbJours, urlPageCoureur: extra?.urlPageCoureur, urlPromesseCoureur: extra?.urlPromesseCoureur }),
     'groupe_j1_angers_coureurs':  (prenom, nbJours, extra) => tplGroupeJ1Angers({ prenom, numeroDossard: extra?.numeroDossard, urlPageCoureur: extra?.urlPageCoureur, urlPromesseCoureur: extra?.urlPromesseCoureur }),
     'groupe_j1_donateurs':        (prenom, nbJours, extra) => tplGroupeJ1Donateurs({ prenom, historiqueHtml: extra?.historiqueHtml || '', urlDon: extra?.urlDon, urlProm: extra?.urlProm }),
+    'groupe_jourj_promesses':     (prenom, nbJours, extra) => tplGroupeJourJPromesses({ prenom, promesses: extra?.promesses || [] }),
+    'groupe_merci_coureurs_angers': (prenom, nbJours, extra) => tplGroupeMerciCoureurAngers({ prenom, dossard: extra?.numeroDossard || 0, nomCoureur: extra?.nom || prenom, equipe: extra?.nomEquipe || '', kmsPerso: extra?.kmsPerso || 0, classementPerso: extra?.classementPerso || 0, kmsEquipe: extra?.kmsEquipe || 0, classementEquipe: extra?.classementEquipe || 0, estSolo: !extra?.nomEquipe || extra?.nomEquipe === (extra?.nom || prenom) }),
     'inscription_coureur':        (prenom, _, extra) => tplInscriptionCoureur({ prenom, nomComplet: prenom, nomAsso: extra?.nomAsso }),
     'inscription_supporter':      (prenom) => tplInscriptionSupporter({ prenom }),
     'inscription_asso':           (prenom, _, extra) => tplInscriptionAsso({ nomAsso: extra?.nomAsso || '', coureur: prenom, email_coureur: '', ville: '', prenomReferent: prenom }),
@@ -3007,7 +3833,9 @@ function getTemplateFunction(templateId) {
 // ══════════════════════════════════════════════════════
 
 const EVENTS_MAP = {
-  'angers_coureurs':   ['Défi Enfance #Course #Angers2026'],
+  'angers_coureurs':             ['Défi Enfance #Course #Angers2026'],
+  'angers_coureurs_referents':   ['Défi Enfance #Course #Angers2026'],
+  'promettants_angers': ['Défi Enfance #Course #Angers2026', 'Défi Enfance #Supporters #Angers2026'],
   'joue_coureurs':     ['Défi Enfance #Course #Joué-lès-Tours2026'],
   'global_coureurs':   ['Défi Enfance #Course #Angers2026', 'Défi Enfance #Course #Joué-lès-Tours2026'],
   'angers_supporters': ['Défi Enfance #Supporters #Angers2026'],
@@ -3103,17 +3931,48 @@ async function fetchDestinataires({ typeDestinataire, filtreEquipe, depuisFrance
           const numeroDossard = (dossardRaw !== null && dossardRaw !== undefined && dossardRaw !== '' && dossardRaw !== 0 && dossardRaw !== '0')
             ? String(dossardRaw)
             : '';
-          addLog(`🎽 Dossard ${prenom} ${nom} : raw=${JSON.stringify(dossardRaw)} → "${numeroDossard}"`, 'info');
+          // Lire les classements Angers depuis les champs personnalisés du contact
+          const cfContact2 = contact.custom_fields || contact;
+          const kmsPerso        = parseFloat(cfContact2.km_parcourus_angers2026 || contact.km_parcourus_angers2026 || 0);
+          const classementPerso = parseInt(cfContact2.classement_angers2026    || contact.classement_angers2026    || 0);
+
+          // Lire les classements équipe depuis la structure (si disponible)
+          let kmsEquipe = 0;
+          let classementEquipe = 0;
+          if (nomEquipe && equipeParContactId.has(String(contact.id))) {
+            const structure = await fetchOhmeStructureByName(nomEquipe);
+            if (structure) {
+              const cfStr = structure.custom_fields || structure;
+              kmsEquipe        = parseFloat(cfStr.km_parcourus_equipe_angers_2026 || structure.km_parcourus_equipe_angers_2026 || 0);
+              classementEquipe = parseInt(cfStr.classement_angers20261            || structure.classement_angers20261            || 0);
+            }
+          }
+          // Fallback sur l'index codé en dur si champs Ohme vides
+          if (!kmsPerso && CLASSEMENT_INDIVIDUEL[parseInt(numeroDossard)]) {
+            const ci = CLASSEMENT_INDIVIDUEL[parseInt(numeroDossard)];
+            kmsPerso        = ci.kms;
+            classementPerso = ci.classement;
+          }
+          if (!kmsEquipe && nomEquipe && CLASSEMENT_EQUIPES[nomEquipe]) {
+            const ce = CLASSEMENT_EQUIPES[nomEquipe];
+            kmsEquipe        = ce.kms;
+            classementEquipe = ce.classement;
+          }
+
           destinataires.push({
-            prenom:        prenom || 'Participant',
+            prenom:          prenom || 'Participant',
             nom,
-            email:         contact.email,
-            contactId:     contact.id,
-            nomAsso:       (cf.asso_soutenue || '').trim(),
-            nomEquipe:     (cf.equipe || '').trim(),
-            eventName:     eventNom,
-            datePaiement:  p.created_at || p.date,
+            email:           contact.email,
+            contactId:       contact.id,
+            nomAsso:         (cf.asso_soutenue || '').trim(),
+            nomEquipe,
+            eventName:       eventNom,
+            datePaiement:    p.created_at || p.date,
             numeroDossard,
+            kmsPerso,
+            classementPerso,
+            kmsEquipe,
+            classementEquipe,
           });
         }
 
@@ -3317,8 +4176,100 @@ async function fetchDestinataires({ typeDestinataire, filtreEquipe, depuisFrance
     addLog(`⚠️ fetchDestinataires erreur : ${e.message}`, 'warn');
   }
 
+
+  // ── Pour le type référents équipe, ajouter les référents en plus des coureurs
+  if (typeDestinataire === 'angers_coureurs_referents') {
+    addLog("🏆 Ajout des référents d'équipe…", 'info');
+    let cursorStr = null;
+    while (true) {
+      await sleep(OHME_DELAY_MS);
+      const urlStr = cursorStr
+        ? `${CONFIG.ohmeBase}/api/v1/structures?limit=250&cursor=${encodeURIComponent(cursorStr)}`
+        : `${CONFIG.ohmeBase}/api/v1/structures?limit=250`;
+      const rStr = await fetchOhmeWithRetry(urlStr, { headers: { 'Accept': 'application/json', 'client-name': CONFIG.ohmeClientName, 'client-secret': CONFIG.ohmeClientSecret } });
+      if (!rStr || !rStr.ok) break;
+      const jStr = await rStr.json();
+      const structs = jStr.data || [];
+      for (const s of structs) {
+        const cf = s.custom_fields || s;
+        const emailRef = (cf.email_referent_defi_enfance || '').trim();
+        const estEquipe = cf.equipe_defi_enfance === true || cf.equipe_defi_enfance === 'true';
+        if (!emailRef || !estEquipe) continue;
+        const prenomRef = cf.prenom_du_referent_defi_enfance || '';
+        const nomRef    = cf.nom_du_referent_defi_enfance || '';
+        const nomEquipe = s.name || '';
+        const kmsEquipe        = parseFloat(cf.km_parcourus_equipe_angers_2026 || 0) || (CLASSEMENT_EQUIPES[nomEquipe]?.kms || 0);
+        const classementEquipe = parseInt(cf.classement_angers20261 || 0) || (CLASSEMENT_EQUIPES[nomEquipe]?.classement || 0);
+        destinataires.push({
+          prenom: prenomRef || nomRef, nom: nomRef, email: emailRef,
+          contactId: `ref_${s.id}`, nomEquipe, nomAsso: '',
+          eventName: 'Défi Enfance #Course #Angers2026',
+          numeroDossard: '', kmsPerso: 0, classementPerso: 0,
+          kmsEquipe, classementEquipe, estReferent: true,
+        });
+      }
+      if (structs.length < 250) break;
+      cursorStr = jStr.cursor || (structs.length > 0 ? String(structs[structs.length - 1].id) : null);
+      if (!cursorStr) break;
+    }
+    addLog(`✅ Référents équipe ajoutés — total: ${destinataires.length}`, 'ok');
+  }
+
   return destinataires;
 }
+
+// ── Récupérer les promettants avec leurs promesses pour Jour J
+async function fetchPromettantsAvecPromesses() {
+  const promettantsMap = new Map(); // email → { prenom, nom, email, contactId, promesses[] }
+  let cursor = null;
+  while (true) {
+    await sleep(OHME_DELAY_MS);
+    const url = cursor
+      ? `${CONFIG.ohmeBase}/api/v1/payments?payment_type_id=1&limit=250&since_date=2025-01-01&cursor=${encodeURIComponent(cursor)}`
+      : `${CONFIG.ohmeBase}/api/v1/payments?payment_type_id=1&limit=250&since_date=2025-01-01`;
+    const r = await fetchOhmeWithRetry(url, { headers: { 'Accept': 'application/json', 'client-name': CONFIG.ohmeClientName, 'client-secret': CONFIG.ohmeClientSecret } });
+    if (!r || !r.ok) break;
+    const j = await r.json();
+    const items = j.data || [];
+    for (const p of items) {
+      const cf = p.custom_fields || p;
+      const montantKm = parseFloat(cf.montant_promesse_don_par_km || 0);
+      if (!montantKm || montantKm <= 0) continue;
+      const eventName = (p.nom_de_levent || cf.nom_de_levent || '').toUpperCase();
+      if (!eventName.includes('ANGERS')) continue;
+      const coureurParraine = (cf.coureur_parraine || '').trim();
+      const equipeParraine  = (cf.equipe_parraine || '').trim();
+      if (!coureurParraine && !equipeParraine) continue;
+      await sleep(OHME_CONTACT_DELAY_MS);
+      const contact = await fetchOhmeContactById(p.contact_id);
+      if (!contact?.email) continue;
+      const email  = contact.email.toLowerCase().trim();
+      const prenom = contact.firstname || contact.first_name || '';
+      const nom    = contact.lastname  || contact.last_name  || '';
+      if (!promettantsMap.has(email)) {
+        promettantsMap.set(email, { prenom, nom, email, contactId: contact.id, promesses: [] });
+      }
+      let kmParcourus = 0;
+      if (coureurParraine) {
+        const contactCoureur = await fetchOhmeContactByName(coureurParraine);
+        if (contactCoureur?.id) {
+          const cfC = contactCoureur.custom_fields || contactCoureur;
+          kmParcourus = parseFloat(cfC.km_parcourus_angers2026 || contactCoureur.km_parcourus_angers2026 || 0);
+        }
+        const montantDu = kmParcourus > 0 ? Math.round(kmParcourus * montantKm * 100) / 100 : 0;
+        promettantsMap.get(email).promesses.push({ type: 'coureur', nom: coureurParraine, montantKm, kmParcourus, montantDu, urlDon: 'https://defienfance.fr/faire-un-don/' });
+      } else if (equipeParraine) {
+        promettantsMap.get(email).promesses.push({ type: 'equipe', nom: equipeParraine, montantKm, kmParcourus: 0, montantDu: 0, urlDon: 'https://defienfance.fr/faire-un-don/' });
+      }
+    }
+    if (items.length < 250) break;
+    cursor = j.cursor || (items.length > 0 ? String(items[items.length - 1].id) : null);
+    if (!cursor) break;
+  }
+  addLog(`✅ ${promettantsMap.size} promettant(s) trouvés`, 'ok');
+  return [...promettantsMap.values()];
+}
+
 
 // ══════════════════════════════════════════════════════
 //  GESTION DES DOUBLONS — ENVOIS GROUPÉS
@@ -3622,15 +4573,20 @@ app.post('/api/envoi-groupe/preview', async (req, res) => {
 
   try {
     envoiGroupeLog(`🔍 Comptage : ${typeDestinataire}…`, 'info');
-    const tous = await fetchDestinataires({ typeDestinataire, filtreEquipe, depuisFrance, nbJours });
+    const tous = typeDestinataire === 'promettants_angers'
+      ? (await fetchPromettantsAvecPromesses()).map(p => ({ prenom: p.prenom, nom: p.nom, email: p.email, contactId: p.contactId, extra_promesses: p.promesses }))
+      : await fetchDestinataires({ typeDestinataire, filtreEquipe, depuisFrance, nbJours });
     const dejaEnvoyes = await getContactsDejaEnvoyes(`custom_${typeDestinataire}_${template}`);
     const nouveaux = tous.filter(p => !dejaEnvoyes.has(String(p.contactId)));
 
     // ── Détection des doublons (100% locale, sans appel API Ohme)
+    // Pour certains templates (merci coureurs), on envoie à tous même si même email
+    const templateSansDedup = ['groupe_merci_coureurs_angers'].includes(template);
     const parEmail = {};
     for (const p of nouveaux) {
-      if (!parEmail[p.email]) parEmail[p.email] = [];
-      parEmail[p.email].push(p);
+      const cle = templateSansDedup ? String(p.contactId || p.email + '_' + Math.random()) : p.email;
+      if (!parEmail[cle]) parEmail[cle] = [];
+      parEmail[cle].push(p);
     }
     const doublons = Object.entries(parEmail)
       .filter(([, groupe]) => groupe.length > 1)
@@ -3767,13 +4723,25 @@ app.post('/api/envoi-groupe/start', async (req, res) => {
             historiqueHtml:      formatHistoriqueDons(await fetchHistoriqueDons(p.contactId)),
             urlDon:              await buildUrlPageCoureur(p.contactId, p.eventName),
             urlProm:             await buildUrlPromesseCoureur(p.contactId, p.eventName),
+            promesses:           p.extra_promesses || [],
+            // Classements depuis Ohme (contacts + structures)
+            kmsPerso:            p.kmsPerso            || 0,
+            classementPerso:     p.classementPerso     || 0,
+            kmsEquipe:           p.kmsEquipe           || 0,
+            classementEquipe:    p.classementEquipe    || 0,
           });
           const campagne = CAMPAGNES[campagneId] || { sujet: template };
           let sujetBase = TEMPLATES_SUJETS[template] || template;
-          // Remplacer ${j} dans les sujets dynamiques
-          if (nbJours) sujetBase = sujetBase.replace(/\$\{j\}/g, nbJours).replace(/\d+ jours?/gi, `${nbJours} jours`);
-          // Personnaliser le prénom dans le sujet
-          const sujetFinal = sujetBase.replace(/\$\{prenom\}/g, p.prenom || 'Participant');
+          // Sujet dynamique selon template
+          let sujetFinal;
+          if (template === 'groupe_merci_coureurs_angers') {
+            const nomComplet = `${p.prenom || ''} ${p.nom || ''}`.trim();
+            const equipeLabel = p.nomEquipe && p.nomEquipe !== nomComplet ? ` — ${p.nomEquipe}` : '';
+            sujetFinal = `🏁 Merci ${nomComplet}${equipeLabel} — votre bilan Défi Enfance 2026 !`;
+          } else {
+            if (nbJours) sujetBase = sujetBase ? sujetBase.replace(/\$\{j\}/g, nbJours).replace(/\d+ jours?/gi, `${nbJours} jours`) : template;
+            sujetFinal = sujetBase ? sujetBase.replace(/\$\{prenom\}/g, p.prenom || 'Participant') : template;
+          }
           const ok = await sendBrevo(p.email, sujetFinal, html);
           if (ok) {
             envoiGroupe.sent++;
