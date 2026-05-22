@@ -154,7 +154,7 @@ async function saveCurrentVersion() {
 // ══════════════════════════════════════════════════════
 //  VERSION
 // ══════════════════════════════════════════════════════
-const SERVER_VERSION = '126';
+const SERVER_VERSION = '127';
 
 // ══════════════════════════════════════════════════════
 //  ÉTAT SERVEUR
@@ -263,13 +263,41 @@ async function initFromRedis() {
   const lastVersion = await getLastVersion();
   premierPoll = lastVersion !== SERVER_VERSION;
 
-  // ── Sécurité : si Redis vide (0 IDs) → forcer mode validation manuelle
-  if (!premierPoll && state.processedIds.size === 0) {
-    premierPoll = true;
-    console.log(`[INIT] ⚠️ Redis vide (0 IDs) — mode validation manuelle forcé par sécurité`);
-    addLog('⚠️ Redis vide — mode validation manuelle forcé par sécurité', 'warn');
-    await saveCurrentVersion();
-  } else if (premierPoll) {
+  // ── Sécurité : si Redis vide (0 IDs) → charger tous les IDs Ohme silencieusement
+  // sans envoyer d'emails, puis passer en mode automatique
+  if (state.processedIds.size === 0) {
+    console.log(`[INIT] ⚠️ Redis vide — chargement silencieux de tous les IDs Ohme…`);
+    addLog('⚠️ Redis vide — chargement silencieux de tous les IDs Ohme…', 'warn');
+    try {
+      let cursor = null;
+      let nbIds = 0;
+      while (true) {
+        await sleep(OHME_DELAY_MS);
+        const url = cursor
+          ? `${CONFIG.ohmeBase}/api/v1/payments?limit=250&since_date=2025-01-01&cursor=${encodeURIComponent(cursor)}`
+          : `${CONFIG.ohmeBase}/api/v1/payments?limit=250&since_date=2025-01-01`;
+        const r = await fetchOhmeWithRetry(url, { headers: { 'Accept': 'application/json', 'client-name': CONFIG.ohmeClientName, 'client-secret': CONFIG.ohmeClientSecret } });
+        if (!r || !r.ok) { addLog(`⚠️ Chargement IDs HTTP ${r?.status || 'erreur'} — mode validation manuelle forcé`, 'warn'); premierPoll = true; break; }
+        const j = await r.json();
+        const items = j.data || [];
+        items.forEach(p => { if (p.id) { state.processedIds.add(String(p.id)); nbIds++; } });
+        if (items.length < 250) break;
+        cursor = j.cursor || (items.length > 0 ? String(items[items.length - 1].id) : null);
+        if (!cursor) break;
+      }
+      if (state.processedIds.size > 0) {
+        await saveProcessedIds();
+        await saveCurrentVersion();
+        premierPoll = false;
+        addLog(`✅ ${state.processedIds.size} IDs chargés — mode automatique direct`, 'ok');
+      }
+    } catch(e) {
+      addLog(`⚠️ Chargement IDs erreur : ${e.message} — mode validation manuelle`, 'warn');
+      premierPoll = true;
+    }
+  }
+
+  if (premierPoll) {
     console.log(`[INIT] 🆕 Nouvelle version (${lastVersion || 'aucune'} → ${SERVER_VERSION}) — mode validation manuelle`);
     await saveCurrentVersion();
   } else {
