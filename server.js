@@ -3723,7 +3723,7 @@ app.post('/api/envoi-groupe/test', async (req, res) => {
   if (!tplFn) return res.json({ error: `Template "${template}" introuvable` });
   try {
     const nbJ = nbJours ? parseInt(nbJours) : null;
-    const html = tplFn('Victor', nbJ, { nomAsso: 'Association Test', nomEquipe: 'Équipe Test', urlPageCoureur: URL_COUREURS, urlPromesseCoureur: URL_PROMESSE_FALLBACK, urlPageEquipe: URL_EQUIPES });
+    const html = tplFn('Victor', nbJ, { nomAsso: 'Association Test', nomEquipe: 'Équipe Test', urlPageCoureur: URL_COUREURS, urlPromesseCoureur: URL_PROMESSE_FALLBACK, urlPageEquipe: URL_EQUIPES, numeroDossard: '42', historiqueHtml: '', urlDon: URL_COUREURS, urlProm: URL_PROMESSE_FALLBACK });
     const sujetBase = TEMPLATES_SUJETS[template] || `[TEST] ${template}`;
     const sujetFinal = nbJ ? sujetBase.replace(/\d+ jours?/gi, `${nbJ} jours`) : sujetBase;
     const ok = await sendBrevo(EMAIL_TEST_VICTOR, `[TEST] ${sujetFinal}`, html);
