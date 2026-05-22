@@ -154,7 +154,7 @@ async function saveCurrentVersion() {
 // ══════════════════════════════════════════════════════
 //  VERSION
 // ══════════════════════════════════════════════════════
-const SERVER_VERSION = '125';
+const SERVER_VERSION = '126';
 
 // ══════════════════════════════════════════════════════
 //  ÉTAT SERVEUR
@@ -1594,6 +1594,32 @@ async function sendMerciDonateur({ email, prenom, montant, donateur, coureurPren
 // ══════════════════════════════════════════════════════
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 const OHME_DELAY_MS = 800;
+const ENVOI_GROUPE_DELAY_MS = 3000; // délai entre emails dans l'envoi groupé
+const OHME_CONTACT_DELAY_MS  = 600;  // délai entre appels contacts dans fetchDestinataires
+
+// ── Fetch Ohme avec retry automatique (gère 429 et 5xx)
+async function fetchOhmeWithRetry(url, options = {}, maxRetries = 3) {
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      const res = await fetch(url, options);
+      if (res.status === 429) {
+        const waitMs = attempt * 2000;
+        addLog(`⏳ Ohme rate limit (429) — attente ${waitMs/1000}s (tentative ${attempt}/${maxRetries})`, 'warn');
+        await sleep(waitMs);
+        continue;
+      }
+      if (res.status >= 500 && attempt < maxRetries) {
+        addLog(`⏳ Ohme erreur ${res.status} — retry dans 1s (tentative ${attempt}/${maxRetries})`, 'warn');
+        await sleep(1000);
+        continue;
+      }
+      return res;
+    } catch(e) {
+      if (attempt < maxRetries) { await sleep(1000); continue; }
+      throw e;
+    }
+  }
+}
 
 async function fetchOhmePayments() {
   if (!CONFIG.ohmeClientName || !CONFIG.ohmeClientSecret || !CONFIG.ohmeBase) {
@@ -1648,8 +1674,8 @@ async function fetchOhmeContactById(contactId) {
   if (contactsCache.has(key)) return contactsCache.get(key);
   try {
     await sleep(OHME_DELAY_MS);
-    const res = await fetch(`${CONFIG.ohmeBase}/api/v1/contacts/${contactId}`, { headers: { 'Accept': 'application/json', 'client-name': CONFIG.ohmeClientName, 'client-secret': CONFIG.ohmeClientSecret } });
-    if (!res.ok) return null;
+    const res = await fetchOhmeWithRetry(`${CONFIG.ohmeBase}/api/v1/contacts/${contactId}`, { headers: { 'Accept': 'application/json', 'client-name': CONFIG.ohmeClientName, 'client-secret': CONFIG.ohmeClientSecret } });
+    if (!res || !res.ok) return null;
     const json = await res.json();
     const contact = json.data || json;
     cacheContact(contact);
@@ -2648,7 +2674,6 @@ async function saveContactsEnvoyes(campagneId, contactIds) {
 // ══════════════════════════════════════════════════════
 
 // Délai entre chaque email pour 800 emails en 30 min = 2250ms
-const ENVOI_GROUPE_DELAY_MS = 3000;
 const EMAIL_TEST_VICTOR = 'v.vieilfault@unionpourlenfance.com';
 
 
@@ -3002,7 +3027,7 @@ async function fetchDestinataires({ typeDestinataire, filtreEquipe, depuisFrance
           if (qualite === 'don attendu' || qualite === 'exclu') continue;
 
           if (!p.contact_id) continue;
-          await sleep(300);
+          await sleep(OHME_CONTACT_DELAY_MS);
           const contact = await fetchOhmeContactById(p.contact_id);
           if (!contact || !contact.email) continue;
           if (emailsVus.has(contact.email)) continue;
@@ -3139,7 +3164,7 @@ async function fetchDestinataires({ typeDestinataire, filtreEquipe, depuisFrance
           if (qualite === 'don attendu' || qualite === 'exclu') continue;
 
           if (!p.contact_id) continue;
-          await sleep(300);
+          await sleep(OHME_CONTACT_DELAY_MS);
           const contact = await fetchOhmeContactById(p.contact_id);
           if (!contact || !contact.email || emailsVus.has(contact.email)) continue;
           emailsVus.add(contact.email);
@@ -3215,7 +3240,7 @@ async function fetchDestinataires({ typeDestinataire, filtreEquipe, depuisFrance
             if (datePmt <= dateFiltre) continue;
           }
           if (!p.contact_id) continue;
-          await sleep(300);
+          await sleep(OHME_CONTACT_DELAY_MS);
           const contact = await fetchOhmeContactById(p.contact_id);
           if (!contact || !contact.email || emailsVus.has(contact.email)) continue;
           emailsVus.add(contact.email);
