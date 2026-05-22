@@ -4241,7 +4241,29 @@ async function fetchPromettantsAvecPromesses() {
       const equipeParraine  = (cf.equipe_parraine || '').trim();
       if (!coureurParraine && !equipeParraine) continue;
       await sleep(OHME_CONTACT_DELAY_MS);
-      const contact = await fetchOhmeContactById(p.contact_id);
+      let contact = await fetchOhmeContactById(p.contact_id);
+      // Fallback : si pas de contact (paiement d'entreprise), chercher via la structure
+      if (!contact?.email && p.structure_id) {
+        await sleep(OHME_CONTACT_DELAY_MS);
+        const rStr = await fetchOhmeWithRetry(`${CONFIG.ohmeBase}/api/v1/structures/${p.structure_id}`, {
+          headers: { 'Accept': 'application/json', 'client-name': CONFIG.ohmeClientName, 'client-secret': CONFIG.ohmeClientSecret }
+        });
+        if (rStr?.ok) {
+          const jStr = await rStr.json();
+          const structure = jStr.data || jStr;
+          const cfStr = structure.custom_fields || structure;
+          const emailRef = (cfStr.email_referent_defi_enfance || '').trim();
+          if (emailRef) {
+            contact = {
+              id: `struct_${p.structure_id}`,
+              email: emailRef,
+              firstname: cfStr.prenom_du_referent_defi_enfance || structure.name || '',
+              lastname:  cfStr.nom_du_referent_defi_enfance || '',
+            };
+            addLog(`🔍 Promettant (structure) : ${structure.name}`, 'info');
+          }
+        }
+      }
       if (!contact?.email) continue;
       const email  = contact.email.toLowerCase().trim();
       const prenom = contact.firstname || contact.first_name || '';
@@ -4259,7 +4281,17 @@ async function fetchPromettantsAvecPromesses() {
         const montantDu = kmParcourus > 0 ? Math.round(kmParcourus * montantKm * 100) / 100 : 0;
         promettantsMap.get(email).promesses.push({ type: 'coureur', nom: coureurParraine, montantKm, kmParcourus, montantDu, urlDon: 'https://defienfance.fr/faire-un-don/' });
       } else if (equipeParraine) {
-        promettantsMap.get(email).promesses.push({ type: 'equipe', nom: equipeParraine, montantKm, kmParcourus: 0, montantDu: 0, urlDon: 'https://defienfance.fr/faire-un-don/' });
+        // Chercher les kms de l'équipe via la structure
+        let kmsEquipe = CLASSEMENT_EQUIPES[equipeParraine]?.kms || 0;
+        if (!kmsEquipe) {
+          const structure = await fetchOhmeStructureByName(equipeParraine);
+          if (structure) {
+            const cfStr = structure.custom_fields || structure;
+            kmsEquipe = parseFloat(cfStr.km_parcourus_equipe_angers_2026 || structure.km_parcourus_equipe_angers_2026 || 0);
+          }
+        }
+        const montantDuEquipe = kmsEquipe > 0 ? Math.round(kmsEquipe * montantKm * 100) / 100 : 0;
+        promettantsMap.get(email).promesses.push({ type: 'equipe', nom: equipeParraine, montantKm, kmParcourus: kmsEquipe, montantDu: montantDuEquipe, urlDon: 'https://defienfance.fr/faire-un-don/' });
       }
     }
     if (items.length < 250) break;
