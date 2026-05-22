@@ -4672,14 +4672,22 @@ app.post('/api/envoi-groupe/start', async (req, res) => {
       envoiGroupeLog(`🚀 Démarrage envoi groupé : ${typeDestinataire} → template: ${template}`, 'info');
       let participants = [];
 
+      // Récupérer tous les destinataires selon le type
+      const fetchTousStart = async () => {
+        if (typeDestinataire === 'promettants_angers') {
+          const promettants = await fetchPromettantsAvecPromesses();
+          return promettants.map(p => ({ prenom: p.prenom, nom: p.nom, email: p.email, contactId: p.contactId, extra_promesses: p.promesses }));
+        }
+        return fetchDestinataires({ typeDestinataire, filtreEquipe, depuisFrance, nbJours });
+      };
+
       if (contactIdsFinals && contactIdsFinals.length > 0) {
-        // Doublons déjà résolus côté client — récupérer uniquement ces contacts
         envoiGroupeLog(`✅ Liste validée reçue — ${contactIdsFinals.length} destinataire(s)`, 'ok');
-        const tous = await fetchDestinataires({ typeDestinataire, filtreEquipe, depuisFrance, nbJours });
+        const tous = await fetchTousStart();
         const idsSet = new Set(contactIdsFinals.map(String));
         participants = tous.filter(p => idsSet.has(String(p.contactId)));
       } else {
-        const tous = await fetchDestinataires({ typeDestinataire, filtreEquipe, depuisFrance, nbJours });
+        const tous = await fetchTousStart();
         const dejaEnvoyes = await getContactsDejaEnvoyes(campagneId);
         const filtres = tous.filter(p => !dejaEnvoyes.has(String(p.contactId)));
         envoiGroupe.skipped = tous.length - filtres.length;
