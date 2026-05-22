@@ -35,16 +35,14 @@ app.post('/login', express.urlencoded({ extended: false }), (req, res) => {
   const pwd = process.env.DASHBOARD_PASSWORD || '';
   if (req.body.password === pwd) {
     res.setHeader('Set-Cookie', `dash_token=${pwd}; Path=/; SameSite=Strict`);
-    return res.send(`<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body>
-    <script>try{localStorage.setItem('dash_pwd',${JSON.stringify(pwd)});}catch(e){}window.location.href='/';</script></body></html>`);
+    return res.redirect('/');
   }
   res.redirect('/login?err=1');
 });
 
 app.get('/logout', (req, res) => {
   res.setHeader('Set-Cookie', 'dash_token=; Path=/; Max-Age=0');
-  return res.send(`<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body>
-  <script>try{localStorage.removeItem('dash_pwd');}catch(e){}window.location.href='/login';</script></body></html>`);
+  return res.redirect('/login');
 });
 
 app.get('/', (req, res) => {
