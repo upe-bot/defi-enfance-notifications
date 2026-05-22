@@ -1899,7 +1899,7 @@ function tplGroupeMerciCoureurAngers({ prenom, dossard, nomCoureur, equipe, kmsP
 <div style="font-size:.85rem;color:#3d1830;line-height:1.7;margin-bottom:20px;text-align:left">Aujourd'hui vous avez relevé le défi — et quelle journée ! <strong>650 coureurs, 100 supporters, 30 bénévoles</strong> ont transformé le Parc Saint-Serge en élan collectif pour l'enfance. Cette <strong>2e édition est une transformation réussie</strong> — le Défi Enfance s'est installé durablement à Angers.</div>
 
 ${blocPerso}
-
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:20px"><tr><td align="center" style="padding:8px 0"><a href="https://upe-bot.github.io/defi-enfance-dossard/index.html" style="display:inline-block;background-color:#3d1830;color:#ffffff;text-decoration:none;padding:11px 24px;border-radius:99px;font-weight:700;font-size:.84rem;font-family:Arial,sans-serif">🏆 Voir le classement général</a></td></tr></table>
 <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:20px"><tr>
   <td width="49%" style="padding-right:6px"><img src="${IMG1}" alt="Défi Enfance Angers 2026" width="100%" style="border-radius:10px;display:block"></td>
   <td width="49%" style="padding-left:6px"><img src="${IMG2}" alt="Défi Enfance Angers 2026" width="100%" style="border-radius:10px;display:block"></td>
@@ -1988,7 +1988,7 @@ function tplGroupeJourJPromesses({ prenom, promesses }) {
 
 ${blocPromesses}
 
-<div style="background-color:#fff8f0;border-left:3px solid #ef6135;border-radius:0 10px 10px 0;padding:14px 18px;margin-bottom:20px;font-size:.84rem;color:#3d1830;text-align:left">
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:20px"><tr><td align="center" style="padding:8px 0"><a href="https://upe-bot.github.io/defi-enfance-dossard/index.html" style="display:inline-block;background-color:#3d1830;color:#ffffff;text-decoration:none;padding:11px 24px;border-radius:99px;font-weight:700;font-size:.84rem;font-family:Arial,sans-serif">🏆 Voir le classement général</a></td></tr></table><div style="background-color:#fff8f0;border-left:3px solid #ef6135;border-radius:0 10px 10px 0;padding:14px 18px;margin-bottom:20px;font-size:.84rem;color:#3d1830;text-align:left">
   ✨ <strong>Envie d'aller encore plus loin ?</strong> Si l'énergie de cette journée vous a touché, vous pouvez donner davantage que votre promesse. Chaque euro supplémentaire fait une vraie différence pour les enfants.
   <div style="margin-top:12px"><a href="https://defienfance.fr/faire-un-don/" style="display:inline-block;background-color:#ef6135;color:#ffffff;text-decoration:none;padding:9px 20px;border-radius:99px;font-weight:700;font-size:.78rem;font-family:Arial,sans-serif">❤️ Faire un don supplémentaire</a></div>
 </div>
@@ -3923,7 +3923,9 @@ async function fetchDestinataires({ typeDestinataire, filtreEquipe, depuisFrance
           await sleep(OHME_CONTACT_DELAY_MS);
           const contact = await fetchOhmeContactById(p.contact_id);
           if (!contact || !contact.email) continue;
-          if (emailsVus.has(contact.email)) continue;
+          // Désactiver déduplication email pour les coureurs (plusieurs coureurs peuvent partager un email)
+          const dedupeEmail = !['angers_coureurs','joue_coureurs','global_coureurs','angers_coureurs_referents'].includes(typeDestinataire);
+          if (dedupeEmail && emailsVus.has(contact.email)) continue;
           emailsVus.add(contact.email);
 
           const prenom = contact.firstname || contact.first_name || '';
