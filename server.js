@@ -2632,8 +2632,35 @@ app.post('/api/dons-attente/ignorer-tous', async (req, res) => {
   const count = state.donsEnAttente.length;
   state.donsEnAttente.forEach(d => state.processedIds.add(String(d.paiementId)));
   state.donsEnAttente = [];
-  await saveDonsEnAttente(); await saveProcessedIds();
-  addLog(`🗑️ ${count} don(s) ignorés`, 'info');
+  await saveDonsEnAttente();
+
+  // ── Récupérer TOUS les IDs Ohme et les sauvegarder en Redis
+  // Evite que les paiements existants soient retraités au prochain redémarrage
+  addLog('🔄 Chargement de tous les IDs Ohme pour Redis…', 'info');
+  try {
+    let cursor = null;
+    let nbIds = 0;
+    while (true) {
+      await sleep(OHME_DELAY_MS);
+      const url = cursor
+        ? `${CONFIG.ohmeBase}/api/v1/payments?limit=250&since_date=2025-01-01&cursor=${encodeURIComponent(cursor)}`
+        : `${CONFIG.ohmeBase}/api/v1/payments?limit=250&since_date=2025-01-01`;
+      const r = await fetchOhmeWithRetry(url, { headers: { 'Accept': 'application/json', 'client-name': CONFIG.ohmeClientName, 'client-secret': CONFIG.ohmeClientSecret } });
+      if (!r || !r.ok) break;
+      const j = await r.json();
+      const items = j.data || [];
+      items.forEach(p => { if (p.id) { state.processedIds.add(String(p.id)); nbIds++; } });
+      if (items.length < 250) break;
+      cursor = j.cursor || (items.length > 0 ? String(items[items.length - 1].id) : null);
+      if (!cursor) break;
+    }
+    addLog(`✅ ${nbIds} IDs Ohme chargés et sauvegardés en Redis`, 'ok');
+  } catch(e) {
+    addLog(`⚠️ Chargement IDs Ohme : ${e.message}`, 'warn');
+  }
+
+  await saveProcessedIds();
+  addLog(`🗑️ ${count} don(s) ignorés — Redis mis à jour`, 'info');
   res.json({ success: true, count });
 });
 
