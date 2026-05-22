@@ -28,7 +28,7 @@ app.get('/login', (req, res) => {
   <body><div class="box"><div class="logo">🤝 DÉFI ENFANCE</div><div class="sub">Dashboard — Accès sécurisé</div>
   <form method="POST" action="/login"><input type="password" name="password" placeholder="Mot de passe" autofocus>
   <button type="submit">Se connecter</button></form>
-  ${req.query.err ? '<div class="err">Mot de passe incorrect</div>' : ''}</div></td></tr></table></body></html>`);
+  ${req.query.err ? '<div class="err">Mot de passe incorrect</div>' : ''}</div></body></html>`);
 });
 
 app.post('/login', express.urlencoded({ extended: false }), (req, res) => {
@@ -1918,7 +1918,11 @@ ${blocPerso}
 
 ${!estSolo && kmsE > 0 ? `<div style="background-color:#fff5ef;border:1.5px solid rgba(239,97,53,0.3);border-radius:12px;padding:14px 18px;margin-bottom:20px;text-align:left"><div style="font-size:.72rem;font-weight:700;color:#ef6135;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">🏆 Votre équipe — ${equipe}</div><div style="font-size:.84rem;color:#3d1830;line-height:1.6">Votre équipe a parcouru <strong>${kmsE.toFixed(1)} km</strong> au total — <strong>${classE}e</strong> au classement des équipes sur ${NB_EQUIPES_ANGERS}. Bravo à toute l'équipe !</div></div>` : ''}
 
-${BLOC_TEMOIGNAGES}${BLOC_SOCIAUX}${BLOC_RECUS_FISCAUX}${BLOC_IFI}
+<div style="background-color:#f0fff5;border:1.5px solid rgba(34,197,94,0.3);border-radius:12px;padding:16px 20px;margin-bottom:18px;text-align:left">
+  <div style="font-size:.72rem;font-weight:700;color:#16a34a;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">🚀 La collecte continue !</div>
+  <div style="font-size:.84rem;color:#3d1830;line-height:1.7;margin-bottom:10px">La collecte sur vos coureurs et vos équipes se poursuit <strong>jusqu'à la fin du mois de mai</strong>. Continuez de récolter des dons auprès de vos réseaux pro et perso pour faire grimper vos collectes pour l'enfance.</div>
+  <div style="font-size:.84rem;color:#3d1830;line-height:1.7">🏃 <strong>Un Défi Enfance à Joué-lès-Tours a lieu dans une semaine !</strong> Angers fera-t-il mieux que Joué en km parcourus et collecte de dons ? L'émulation est bonne ! N'hésitez pas à inviter vos connaissances de Touraine à se joindre à ce bel élan du Défi Enfance !</div>
+</div>${BLOC_TEMOIGNAGES}${BLOC_SOCIAUX}${BLOC_RECUS_FISCAUX}${BLOC_IFI}
 <div class="divider"></div>
 <div style="font-size:.86rem;color:#3d1830;text-align:center;font-style:italic;margin-bottom:8px">Chaque foulée compte. Chaque km parcouru fait la différence.<br><strong style="color:#fb0089">Merci d'avoir couru pour l'enfance ! 🏁</strong></div>
 <div style="font-size:.82rem;color:#fb0089;font-weight:600;text-align:center">— Team Défi Enfance 🤝</div>
@@ -1993,7 +1997,11 @@ ${blocPromesses}
 
 <div style="font-size:.85rem;color:#3d1830;line-height:1.7;margin-bottom:20px;text-align:left">Un immense <strong>merci pour votre engagement</strong> — votre promesse de don a donné de l'élan à nos coureurs aujourd'hui. Grâce à vous et à tous les donateurs, le Défi Enfance 2026 est une nouvelle victoire pour l'enfance. 🤝</div>
 
-${BLOC_RECUS_FISCAUX}${BLOC_IFI}
+<div style="background-color:#f0fff5;border:1.5px solid rgba(34,197,94,0.3);border-radius:12px;padding:16px 20px;margin-bottom:18px;text-align:left">
+  <div style="font-size:.72rem;font-weight:700;color:#16a34a;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">🚀 La collecte continue !</div>
+  <div style="font-size:.84rem;color:#3d1830;line-height:1.7;margin-bottom:10px">La collecte sur vos coureurs et vos équipes se poursuit <strong>jusqu'à la fin du mois de mai</strong>. Continuez de récolter des dons auprès de vos réseaux pro et perso pour faire grimper vos collectes pour l'enfance.</div>
+  <div style="font-size:.84rem;color:#3d1830;line-height:1.7">🏃 <strong>Un Défi Enfance à Joué-lès-Tours a lieu dans une semaine !</strong> Angers fera-t-il mieux que Joué en km parcourus et collecte de dons ? L'émulation est bonne ! N'hésitez pas à inviter vos connaissances de Touraine à se joindre à ce bel élan du Défi Enfance !</div>
+</div>${BLOC_RECUS_FISCAUX}${BLOC_IFI}
 <div class="divider"></div>
 <div style="font-size:.86rem;color:#3d1830;text-align:center;font-style:italic;margin-bottom:8px">Merci d'avoir cru en nous. On continue ensemble. 🏁</div>
 <div style="font-size:.82rem;color:#fb0089;font-weight:600;text-align:center">— Team Défi Enfance 🤝</div>
