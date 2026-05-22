@@ -3007,8 +3007,12 @@ async function fetchDestinataires({ typeDestinataire, filtreEquipe, depuisFrance
           const cf = p.custom_fields || p;
           const eventNom = (p.nom_de_levent || cf.nom_de_levent || '').trim();
 
-          // Filtre event
-          if (!eventsAttendus.some(e => eventNom.toLowerCase().includes(e.toLowerCase().replace('défi enfance ', '')))) continue;
+          // Filtre event — normalisation accents + casse
+          const normalize = s => s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+          if (!eventsAttendus.some(e => {
+            const tag = normalize(e).replace('defi enfance ', '');
+            return normalize(eventNom).includes(tag);
+          })) continue;
 
           // Filtre date
           if (dateFiltre) {
