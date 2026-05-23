@@ -3931,6 +3931,7 @@ function getTemplateFunction(templateId) {
     'groupe_j10_angers_coureurs': (prenom, nbJours, extra) => tplGroupeJ10Angers({ prenom, nbJours, urlPageCoureur: extra?.urlPageCoureur, urlPromesseCoureur: extra?.urlPromesseCoureur }),
     'groupe_j2_referents_angers':  (prenom, nbJours, extra) => tplGroupeJ2Referents({ prenom, urlPromesseEquipe: extra?.urlPromesseEquipe, urlPageEquipe: extra?.urlPageEquipe }),
     'groupe_j10_joue_coureurs':    (prenom, nbJours, extra) => tplGroupeJ10Joue({ prenom, nbJours, urlPageCoureur: extra?.urlPageCoureur, urlPromesseCoureur: extra?.urlPromesseCoureur }),
+    'groupe_j10_joue_coureurs_v2':  (prenom, nbJours, extra) => tplGroupeJ10JoueV2({ prenom, nbJours, urlPageCoureur: extra?.urlPageCoureur, urlPromesseCoureur: extra?.urlPromesseCoureur }),
     'groupe_j1_angers_coureurs':  (prenom, nbJours, extra) => tplGroupeJ1Angers({ prenom, numeroDossard: extra?.numeroDossard, urlPageCoureur: extra?.urlPageCoureur, urlPromesseCoureur: extra?.urlPromesseCoureur }),
     'groupe_j1_donateurs':        (prenom, nbJours, extra) => tplGroupeJ1Donateurs({ prenom, historiqueHtml: extra?.historiqueHtml || '', urlDon: extra?.urlDon, urlProm: extra?.urlProm }),
     'groupe_jourj_promesses':     (prenom, nbJours, extra) => tplGroupeJourJPromesses({ prenom, promesses: extra?.promesses || [] }),
