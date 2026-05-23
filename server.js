@@ -1149,12 +1149,12 @@ function tplGroupeJ10JoueV2({ prenom, nbJours, urlPageCoureur, urlPromesseCoureu
 <div class="header mixed"><h1>🎽 ${prenom}, dans ${j} jours<br>c'est votre tour !</h1><p>Défi Enfance · Joué-lès-Tours · 29 mai 2026</p></div>
 <div class="body">
 
-<div class="greeting">Bonjour ${prenom} 👋</div>
-<div class="intro">Dans <strong>${j} jours</strong>, c'est le grand jour pour Joué-lès-Tours ! 🎉 Et ce que vous avez vu se passer à Angers le 22 mai va vous donner encore plus d'élan pour faire de cette <strong>première édition à Joué</strong> quelque chose d'exceptionnel. Voici tout ce qu'il faut savoir ! 💪</div>
+<div style="font-size:1rem;font-weight:600;color:#3d1830;margin-bottom:12px;text-align:left">Bonjour ${prenom} 👋</div>
+<div style="font-size:.85rem;color:#3d1830;line-height:1.7;margin-bottom:20px;text-align:left">Dans <strong>${j} jours</strong>, c'est le grand jour pour Joué-lès-Tours ! 🎉 Et ce que vous avez vu se passer à Angers le 22 mai va vous donner encore plus d'élan pour faire de cette <strong>première édition à Joué</strong> quelque chose d'exceptionnel. Voici tout ce qu'il faut savoir ! 💪</div>
 
 <div style="background-color:#fff0f8;border:2px solid #fb0089;border-radius:14px;padding:18px 22px;margin-bottom:20px">
   <div style="font-size:.75rem;font-weight:700;color:#fb0089;text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px">🏁 Ce qui s'est passé à Angers le 22 mai</div>
-  <div style="font-size:.85rem;color:#3d1830;line-height:1.7;margin-bottom:14px">La <strong>2e édition du Défi Enfance à Angers</strong> a été une transformation réussie. Près de <strong>600 coureurs participants, des centaines de supporters et de nombreux bénévoles</strong> ont envahi le Parc Saint-Serge pour courir pour l'enfance. Des dizaines d'équipes d'entreprises, d'écoles, d'associations et d'institutions côte à côte.</div>
+  <div style="font-size:.85rem;color:#3d1830;line-height:1.7;margin-bottom:14px;text-align:left">La <strong>2e édition du Défi Enfance à Angers</strong> a été une transformation réussie. Près de <strong>600 coureurs participants, des centaines de supporters et de nombreux bénévoles</strong> ont envahi le Parc Saint-Serge pour courir pour l'enfance. Des dizaines d'équipes d'entreprises, d'écoles, d'associations et d'institutions côte à côte.</div>
   <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:14px"><tr>
     <td width="49%" style="padding-right:5px"><img src="${IMG1}" alt="Défi Enfance Angers 2026" width="100%" style="border-radius:8px;display:block"></td>
     <td width="49%" style="padding-left:5px"><img src="${IMG2}" alt="Défi Enfance Angers 2026" width="100%" style="border-radius:8px;display:block"></td>
@@ -1168,13 +1168,13 @@ function tplGroupeJ10JoueV2({ prenom, nbJours, urlPageCoureur, urlPromesseCoureu
 
 <div style="background-color:#f0fff5;border:1.5px solid rgba(34,197,94,0.3);border-radius:12px;padding:16px 20px;margin-bottom:20px">
   <div style="font-size:.75rem;font-weight:700;color:#16a34a;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">🏆 Angers vs Joué — l'émulation est lancée !</div>
-  <div style="font-size:.84rem;color:#3d1830;line-height:1.7">Angers a posé la barre. <strong>Joué-lès-Tours peut faire mieux !</strong> Collecte de dons, km parcourus, énergie collective — tout est encore ouvert. C'est votre tour de montrer ce que la Touraine a dans les jambes pour l'enfance. 💚</div>
+  <div style="font-size:.84rem;color:#3d1830;line-height:1.7;text-align:left">Angers a posé la barre. <strong>Joué-lès-Tours peut faire mieux !</strong> Collecte de dons, km parcourus, énergie collective — tout est encore ouvert. C'est votre tour de montrer ce que la Touraine a dans les jambes pour l'enfance. 💚</div>
 </div>
 
 <div style="background:linear-gradient(135deg,#fff0f8,#fdf5ff);border:2px solid #fb0089;border-radius:14px;padding:18px 22px;margin-bottom:20px">
   <div style="font-size:.75rem;font-weight:700;color:#fb0089;text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px">🏅 La promesse de don — le vrai game changer</div>
-  <div style="font-size:.85rem;color:#3d1830;line-height:1.7;margin-bottom:12px">À Angers, les <strong>promesses de dons au km</strong> ont transformé la collecte. Chaque km couru avait une valeur concrète — et les donateurs étaient <strong>connectés en temps réel</strong> à la performance de leurs coureurs. <strong>C'est le levier le plus puissant pour votre collecte.</strong></div>
-  <div style="font-size:.84rem;color:#3d1830;line-height:1.7;margin-bottom:14px">Le principe : un proche vous promet <strong>X€ par km</strong>. Vous courez, il donne selon votre performance. <strong>Plus vous courez, plus l'enfance gagne.</strong> Pas besoin de décider d'un montant à l'avance — et votre réseau sera naturellement motivé à vous encourager à fond !</div>
+  <div style="font-size:.85rem;color:#3d1830;line-height:1.7;margin-bottom:12px;text-align:left">À Angers, les <strong>promesses de dons au km</strong> ont transformé la collecte. Chaque km couru avait une valeur concrète — et les donateurs étaient <strong>connectés en temps réel</strong> à la performance de leurs coureurs. <strong>C'est le levier le plus puissant pour votre collecte.</strong></div>
+  <div style="font-size:.84rem;color:#3d1830;line-height:1.7;margin-bottom:14px;text-align:left">Le principe : un proche vous promet <strong>X€ par km</strong>. Vous courez, il donne selon votre performance. <strong>Plus vous courez, plus l'enfance gagne.</strong> Pas besoin de décider d'un montant à l'avance — et votre réseau sera naturellement motivé à vous encourager à fond !</div>
   <div style="display:flex;justify-content:center;gap:10px;flex-wrap:wrap">
     <a href="${urlProm}" style="display:inline-block;background-color:#7c3aed;color:#ffffff;text-decoration:none;padding:11px 24px;border-radius:99px;font-weight:700;font-size:.82rem;font-family:Arial,sans-serif">🏅 Faire promettre un don au km</a>
     <a href="${urlDon}" style="display:inline-block;background-color:#fb0089;color:#ffffff;text-decoration:none;padding:11px 24px;border-radius:99px;font-weight:700;font-size:.82rem;font-family:Arial,sans-serif">❤️ Ma page de collecte</a>
@@ -1201,6 +1201,11 @@ function tplGroupeJ10JoueV2({ prenom, nbJours, urlPageCoureur, urlPromesseCoureu
 </div>
 
 <div class="note magenta">🎽 <strong>Votre dossard</strong><br>Vous recevrez un email la veille, le <strong>jeudi 28 mai</strong>, avec votre numéro de dossard. Il ne vous restera plus qu'à le récupérer sur place dès 13h00 !</div>
+
+<div style="text-align:center;margin-bottom:20px">
+  <div style="font-size:.78rem;color:#3d1830;margin-bottom:10px;text-align:left">🔍 <strong>Dossards disponibles</strong> la veille au soir (28 mai, 21h max) — <strong>résultats de la course</strong> disponibles le lundi 1er juin 18h max.</div>
+  <a href="https://upe-bot.github.io/defi-enfance-dossard/index.html" style="display:inline-block;background-color:#3d1830;color:#ffffff;text-decoration:none;padding:11px 24px;border-radius:99px;font-weight:700;font-size:.84rem;font-family:Arial,sans-serif">🎽 Retrouver mon dossard &amp; mes résultats</a>
+</div>
 
 <div style="background:linear-gradient(135deg,#1a0a12,#2d1020);border-radius:14px;padding:20px 24px;margin-bottom:20px">
   <div style="font-size:.75rem;font-weight:700;color:#fb0089;text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">✉️ Email prêt à envoyer à vos proches</div>
@@ -4041,6 +4046,7 @@ async function fetchDestinataires({ typeDestinataire, filtreEquipe, depuisFrance
 
           if (!p.contact_id) continue;
           const isCoureurAngers = ['angers_coureurs','angers_coureurs_referents'].includes(typeDestinataire);
+          const isCoureurJoue   = ['joue_coureurs','joue_coureurs_equipe'].includes(typeDestinataire);
           // Pour les coureurs Angers : utiliser le cache bulk (chargé en ~3 appels)
           let contact = contactsCache.get(String(p.contact_id));
           if (!contact) {
@@ -4065,7 +4071,7 @@ async function fetchDestinataires({ typeDestinataire, filtreEquipe, depuisFrance
           // Filtre équipe non vide pour joue_coureurs_equipe
           if (typeDestinataire === 'joue_coureurs_equipe' && !nomEquipe) continue;
           // Déduplication email (désactivée pour les coureurs)
-          const dedupeEmail = !isCoureurAngers;
+          const dedupeEmail = !isCoureurAngers && !isCoureurJoue;
           if (dedupeEmail && emailsVus.has(contact.email)) continue;
           emailsVus.add(contact.email);
 
