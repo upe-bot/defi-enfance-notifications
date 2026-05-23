@@ -3998,7 +3998,7 @@ async function fetchDestinataires({ typeDestinataire, filtreEquipe, depuisFrance
          'angers_supporters','joue_supporters','global_supporters','dejeuner'].includes(typeDestinataire)) {
 
       // Pré-charger contacts puis structures en bulk séquentiel (~6 appels, ménage Ohme)
-      if (['angers_coureurs','angers_coureurs_referents'].includes(typeDestinataire)) {
+      if (['angers_coureurs','angers_coureurs_referents','joue_coureurs','joue_coureurs_equipe'].includes(typeDestinataire)) {
         await chargerContactsBulk();
         await chargerStructuresBulk();
       }
@@ -4020,6 +4020,11 @@ async function fetchDestinataires({ typeDestinataire, filtreEquipe, depuisFrance
         for (const p of items) {
           const cf = p.custom_fields || p;
           const eventNom = (p.nom_de_levent || cf.nom_de_levent || '').trim();
+
+          // Log diagnostic pour joue_coureurs_equipe
+          if (['joue_coureurs','joue_coureurs_equipe'].includes(typeDestinataire) && eventNom && destinataires.length === 0) {
+            addLog(`🔍 Joué — eventNom: "${eventNom}" | equipe: "${(cf.equipe||'').trim()}"`, 'info');
+          }
 
           // Filtre event — normalisation accents + casse
           const normalize = s => s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
