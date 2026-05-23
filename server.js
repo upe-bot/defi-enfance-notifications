@@ -1132,9 +1132,9 @@ function tplGroupeJ10JoueV2({ prenom, nbJours, urlPageCoureur, urlPromesseCoureu
   const urlProm = urlPromesseCoureur || 'https://defienfance.fr/suivre-la-collecte-defi-enfance/?de_promise=1';
   const urlDon  = urlPageCoureur     || 'https://defienfance.fr/faire-un-don/';
 
-  const IMG1 = 'https://defi-enfance-notifications.onrender.com/WhatsApp%20Image%202026-05-22%20at%2016.52.36.jpeg';
-  const IMG2 = 'https://defi-enfance-notifications.onrender.com/WhatsApp%20Image%202026-05-22%20at%2016.53.42.jpeg';
-  const IMG3 = 'https://defi-enfance-notifications.onrender.com/WhatsApp%20Image%202026-05-22%20at%2016.54.49.jpeg';
+  const IMG1 = 'https://upe-bot.github.io/defi-enfance-dossard/WhatsApp%20Image%202026-05-22%20at%2016.52.36.jpeg';
+  const IMG2 = 'https://upe-bot.github.io/defi-enfance-dossard/WhatsApp%20Image%202026-05-22%20at%2016.53.42.jpeg';
+  const IMG3 = 'https://upe-bot.github.io/defi-enfance-dossard/WhatsApp%20Image%202026-05-22%20at%2016.54.49.jpeg';
 
   return `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Antonio:wght@700&display=swap" rel="stylesheet"><style>${CSS_COMMUN}
     .programme-item{display:flex;align-items:flex-start;gap:12px;padding:10px 0;border-bottom:1px solid #f5dced;font-size:.84rem;color:#3d1830}
@@ -1976,9 +1976,9 @@ function tplGroupeMerciCoureurAngers({ prenom, dossard, nomCoureur, equipe, kmsP
   const kmsE        = infoEquipe.kms      || kmsEquipe      || 0;
   const classE      = infoEquipe.classement || classementEquipe || '?';
 
-  const IMG1 = 'https://defi-enfance-notifications.onrender.com/WhatsApp%20Image%202026-05-22%20at%2016.52.36.jpeg';
-  const IMG2 = 'https://defi-enfance-notifications.onrender.com/WhatsApp%20Image%202026-05-22%20at%2016.53.42.jpeg';
-  const IMG3 = 'https://defi-enfance-notifications.onrender.com/WhatsApp%20Image%202026-05-22%20at%2016.54.49.jpeg';
+  const IMG1 = 'https://upe-bot.github.io/defi-enfance-dossard/WhatsApp%20Image%202026-05-22%20at%2016.52.36.jpeg';
+  const IMG2 = 'https://upe-bot.github.io/defi-enfance-dossard/WhatsApp%20Image%202026-05-22%20at%2016.53.42.jpeg';
+  const IMG3 = 'https://upe-bot.github.io/defi-enfance-dossard/WhatsApp%20Image%202026-05-22%20at%2016.54.49.jpeg';
 
   const blocPerso = `<table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:16px"><tr>
     <td width="48%" align="center" bgcolor="#fff0f8" style="background-color:#fff0f8;border:2px solid #fb0089;border-radius:12px;padding:14px 10px">
@@ -2059,9 +2059,9 @@ function tplGroupeJourJPromesses({ prenom, promesses }) {
 </div>`;
   }).join('');
 
-  const IMG1 = 'https://defi-enfance-notifications.onrender.com/WhatsApp%20Image%202026-05-22%20at%2016.52.36.jpeg';
-  const IMG2 = 'https://defi-enfance-notifications.onrender.com/WhatsApp%20Image%202026-05-22%20at%2016.53.42.jpeg';
-  const IMG3 = 'https://defi-enfance-notifications.onrender.com/WhatsApp%20Image%202026-05-22%20at%2016.54.49.jpeg';
+  const IMG1 = 'https://upe-bot.github.io/defi-enfance-dossard/WhatsApp%20Image%202026-05-22%20at%2016.52.36.jpeg';
+  const IMG2 = 'https://upe-bot.github.io/defi-enfance-dossard/WhatsApp%20Image%202026-05-22%20at%2016.53.42.jpeg';
+  const IMG3 = 'https://upe-bot.github.io/defi-enfance-dossard/WhatsApp%20Image%202026-05-22%20at%2016.54.49.jpeg';
 
   return `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Antonio:wght@700&display=swap" rel="stylesheet"><style>${CSS_COMMUN}</style></head><body bgcolor="#f5f0f3" style="background-color:#f5f0f3;margin:0;padding:0"><table class="bg-wrap" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#f5f0f3" style="background-color:#f5f0f3"><tr><td align="center" bgcolor="#f5f0f3" style="background-color:#f5f0f3"><div class="outer">
 
@@ -4046,10 +4046,6 @@ async function fetchDestinataires({ typeDestinataire, filtreEquipe, depuisFrance
           const qualite = (cf.qualite_du_participant || '').toLowerCase().trim();
           if (qualite === 'don attendu' || qualite === 'exclu') continue;
 
-          // Log diagnostic Joué
-          if (['joue_coureurs','joue_coureurs_equipe'].includes(typeDestinataire) && destinataires.length === 0) {
-            addLog(`🔍 Joué paiement — contact_id: ${p.contact_id || 'VIDE'} | event: "${(p.nom_de_levent||'').substring(0,40)}"`, 'info');
-          }
           if (!p.contact_id) continue;
           const isCoureurAngers = ['angers_coureurs','angers_coureurs_referents'].includes(typeDestinataire);
           const isCoureurJoue   = ['joue_coureurs','joue_coureurs_equipe'].includes(typeDestinataire);
@@ -4406,7 +4402,7 @@ const contactsParId      = new Map(); // contactId → contact
 
 async function chargerContactsBulk() {
   if (contactsParDossard.size > 0) return; // déjà chargé
-  addLog('📋 Chargement bulk contacts coureurs Angers…', 'info');
+  addLog('📋 Chargement bulk tous les contacts Ohme…', 'info');
   let cursor = null;
   let nbTotal = 0;
   let nbCoureurs = 0;
@@ -4433,12 +4429,12 @@ async function chargerContactsBulk() {
         nbCoureurs++;
       }
     }
-    addLog(`📦 Bulk contacts : ${nbTotal} chargés, ${nbCoureurs} coureurs Angers…`, 'info');
+    addLog(`📦 Bulk contacts : ${nbTotal} chargés (dont ${nbCoureurs} coureurs Angers indexés)…`, 'info');
     if (items.length < 250) break;
     cursor = j.cursor || (items.length > 0 ? String(items[items.length - 1].id) : null);
     if (!cursor) break;
   }
-  addLog(`✅ Bulk contacts terminé — ${nbCoureurs} coureurs Angers sur ${nbTotal} contacts`, 'ok');
+  addLog(`✅ Bulk contacts terminé — ${nbTotal} contacts chargés (${nbCoureurs} coureurs Angers indexés)`, 'ok');
 }
 
 // ── Récupérer les promettants avec leurs promesses pour Jour J
