@@ -4021,11 +4021,6 @@ async function fetchDestinataires({ typeDestinataire, filtreEquipe, depuisFrance
           const cf = p.custom_fields || p;
           const eventNom = (p.nom_de_levent || cf.nom_de_levent || '').trim();
 
-          // Log diagnostic pour joue_coureurs_equipe
-          if (['joue_coureurs','joue_coureurs_equipe'].includes(typeDestinataire) && eventNom && destinataires.length === 0) {
-            addLog(`🔍 Joué — eventNom: "${eventNom}" | equipe: "${(cf.equipe||'').trim()}"`, 'info');
-          }
-
           // Filtre event — normalisation accents + casse
           const normalize = s => s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
           if (!eventsAttendus.some(e => {
