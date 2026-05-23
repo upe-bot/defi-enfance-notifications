@@ -4008,9 +4008,11 @@ async function fetchDestinataires({ typeDestinataire, filtreEquipe, depuisFrance
 
       while (true) {
         await sleep(OHME_DELAY_MS);
+        const useTypeFilter = !['joue_coureurs','joue_coureurs_equipe'].includes(typeDestinataire);
+        const typeParam = useTypeFilter ? 'payment_type_id=3&' : '';
         const url = cursor
-          ? `${CONFIG.ohmeBase}/api/v1/payments?limit=250&payment_type_id=3&since_date=2026-01-01&cursor=${encodeURIComponent(cursor)}`
-          : `${CONFIG.ohmeBase}/api/v1/payments?limit=250&payment_type_id=3&since_date=2026-01-01`;
+          ? `${CONFIG.ohmeBase}/api/v1/payments?limit=250&${typeParam}since_date=2026-01-01&cursor=${encodeURIComponent(cursor)}`
+          : `${CONFIG.ohmeBase}/api/v1/payments?limit=250&${typeParam}since_date=2026-01-01`;
 
         const res = await fetchOhmeWithRetry(url, { headers: { 'Accept': 'application/json', 'client-name': CONFIG.ohmeClientName, 'client-secret': CONFIG.ohmeClientSecret } });
         if (!res.ok) { addLog(`⚠️ Ohme HTTP ${res.status} (fetchDestinataires billetterie)`, 'warn'); break; }
@@ -4044,6 +4046,10 @@ async function fetchDestinataires({ typeDestinataire, filtreEquipe, depuisFrance
           const qualite = (cf.qualite_du_participant || '').toLowerCase().trim();
           if (qualite === 'don attendu' || qualite === 'exclu') continue;
 
+          // Log diagnostic Joué
+          if (['joue_coureurs','joue_coureurs_equipe'].includes(typeDestinataire) && destinataires.length === 0) {
+            addLog(`🔍 Joué paiement — contact_id: ${p.contact_id || 'VIDE'} | event: "${(p.nom_de_levent||'').substring(0,40)}"`, 'info');
+          }
           if (!p.contact_id) continue;
           const isCoureurAngers = ['angers_coureurs','angers_coureurs_referents'].includes(typeDestinataire);
           const isCoureurJoue   = ['joue_coureurs','joue_coureurs_equipe'].includes(typeDestinataire);
