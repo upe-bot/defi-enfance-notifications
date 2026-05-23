@@ -1155,11 +1155,13 @@ function tplGroupeJ10JoueV2({ prenom, nbJours, urlPageCoureur, urlPromesseCoureu
 <div style="background-color:#fff0f8;border:2px solid #fb0089;border-radius:14px;padding:18px 22px;margin-bottom:20px">
   <div style="font-size:.75rem;font-weight:700;color:#fb0089;text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px">🏁 Ce qui s'est passé à Angers le 22 mai</div>
   <div style="font-size:.85rem;color:#3d1830;line-height:1.7;margin-bottom:14px;text-align:left">La <strong>2e édition du Défi Enfance à Angers</strong> a été une transformation réussie. Près de <strong>600 coureurs participants, des centaines de supporters et de nombreux bénévoles</strong> ont envahi le Parc Saint-Serge pour courir pour l'enfance. Des dizaines d'équipes d'entreprises, d'écoles, d'associations et d'institutions côte à côte.</div>
-  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:14px"><tr>
-    <td width="49%" style="padding-right:5px"><img src="${IMG1}" alt="Défi Enfance Angers 2026" width="100%" style="border-radius:8px;display:block"></td>
-    <td width="49%" style="padding-left:5px"><img src="${IMG2}" alt="Défi Enfance Angers 2026" width="100%" style="border-radius:8px;display:block"></td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:8px"><tr>
+    <td width="49%" style="padding-right:4px;vertical-align:top"><img src="${IMG1}" alt="Défi Enfance Angers 2026" width="100%" style="border-radius:8px;display:block"></td>
+    <td width="49%" style="padding-left:4px;vertical-align:top"><img src="${IMG2}" alt="Défi Enfance Angers 2026" width="100%" style="border-radius:8px;display:block"></td>
   </tr></table>
-  <img src="${IMG3}" alt="Défi Enfance Angers 2026" width="100%" style="border-radius:8px;display:block;margin-bottom:14px">
+  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:14px"><tr>
+    <td><img src="${IMG3}" alt="Défi Enfance Angers 2026" width="100%" style="border-radius:8px;display:block"></td>
+  </tr></table>
   <div style="background-color:#fff;border-left:3px solid #fb0089;border-radius:0 8px 8px 0;padding:12px 16px;font-size:.83rem;color:#3d1830;font-style:italic">
     💬 <strong>Témoignage d'un chef d'entreprise angevin :</strong><br>
     "Course incroyable. Moment super avec les équipes. On a déjà motivé une entreprise partenaire de venir l'année prochaine !"
@@ -4070,8 +4072,6 @@ async function fetchDestinataires({ typeDestinataire, filtreEquipe, depuisFrance
           const dossardNum = parseInt(numeroDossard || 0);
           // Filtre dossard officiel pour les coureurs Angers
           if (isCoureurAngers && (!dossardNum || !DOSSARDS_ANGERS_2026.has(dossardNum))) continue;
-          // Filtre équipe non vide pour joue_coureurs_equipe
-          if (typeDestinataire === 'joue_coureurs_equipe' && !nomEquipe) continue;
           // Déduplication email (désactivée pour les coureurs)
           const dedupeEmail = !isCoureurAngers && !isCoureurJoue;
           if (dedupeEmail && emailsVus.has(contact.email)) continue;
@@ -4083,6 +4083,9 @@ async function fetchDestinataires({ typeDestinataire, filtreEquipe, depuisFrance
           const classementPerso = parseInt(cfContact2.classement_angers2026    || contact.classement_angers2026    || 0);
 
           const nomEquipe = (cf.equipe || '').trim();
+
+          // Filtre équipe non vide pour joue_coureurs_equipe
+          if (typeDestinataire === 'joue_coureurs_equipe' && !nomEquipe) continue;
 
           // Lire classement équipe depuis la structure Ohme via le nom d'équipe du paiement
           let kmsEquipe = 0;
