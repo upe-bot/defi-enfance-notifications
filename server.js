@@ -891,10 +891,10 @@ function tplGroupeJ10Angers({ prenom, nbJours, urlPageCoureur, urlPromesseCoureu
 <div class="note magenta">🎽 <strong>Votre dossard</strong><br>Vous recevrez un email le <strong>jeudi 21 mai</strong> avec votre numéro de dossard. Il ne vous restera plus qu'à le récupérer sur place dès 8h30 et à enfiler vos baskets ! 👟</div>
 
 
-<div style="background:linear-gradient(135deg,#1a0a12,#2d1020);border-radius:14px;padding:20px 24px;margin-bottom:20px">
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:20px"><tr><td bgcolor="#1a0a12" style="background-color:#1a0a12;border-radius:14px;padding:20px 24px">
   <div style="font-size:.75rem;font-weight:700;color:#fb0089;text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">✉️ Email prêt à envoyer à vos proches</div>
-  <div style="font-size:.72rem;color:rgba(255,255,255,0.5);margin-bottom:16px">Copiez-collez ce message à vos amis, collègues, clients, fournisseurs…</div>
-  <div style="background:#fff;border-radius:10px;padding:20px 22px">
+  <div style="font-size:.72rem;color:#aaaaaa;margin-bottom:16px">Copiez-collez ce message à vos amis, collègues, clients, fournisseurs…</div>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td bgcolor="#ffffff" style="background-color:#ffffff;border-radius:10px;padding:20px 22px">
     <div style="font-size:.7rem;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">Objet</div>
     <div style="font-size:.84rem;font-weight:700;color:#3d1830;margin-bottom:16px;border-bottom:1px solid #f5dced;padding-bottom:12px">Plus qu'un défi sportif, une urgence pour l'enfance 🏁</div>
     <div style="font-size:.82rem;color:#3d1830;line-height:1.8">
@@ -1024,8 +1024,8 @@ ${equipeBlock}
       <p style="margin:0 0 12px">Un immense merci pour ton soutien, tes encouragements et pour l'aide que tu apportes à ces enfants.</p>
       <p style="margin:0">À très vite,<br><strong>${prenom}</strong></p>
     </div>
-  </div>
-</div>
+  </td></tr></table>
+</td></tr></table>
 
 ${BLOC_TEMOIGNAGES}${BLOC_SOCIAUX}${BLOC_RECUS_FISCAUX}
 <div class="divider"></div>
@@ -1132,9 +1132,9 @@ function tplGroupeJ10JoueV2({ prenom, nbJours, urlPageCoureur, urlPromesseCoureu
   const urlProm = urlPromesseCoureur || 'https://defienfance.fr/suivre-la-collecte-defi-enfance/?de_promise=1';
   const urlDon  = urlPageCoureur     || 'https://defienfance.fr/faire-un-don/';
 
-  const IMG1 = 'https://upe-bot.github.io/defi-enfance-dossard/WhatsApp%20Image%202026-05-22%20at%2016.52.36.jpeg';
-  const IMG2 = 'https://upe-bot.github.io/defi-enfance-dossard/WhatsApp%20Image%202026-05-22%20at%2016.53.42.jpeg';
-  const IMG3 = 'https://upe-bot.github.io/defi-enfance-dossard/WhatsApp%20Image%202026-05-22%20at%2016.54.49.jpeg';
+  const IMG1 = 'https://raw.githubusercontent.com/upe-bot/defi-enfance-dossard/main/WhatsApp%20Image%202026-05-22%20at%2016.52.36.jpeg';
+  const IMG2 = 'https://raw.githubusercontent.com/upe-bot/defi-enfance-dossard/main/WhatsApp%20Image%202026-05-22%20at%2016.53.42.jpeg';
+  const IMG3 = 'https://raw.githubusercontent.com/upe-bot/defi-enfance-dossard/main/WhatsApp%20Image%202026-05-22%20at%2016.54.49.jpeg';
 
   return `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Antonio:wght@700&display=swap" rel="stylesheet"><style>${CSS_COMMUN}
     .programme-item{display:flex;align-items:flex-start;gap:12px;padding:10px 0;border-bottom:1px solid #f5dced;font-size:.84rem;color:#3d1830}
@@ -1146,7 +1146,7 @@ function tplGroupeJ10JoueV2({ prenom, nbJours, urlPageCoureur, urlPromesseCoureu
   </style></head><body bgcolor="#f5f0f3" style="background-color:#f5f0f3;margin:0;padding:0"><table class="bg-wrap" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#f5f0f3" style="background-color:#f5f0f3"><tr><td align="center" bgcolor="#f5f0f3" style="background-color:#f5f0f3"><div class="outer">
 
 <div class="logo-header"><div class="logo-text">🤝 Défi Enfance</div><div class="logo-sub">Générateur de victoires pour l'enfance</div></div>
-<div class="header mixed"><h1>🎽 ${prenom}, dans ${j} jours<br>c'est votre tour !</h1><p>Défi Enfance · Joué-lès-Tours · 29 mai 2026</p></div>
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:0"><tr><td bgcolor="#fb0089" style="background-color:#fb0089;padding:24px 32px;text-align:center;border-radius:0"><h1 style="font-family:Arial,sans-serif;font-size:1.3rem;font-weight:700;color:#ffffff;margin:0 0 6px">🎽 ${prenom}, dans ${j} jours<br>c'est votre tour !</h1><p style="font-size:.8rem;color:rgba(255,255,255,.8);margin:0">Défi Enfance · Joué-lès-Tours · 29 mai 2026</p></td></tr></table>
 <div class="body">
 
 <div style="font-size:1rem;font-weight:600;color:#3d1830;margin-bottom:12px;text-align:left">Bonjour ${prenom} 👋</div>
@@ -1230,7 +1230,7 @@ ${BLOC_TEMOIGNAGES}${BLOC_SOCIAUX}${BLOC_IFI}${BLOC_RECUS_FISCAUX}
 <div style="font-size:.84rem;color:#3d1830;text-align:center;line-height:1.8">Pour toute question : <a href="mailto:contact@defienfance.com" style="color:#fb0089;font-weight:600">contact@defienfance.com</a> 📩<br><br><strong>On vous attend avec impatience — allez, plus que ${j} jours ! 🏁</strong></div>
 <div style="margin-top:16px;font-size:.82rem;color:#fb0089;font-weight:600;text-align:center">— L'équipe du Défi Enfance 🤲</div>
 
-</div><div class="footer"><div style="font-family:Arial,sans-serif;font-size:1.1rem;font-weight:700;color:#fb0089;letter-spacing:.08em;margin-bottom:6px">DÉFI ENFANCE</div><div class="footer-sub">Générateur de victoires pour l'enfance<br>contact@defienfance.fr</div></div></div></td></tr></table></body></html>`;
+</div></td></tr></table><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td bgcolor="#3d1830" style="background-color:#3d1830;padding:16px;text-align:center;border-radius:0 0 14px 14px"><div style="font-family:Arial,sans-serif;font-size:1.1rem;font-weight:700;color:#fb0089;letter-spacing:.08em;margin-bottom:6px">DÉFI ENFANCE</div><div style="font-size:.82rem;color:rgba(255,255,255,.5)">Générateur de victoires pour l'enfance<br>contact@defienfance.fr</div></td></tr></table></div></td></tr></table></body></html>`;
 }
 
 function tplGroupeJ1Donateurs({ prenom, historiqueHtml, urlDon, urlProm }) {
@@ -1976,9 +1976,9 @@ function tplGroupeMerciCoureurAngers({ prenom, dossard, nomCoureur, equipe, kmsP
   const kmsE        = infoEquipe.kms      || kmsEquipe      || 0;
   const classE      = infoEquipe.classement || classementEquipe || '?';
 
-  const IMG1 = 'https://upe-bot.github.io/defi-enfance-dossard/WhatsApp%20Image%202026-05-22%20at%2016.52.36.jpeg';
-  const IMG2 = 'https://upe-bot.github.io/defi-enfance-dossard/WhatsApp%20Image%202026-05-22%20at%2016.53.42.jpeg';
-  const IMG3 = 'https://upe-bot.github.io/defi-enfance-dossard/WhatsApp%20Image%202026-05-22%20at%2016.54.49.jpeg';
+  const IMG1 = 'https://raw.githubusercontent.com/upe-bot/defi-enfance-dossard/main/WhatsApp%20Image%202026-05-22%20at%2016.52.36.jpeg';
+  const IMG2 = 'https://raw.githubusercontent.com/upe-bot/defi-enfance-dossard/main/WhatsApp%20Image%202026-05-22%20at%2016.53.42.jpeg';
+  const IMG3 = 'https://raw.githubusercontent.com/upe-bot/defi-enfance-dossard/main/WhatsApp%20Image%202026-05-22%20at%2016.54.49.jpeg';
 
   const blocPerso = `<table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:16px"><tr>
     <td width="48%" align="center" bgcolor="#fff0f8" style="background-color:#fff0f8;border:2px solid #fb0089;border-radius:12px;padding:14px 10px">
@@ -2059,9 +2059,9 @@ function tplGroupeJourJPromesses({ prenom, promesses }) {
 </div>`;
   }).join('');
 
-  const IMG1 = 'https://upe-bot.github.io/defi-enfance-dossard/WhatsApp%20Image%202026-05-22%20at%2016.52.36.jpeg';
-  const IMG2 = 'https://upe-bot.github.io/defi-enfance-dossard/WhatsApp%20Image%202026-05-22%20at%2016.53.42.jpeg';
-  const IMG3 = 'https://upe-bot.github.io/defi-enfance-dossard/WhatsApp%20Image%202026-05-22%20at%2016.54.49.jpeg';
+  const IMG1 = 'https://raw.githubusercontent.com/upe-bot/defi-enfance-dossard/main/WhatsApp%20Image%202026-05-22%20at%2016.52.36.jpeg';
+  const IMG2 = 'https://raw.githubusercontent.com/upe-bot/defi-enfance-dossard/main/WhatsApp%20Image%202026-05-22%20at%2016.53.42.jpeg';
+  const IMG3 = 'https://raw.githubusercontent.com/upe-bot/defi-enfance-dossard/main/WhatsApp%20Image%202026-05-22%20at%2016.54.49.jpeg';
 
   return `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Antonio:wght@700&display=swap" rel="stylesheet"><style>${CSS_COMMUN}</style></head><body bgcolor="#f5f0f3" style="background-color:#f5f0f3;margin:0;padding:0"><table class="bg-wrap" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#f5f0f3" style="background-color:#f5f0f3"><tr><td align="center" bgcolor="#f5f0f3" style="background-color:#f5f0f3"><div class="outer">
 
