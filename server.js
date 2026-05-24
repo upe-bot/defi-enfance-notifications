@@ -2056,10 +2056,10 @@ function tplGroupeMerciDonateurAngers({ prenom, historiqueHtml, totalDons, nbDon
 
 <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:8px"><tr>
   <td width="49%" style="padding-right:4px;vertical-align:top"><img src="${IMG1}" alt="Défi Enfance Angers 2026" width="100%" style="border-radius:10px;display:block"></td>
-  <td width="49%" style="padding-left:4px;vertical-align:top"><img src="${IMG2}" alt="Défi Enfance Angers 2026" width="100%" style="border-radius:10px;display:block"></td>
+  <td width="49%" style="padding-left:4px;vertical-align:top"><img src="${IMG3}" alt="Défi Enfance Angers 2026" width="100%" style="border-radius:10px;display:block"></td>
 </tr></table>
 <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:20px"><tr>
-  <td><img src="${IMG3}" alt="Défi Enfance Angers 2026" width="100%" style="border-radius:10px;display:block"></td>
+  <td><img src="${IMG2}" alt="Défi Enfance Angers 2026" width="100%" style="border-radius:10px;display:block"></td>
 </tr></table>
 
 <div style="background-color:#fff0f8;border-left:3px solid #fb0089;border-radius:0 10px 10px 0;padding:14px 18px;margin-bottom:20px;font-size:.84rem;color:#3d1830;font-style:italic;text-align:left">
@@ -2121,10 +2121,10 @@ function tplGroupeMerciDonateurJoue({ prenom, historiqueHtml, totalDons, nbDons 
 
 <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:8px"><tr>
   <td width="49%" style="padding-right:4px;vertical-align:top"><img src="${IMG1}" alt="Défi Enfance Angers 2026" width="100%" style="border-radius:10px;display:block"></td>
-  <td width="49%" style="padding-left:4px;vertical-align:top"><img src="${IMG2}" alt="Défi Enfance Angers 2026" width="100%" style="border-radius:10px;display:block"></td>
+  <td width="49%" style="padding-left:4px;vertical-align:top"><img src="${IMG3}" alt="Défi Enfance Angers 2026" width="100%" style="border-radius:10px;display:block"></td>
 </tr></table>
 <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:20px"><tr>
-  <td><img src="${IMG3}" alt="Défi Enfance Angers 2026" width="100%" style="border-radius:10px;display:block"></td>
+  <td><img src="${IMG2}" alt="Défi Enfance Angers 2026" width="100%" style="border-radius:10px;display:block"></td>
 </tr></table>
 
 <div style="background-color:#fff0f8;border-left:3px solid #fb0089;border-radius:0 10px 10px 0;padding:14px 18px;margin-bottom:20px;font-size:.84rem;color:#3d1830;font-style:italic;text-align:left">
@@ -4590,6 +4590,10 @@ async function fetchDestinatairesAvecDons(typeDestinataire) {
   const isAngers = typeDestinataire === 'donateurs_angers_global';
   const isJoue   = typeDestinataire === 'donateurs_joue';
 
+  // Charger le cache bulk contacts + structures pour les classements
+  await chargerContactsBulk();
+  await chargerStructuresBulk();
+
   const donateursMap = new Map(); // email → { prenom, nom, email, contactId, dons[], totalDons }
   let cursor = null;
 
@@ -4609,9 +4613,8 @@ async function fetchDestinatairesAvecDons(typeDestinataire) {
       if (montant <= 0) continue;
       const eventNom = (p.nom_de_levent || cf.nom_de_levent || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 
-      // Filtre event selon le type
-      // Filtre event selon le type
-      if (isAngers && !(eventNom.includes('angers2026') || eventNom.includes('global'))) continue;
+      // Filtre event selon le type (eventNom déjà normalisé lowercase sans accents)
+      if (isAngers && !(eventNom.includes('angers2026') || eventNom.includes('global') || eventNom.includes('defi enfance global'))) continue;
       if (isJoue   && !eventNom.includes('joue')) continue;
       // Récupérer le contact
       if (!p.contact_id) continue;
@@ -4635,14 +4638,50 @@ async function fetchDestinatairesAvecDons(typeDestinataire) {
       const equipeParraine  = (cf.equipe_parraine  || '').trim();
       const dateStr = (p.date || p.created_at) ? new Date(p.date || p.created_at).toLocaleDateString('fr-FR') : '';
 
-      // Classement du coureur/équipe parrainé(e)
+      // Classement et kms depuis les champs personnalisés Ohme du coureur/équipe parrainé(e)
       let classementInfo = '';
+      let kmsParraine = 0;
+      let classParraine = 0;
+      let equipeParraine2 = '';
+
       if (coureurParraine) {
-        const ci = Object.values(CLASSEMENT_INDIVIDUEL).find(c => c.nom === coureurParraine);
-        if (ci) classementInfo = ` — ${ci.classement}e sur ${NB_COUREURS_ANGERS} coureurs (${ci.kms} km) — court pour ${ci.equipe}`;
-      } else if (equipeParraine && CLASSEMENT_EQUIPES[equipeParraine]) {
-        const ce = CLASSEMENT_EQUIPES[equipeParraine];
-        classementInfo = ` — ${ce.classement}e sur ${NB_EQUIPES_ANGERS} équipes (${ce.kms} km)`;
+        // Chercher le contact du coureur parrainé via le cache bulk
+        const contactCoureur = contactsParId.get(String(p.beneficiary_contact_id || ''))
+          || [...contactsCache.values()].find(c => {
+              const n = `${c.lastname||c.last_name||''} ${c.firstname||c.first_name||''}`.trim();
+              const n2 = `${c.firstname||c.first_name||''} ${c.lastname||c.last_name||''}`.trim();
+              return n === coureurParraine || n2 === coureurParraine;
+            });
+        if (contactCoureur) {
+          const cfC = contactCoureur.custom_fields || contactCoureur;
+          kmsParraine   = parseFloat(cfC.km_parcourus_angers2026   || 0);
+          classParraine = parseInt(cfC.classement_angers2026        || 0);
+          equipeParraine2 = cfC.lequipe_defi_enfance_dont_je_suis_le_referent || '';
+        }
+        // Fallback index codé en dur
+        if (!kmsParraine) {
+          const ci = Object.values(CLASSEMENT_INDIVIDUEL).find(c => c.nom === coureurParraine);
+          if (ci) { kmsParraine = ci.kms; classParraine = ci.classement; equipeParraine2 = ci.equipe; }
+        }
+        if (kmsParraine || classParraine) {
+          classementInfo = `${classParraine ? ` — ${classParraine}e / ${NB_COUREURS_ANGERS} coureurs` : ''}${kmsParraine ? ` — ${kmsParraine} km parcourus` : ''}${equipeParraine2 ? ` — ${equipeParraine2}` : ''}`;
+        }
+      } else if (equipeParraine) {
+        // Chercher la structure via le cache bulk
+        const structure = structuresParNom.get(equipeParraine) || structuresParNom.get(equipeParraine.toLowerCase());
+        if (structure) {
+          const cfS = structure.custom_fields || structure;
+          kmsParraine   = parseFloat(cfS.km_parcourus_equipe_angers_2026 || 0);
+          classParraine = parseInt(cfS.classement_angers20261              || 0);
+        }
+        // Fallback index codé en dur
+        if (!kmsParraine && CLASSEMENT_EQUIPES[equipeParraine]) {
+          kmsParraine   = CLASSEMENT_EQUIPES[equipeParraine].kms;
+          classParraine = CLASSEMENT_EQUIPES[equipeParraine].classement;
+        }
+        if (kmsParraine || classParraine) {
+          classementInfo = `${classParraine ? ` — ${classParraine}e / ${NB_EQUIPES_ANGERS} équipes` : ''}${kmsParraine ? ` — ${kmsParraine} km parcourus` : ''}`;
+        }
       }
 
       const don = { montant, dateStr, coureurParraine, equipeParraine, classementInfo };
@@ -4659,9 +4698,9 @@ async function fetchDestinatairesAvecDons(typeDestinataire) {
   for (const [, d] of donateursMap) {
     const historiqueHtml = d.dons.map(don => {
       const parrainage = don.coureurParraine
-        ? `<span style="color:#7c3aed;font-weight:600">🏃 ${don.coureurParraine}</span>${don.classementInfo ? `<span style="font-size:.78rem;color:#888"> ${don.classementInfo}</span>` : ''}`
+        ? `<span style="color:#7c3aed;font-weight:600">🏃 ${don.coureurParraine}</span>${don.classementInfo ? `<br><span style="font-size:.75rem;color:#888">${don.classementInfo.trim()}</span>` : ''}`
         : don.equipeParraine
-        ? `<span style="color:#ef6135;font-weight:600">🏆 ${don.equipeParraine}</span>${don.classementInfo ? `<span style="font-size:.78rem;color:#888"> ${don.classementInfo}</span>` : ''}`
+        ? `<span style="color:#ef6135;font-weight:600">🏆 ${don.equipeParraine}</span>${don.classementInfo ? `<br><span style="font-size:.75rem;color:#888">${don.classementInfo.trim()}</span>` : ''}`
         : '<span style="color:#888">Don général</span>';
       return `<div style="display:flex;justify-content:space-between;align-items:flex-start;padding:8px 0;border-bottom:1px solid #f5dced;font-size:.82rem;color:#3d1830"><div><span style="color:#888;font-size:.75rem">${don.dateStr}</span><br>${parrainage}</div><div style="font-weight:700;color:#fb0089;white-space:nowrap;padding-left:8px">${don.montant.toFixed(2)} €</div></div>`;
     }).join('');
