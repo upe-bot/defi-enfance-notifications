@@ -152,7 +152,7 @@ async function saveCurrentVersion() {
 // ══════════════════════════════════════════════════════
 //  VERSION
 // ══════════════════════════════════════════════════════
-const SERVER_VERSION = '129';
+const SERVER_VERSION = '130';
 
 // ══════════════════════════════════════════════════════
 //  ÉTAT SERVEUR
@@ -2034,6 +2034,145 @@ ${!estSolo && kmsE > 0 ? `<div style="background-color:#fff5ef;border:1.5px soli
 <div class="divider"></div>
 <div style="font-size:.86rem;color:#3d1830;text-align:center;font-style:italic;margin-bottom:8px">Chaque foulée compte. Chaque km parcouru fait la différence.<br><strong style="color:#fb0089">Merci d'avoir couru pour l'enfance ! 🏁</strong></div>
 <div style="font-size:.82rem;color:#fb0089;font-weight:600;text-align:center">— Team Défi Enfance 🤝</div>
+</div></td></tr></table></body></html>`;
+}
+
+
+function tplGroupeMerciDonateurAngers({ prenom, historiqueHtml, totalDons, nbDons }) {
+  const IMG1 = 'https://raw.githubusercontent.com/upe-bot/defi-enfance-dossard/main/WhatsApp%20Image%202026-05-22%20at%2016.52.36.jpeg';
+  const IMG2 = 'https://raw.githubusercontent.com/upe-bot/defi-enfance-dossard/main/WhatsApp%20Image%202026-05-22%20at%2016.53.42.jpeg';
+  const IMG3 = 'https://raw.githubusercontent.com/upe-bot/defi-enfance-dossard/main/WhatsApp%20Image%202026-05-22%20at%2016.54.49.jpeg';
+  const URL_CLASSEMENT = 'https://upe-bot.github.io/defi-enfance-dossard/index.html';
+  const URL_COLLECTE   = 'https://defienfance.fr/suivre-la-collecte-defi-enfance/?de_event=36946';
+
+  return `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Antonio:wght@700&display=swap" rel="stylesheet"><style>${CSS_COMMUN}</style></head><body bgcolor="#f5f0f3" style="background-color:#f5f0f3;margin:0;padding:0"><table class="bg-wrap" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#f5f0f3" style="background-color:#f5f0f3"><tr><td align="center" bgcolor="#f5f0f3" style="background-color:#f5f0f3"><div class="outer">
+
+<div class="logo-header"><div class="logo-text">🤝 Défi Enfance</div><div class="logo-sub">Générateur de victoires pour l'enfance</div></div>
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:0"><tr><td bgcolor="#fb0089" style="background-color:#fb0089;padding:24px 32px;text-align:center;border-radius:0"><h1 style="font-family:Arial,sans-serif;font-size:1.3rem;font-weight:700;color:#ffffff;margin:0 0 6px">❤️ Merci ${prenom} —<br>vous êtes les pionniers du Défi Enfance !</h1><p style="font-size:.8rem;color:rgba(255,255,255,.8);margin:0">Défi Enfance · Angers · 22 mai 2026</p></td></tr></table>
+
+<div class="body">
+<div style="font-size:1rem;font-weight:600;color:#3d1830;margin-bottom:12px;text-align:left">Bonjour ${prenom} 👋</div>
+<div style="font-size:.85rem;color:#3d1830;line-height:1.7;margin-bottom:20px;text-align:left">Le <strong>22 mai 2026</strong>, le Défi Enfance a couru à Angers — et vous, en tant que <strong>Donateur</strong>, vous étiez là, dans les coulisses, à rendre chaque foulée possible. <strong>Merci.</strong> Votre soutien ne s'arrête pas à un chiffre — il représente un engagement concret pour des enfants vulnérables. Vous faites partie du Défi Enfance à part entière.</div>
+
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:8px"><tr>
+  <td width="49%" style="padding-right:4px;vertical-align:top"><img src="${IMG1}" alt="Défi Enfance Angers 2026" width="100%" style="border-radius:10px;display:block"></td>
+  <td width="49%" style="padding-left:4px;vertical-align:top"><img src="${IMG2}" alt="Défi Enfance Angers 2026" width="100%" style="border-radius:10px;display:block"></td>
+</tr></table>
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:20px"><tr>
+  <td><img src="${IMG3}" alt="Défi Enfance Angers 2026" width="100%" style="border-radius:10px;display:block"></td>
+</tr></table>
+
+<div style="background-color:#fff0f8;border-left:3px solid #fb0089;border-radius:0 10px 10px 0;padding:14px 18px;margin-bottom:20px;font-size:.84rem;color:#3d1830;font-style:italic;text-align:left">
+  💬 <strong>Témoignage d'un chef d'entreprise :</strong><br>
+  "Course incroyable. Moment super avec les équipes. On a déjà motivé une entreprise partenaire de venir l'année prochaine !"
+</div>
+
+<div style="font-size:.85rem;color:#3d1830;line-height:1.7;margin-bottom:20px;text-align:left">Près de <strong>600 coureurs participants, des centaines de supporters et de nombreux bénévoles</strong> ont transformé le Parc Saint-Serge en élan collectif pour l'enfance. Des dizaines d'équipes d'<strong>entreprises, d'écoles, d'associations et d'institutions</strong> ont couru côte à côte. <strong>Cette 2e édition est une transformation réussie — le Défi Enfance s'est installé durablement à Angers.</strong></div>
+
+<div style="background-color:#fff0f8;border:2px solid #fb0089;border-radius:14px;padding:18px 22px;margin-bottom:20px">
+  <div style="font-size:.75rem;font-weight:700;color:#fb0089;text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px">❤️ Vos dons au Défi Enfance</div>
+  ${historiqueHtml}
+  <div style="font-size:.84rem;color:#3d1830;margin-top:12px;font-weight:600">Total : <span style="color:#fb0089">${totalDons > 0 ? totalDons.toFixed(2) + ' €' : 'voir ci-dessus'}</span> — ${nbDons} don(s)</div>
+</div>
+
+<div style="font-size:.85rem;color:#3d1830;line-height:1.7;margin-bottom:20px;text-align:left">Vous êtes les <strong>pionniers du Défi Enfance</strong> — les premiers soutiens, les premiers ambassadeurs. Grâce à vous, des enfants vulnérables bénéficient de projets innovants qui brisent les silos et placent enfin leur intérêt au centre. <strong>On compte sur vous pour la suite.</strong></div>
+
+<div style="background-color:#f0fff5;border:1.5px solid rgba(34,197,94,0.3);border-radius:12px;padding:16px 20px;margin-bottom:20px;text-align:left">
+  <div style="font-size:.75rem;font-weight:700;color:#16a34a;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">🚀 La collecte continue jusqu'au 31 mai minuit !</div>
+  <div style="font-size:.84rem;color:#3d1830;line-height:1.7;margin-bottom:10px">La collecte pour les coureurs et équipes du Défi Enfance Angers reste ouverte <strong>jusqu'au 31 mai à minuit</strong>. Vous pouvez refaire un don aux coureurs et équipes que vous avez soutenus pour les féliciter et affermir votre engagement pour l'Enfance — chaque euro compte !</div>
+  <div style="font-size:.84rem;color:#3d1830;line-height:1.7">Et dans une semaine, <strong>le Défi Enfance débarque à Joué-lès-Tours (29 mai)</strong> — l'élan continue !</div>
+</div>
+
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:20px"><tr>
+  <td align="center" style="padding:4px"><a href="${URL_CLASSEMENT}" style="display:inline-block;background-color:#3d1830;color:#ffffff;text-decoration:none;padding:11px 22px;border-radius:99px;font-weight:700;font-size:.82rem;font-family:Arial,sans-serif">🏆 Classement général Angers</a></td>
+  <td align="center" style="padding:4px"><a href="${URL_COLLECTE}" style="display:inline-block;background-color:#fb0089;color:#ffffff;text-decoration:none;padding:11px 22px;border-radius:99px;font-weight:700;font-size:.82rem;font-family:Arial,sans-serif">❤️ Soutenir la collecte Angers</a></td>
+</tr></table>
+
+${BLOC_RECUS_FISCAUX}${BLOC_IFI}${BLOC_SOCIAUX}
+<div class="divider"></div>
+<div style="font-size:.84rem;color:#3d1830;text-align:center;font-style:italic;margin-bottom:8px">Merci d'être là. On continue ensemble pour l'enfance. 🤝</div>
+<div style="font-size:.82rem;color:#fb0089;font-weight:600;text-align:center">— Team Défi Enfance</div>
+</div>
+<table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td bgcolor="#3d1830" style="background-color:#3d1830;padding:16px;text-align:center;border-radius:0 0 14px 14px"><div style="font-family:Arial,sans-serif;font-size:1.1rem;font-weight:700;color:#fb0089;letter-spacing:.08em;margin-bottom:6px">DÉFI ENFANCE</div><div style="font-size:.82rem;color:rgba(255,255,255,.5)">Générateur de victoires pour l'enfance<br>contact@defienfance.fr</div></td></tr></table>
+</div></td></tr></table></body></html>`;
+}
+
+
+function tplGroupeMerciDonateurJoue({ prenom, historiqueHtml, totalDons, nbDons }) {
+  const IMG1 = 'https://raw.githubusercontent.com/upe-bot/defi-enfance-dossard/main/WhatsApp%20Image%202026-05-22%20at%2016.52.36.jpeg';
+  const IMG2 = 'https://raw.githubusercontent.com/upe-bot/defi-enfance-dossard/main/WhatsApp%20Image%202026-05-22%20at%2016.53.42.jpeg';
+  const IMG3 = 'https://raw.githubusercontent.com/upe-bot/defi-enfance-dossard/main/WhatsApp%20Image%202026-05-22%20at%2016.54.49.jpeg';
+  const URL_CLASSEMENT  = 'https://upe-bot.github.io/defi-enfance-dossard/index.html';
+  const URL_COLLECTE    = 'https://defienfance.fr/suivre-la-collecte-defi-enfance/?de_view=teams&de_event=36946';
+  const URL_MUR_DONS    = 'https://defienfance.fr/mur-de-dons/';
+  const URL_MOTIVATIONS = 'https://defienfance.fr/motivations-des-coureurs/';
+  const URL_SUPPORTER   = 'https://luma.com/defi-supporters-jouelestours2026';
+  const URL_COUREUR     = 'https://luma.com/defi-course-jouelestours2026';
+  const URL_PROMESSE    = 'https://defienfance.fr/suivre-la-collecte-defi-enfance/?de_promise=1';
+
+  return `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Antonio:wght@700&display=swap" rel="stylesheet"><style>${CSS_COMMUN}</style></head><body bgcolor="#f5f0f3" style="background-color:#f5f0f3;margin:0;padding:0"><table class="bg-wrap" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#f5f0f3" style="background-color:#f5f0f3"><tr><td align="center" bgcolor="#f5f0f3" style="background-color:#f5f0f3"><div class="outer">
+
+<div class="logo-header"><div class="logo-text">🤝 Défi Enfance</div><div class="logo-sub">Générateur de victoires pour l'enfance</div></div>
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:0"><tr><td bgcolor="#fb0089" style="background-color:#fb0089;padding:24px 32px;text-align:center;border-radius:0"><h1 style="font-family:Arial,sans-serif;font-size:1.3rem;font-weight:700;color:#ffffff;margin:0 0 6px">🏁 Angers a montré la voie —<br>Joué-lès-Tours entre en scène !</h1><p style="font-size:.8rem;color:rgba(255,255,255,.8);margin:0">Défi Enfance · Angers · 22 mai 2026</p></td></tr></table>
+
+<div class="body">
+<div style="font-size:1rem;font-weight:600;color:#3d1830;margin-bottom:12px;text-align:left">Bonjour ${prenom} 👋</div>
+<div style="font-size:.85rem;color:#3d1830;line-height:1.7;margin-bottom:20px;text-align:left">Vendredi 22 mai, sous un soleil radieux, le Défi Enfance a couru à Angers — et quelle course ! Voici ce que vous avez raté… et ce qui vous attend à <strong>Joué-lès-Tours le 29 mai !</strong> 🎉</div>
+
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:8px"><tr>
+  <td width="49%" style="padding-right:4px;vertical-align:top"><img src="${IMG1}" alt="Défi Enfance Angers 2026" width="100%" style="border-radius:10px;display:block"></td>
+  <td width="49%" style="padding-left:4px;vertical-align:top"><img src="${IMG2}" alt="Défi Enfance Angers 2026" width="100%" style="border-radius:10px;display:block"></td>
+</tr></table>
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:20px"><tr>
+  <td><img src="${IMG3}" alt="Défi Enfance Angers 2026" width="100%" style="border-radius:10px;display:block"></td>
+</tr></table>
+
+<div style="background-color:#fff0f8;border-left:3px solid #fb0089;border-radius:0 10px 10px 0;padding:14px 18px;margin-bottom:20px;font-size:.84rem;color:#3d1830;font-style:italic;text-align:left">
+  💬 <strong>Témoignage d'un chef d'entreprise angevin :</strong><br>
+  "Course incroyable. Moment super avec les équipes. On a déjà motivé une entreprise partenaire de venir l'année prochaine !"
+</div>
+
+<div style="font-size:.85rem;color:#3d1830;line-height:1.7;margin-bottom:20px;text-align:left">Près de <strong>600 coureurs participants, des centaines de supporters et de nombreux bénévoles</strong> ont envahi le Parc Saint-Serge. Des dizaines d'équipes d'entreprises, d'écoles, d'associations et d'institutions côte à côte. <strong>Cette 2e édition est une transformation réussie — le Défi Enfance s'installe durablement !</strong></div>
+
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:20px"><tr>
+  <td align="center" style="padding:4px"><a href="${URL_CLASSEMENT}" style="display:inline-block;background-color:#3d1830;color:#ffffff;text-decoration:none;padding:11px 22px;border-radius:99px;font-weight:700;font-size:.82rem;font-family:Arial,sans-serif">🏆 Classement général Angers</a></td>
+  <td align="center" style="padding:4px"><a href="${URL_COLLECTE}" style="display:inline-block;background-color:#fb0089;color:#ffffff;text-decoration:none;padding:11px 22px;border-radius:99px;font-weight:700;font-size:.82rem;font-family:Arial,sans-serif">❤️ Collecte des équipes Angers</a></td>
+</tr></table>
+
+<div style="background-color:#fff0f8;border:2px solid #fb0089;border-radius:14px;padding:18px 22px;margin-bottom:20px">
+  <div style="font-size:.75rem;font-weight:700;color:#fb0089;text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px">❤️ Vos dons au Défi Enfance</div>
+  ${historiqueHtml}
+  <div style="font-size:.84rem;color:#3d1830;margin-top:12px;font-weight:600">Total : <span style="color:#fb0089">${totalDons > 0 ? totalDons.toFixed(2) + ' €' : 'voir ci-dessus'}</span> — ${nbDons} don(s)</div>
+</div>
+
+<div style="font-size:.85rem;color:#3d1830;line-height:1.7;margin-bottom:20px;text-align:left">Vous êtes les <strong>premiers ambassadeurs du Défi Enfance</strong> — les pionniers, ceux qui ont cru en ce projet avant tout le monde. Votre soutien donne de l'élan à toute la communauté. <strong>Merci d'être là.</strong></div>
+
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:16px"><tr>
+  <td align="center" style="padding:4px"><a href="${URL_MUR_DONS}" style="display:inline-block;background-color:#ef6135;color:#ffffff;text-decoration:none;padding:10px 20px;border-radius:99px;font-weight:700;font-size:.8rem;font-family:Arial,sans-serif">💌 Le mur des donateurs</a></td>
+  <td align="center" style="padding:4px"><a href="${URL_MOTIVATIONS}" style="display:inline-block;background-color:#7c3aed;color:#ffffff;text-decoration:none;padding:10px 20px;border-radius:99px;font-weight:700;font-size:.8rem;font-family:Arial,sans-serif">💪 Motivations des coureurs</a></td>
+</tr></table>
+
+<div style="background:linear-gradient(135deg,#fff0f8,#fdf5ff);border:2px solid #fb0089;border-radius:14px;padding:18px 22px;margin-bottom:20px;text-align:left">
+  <div style="font-size:.75rem;font-weight:700;color:#fb0089;text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px">🏅 Transformez l'essai — Joué le 29 mai !</div>
+  <div style="font-size:.84rem;color:#3d1830;line-height:1.7;margin-bottom:12px">Le <strong>29 mai à Joué-lès-Tours</strong>, c'est au tour de la Touraine de courir pour l'enfance ! Voici comment vous pouvez amplifier votre impact :</div>
+  <div style="font-size:.83rem;color:#3d1830;line-height:1.8;margin-bottom:14px">
+    🏅 <strong>Faire une promesse de don au km</strong> — le vrai game changer ! Choisissez un montant par km parcouru par un coureur ou une équipe, et versez seulement après la course selon leur performance.<br>
+    👟 <strong>S'inscrire comme supporter</strong> — les inscriptions sont encore ouvertes, convoyez votre entourage !<br>
+    🏃 <strong>Inscrire un coureur</strong> — il est encore temps de rejoindre la course !
+  </div>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
+    <td align="center" style="padding:4px"><a href="${URL_PROMESSE}" style="display:inline-block;background-color:#fb0089;color:#ffffff;text-decoration:none;padding:10px 18px;border-radius:99px;font-weight:700;font-size:.78rem;font-family:Arial,sans-serif">🏅 Promettre un don au km</a></td>
+    <td align="center" style="padding:4px"><a href="${URL_SUPPORTER}" style="display:inline-block;background-color:#16a34a;color:#ffffff;text-decoration:none;padding:10px 18px;border-radius:99px;font-weight:700;font-size:.78rem;font-family:Arial,sans-serif">🎉 S'inscrire supporter</a></td>
+    <td align="center" style="padding:4px"><a href="${URL_COUREUR}" style="display:inline-block;background-color:#ef6135;color:#ffffff;text-decoration:none;padding:10px 18px;border-radius:99px;font-weight:700;font-size:.78rem;font-family:Arial,sans-serif">🏃 Inscrire un coureur</a></td>
+  </tr></table>
+</div>
+
+${BLOC_RECUS_FISCAUX}${BLOC_IFI}${BLOC_SOCIAUX}
+<div class="divider"></div>
+<div style="font-size:.84rem;color:#3d1830;text-align:center;font-style:italic;margin-bottom:8px">L'aventure continue — merci d'en faire partie. 🤝</div>
+<div style="font-size:.82rem;color:#fb0089;font-weight:600;text-align:center">— Team Défi Enfance</div>
+</div>
+<table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td bgcolor="#3d1830" style="background-color:#3d1830;padding:16px;text-align:center;border-radius:0 0 14px 14px"><div style="font-family:Arial,sans-serif;font-size:1.1rem;font-weight:700;color:#fb0089;letter-spacing:.08em;margin-bottom:6px">DÉFI ENFANCE</div><div style="font-size:.82rem;color:rgba(255,255,255,.5)">Générateur de victoires pour l'enfance<br>contact@defienfance.fr</div></td></tr></table>
 </div></td></tr></table></body></html>`;
 }
 
@@ -3921,6 +4060,8 @@ const TEMPLATES_SUJETS = {
   'groupe_j1_angers_coureurs':    '🎽 Demain, c\'est le jour J ! 🎽',
   'groupe_j1_donateurs':          '❤️ Merci pour votre soutien — demain c\'est le grand jour !',
   'groupe_jourj_promesses':        '🏁 Vos promesses de don — le Défi Enfance a couru pour l\'enfance !',
+  'groupe_merci_donateurs_angers':  null, // sujet dynamique
+  'groupe_merci_donateurs_joue':    null, // sujet dynamique
   'groupe_merci_coureurs_angers':   null, // sujet dynamique par coureur
   'inscription_coureur':          'Heureux de votre inscription au Défi Enfance !',
   'inscription_supporter':        'Heureux de votre inscription au Défi Enfance !',
@@ -3942,6 +4083,8 @@ function getTemplateFunction(templateId) {
     'groupe_j1_angers_coureurs':  (prenom, nbJours, extra) => tplGroupeJ1Angers({ prenom, numeroDossard: extra?.numeroDossard, urlPageCoureur: extra?.urlPageCoureur, urlPromesseCoureur: extra?.urlPromesseCoureur }),
     'groupe_j1_donateurs':        (prenom, nbJours, extra) => tplGroupeJ1Donateurs({ prenom, historiqueHtml: extra?.historiqueHtml || '', urlDon: extra?.urlDon, urlProm: extra?.urlProm }),
     'groupe_jourj_promesses':     (prenom, nbJours, extra) => tplGroupeJourJPromesses({ prenom, promesses: extra?.promesses || [] }),
+    'groupe_merci_donateurs_angers': (prenom, nbJours, extra) => tplGroupeMerciDonateurAngers({ prenom, historiqueHtml: extra?.historiqueHtml || '', totalDons: extra?.totalDons || 0, nbDons: extra?.nbDons || 0 }),
+    'groupe_merci_donateurs_joue':   (prenom, nbJours, extra) => tplGroupeMerciDonateurJoue({ prenom, historiqueHtml: extra?.historiqueHtml || '', totalDons: extra?.totalDons || 0, nbDons: extra?.nbDons || 0 }),
     'groupe_merci_coureurs_angers': (prenom, nbJours, extra) => tplGroupeMerciCoureurAngers({ prenom, dossard: extra?.numeroDossard || 0, nomCoureur: extra?.nom || prenom, equipe: extra?.nomEquipe || '', kmsPerso: extra?.kmsPerso || 0, classementPerso: extra?.classementPerso || 0, kmsEquipe: extra?.kmsEquipe || 0, classementEquipe: extra?.classementEquipe || 0, estSolo: !extra?.nomEquipe || extra?.nomEquipe === (extra?.nom || prenom) }),
     'inscription_coureur':        (prenom, _, extra) => tplInscriptionCoureur({ prenom, nomComplet: prenom, nomAsso: extra?.nomAsso }),
     'inscription_supporter':      (prenom) => tplInscriptionSupporter({ prenom }),
@@ -3961,7 +4104,9 @@ function getTemplateFunction(templateId) {
 const EVENTS_MAP = {
   'angers_coureurs':             ['Défi Enfance #Course #Angers2026'],
   'angers_coureurs_referents':   ['Défi Enfance #Course #Angers2026'],
-  'promettants_angers': ['Défi Enfance #Course #Angers2026', 'Défi Enfance #Supporters #Angers2026'],
+  'promettants_angers':         ['Défi Enfance #Course #Angers2026', 'Défi Enfance #Supporters #Angers2026'],
+  'donateurs_angers_global':    ['Défi Enfance #Course #Angers2026', 'Défi Enfance global'],
+  'donateurs_joue':             ['Défi Enfance #Course #Joué-lès-Tours2026'],
   'joue_coureurs':          ['Défi Enfance #Course #Joué-lès-Tours2026'],
   'joue_coureurs_equipe':   ['Défi Enfance #Course #Joué-lès-Tours2026'],
   'global_coureurs':   ['Défi Enfance #Course #Angers2026', 'Défi Enfance #Course #Joué-lès-Tours2026'],
@@ -4440,6 +4585,93 @@ async function chargerContactsBulk() {
   addLog(`✅ Bulk contacts terminé — ${nbTotal} contacts chargés (${nbCoureurs} coureurs Angers indexés)`, 'ok');
 }
 
+// ── Récupérer les donateurs avec historique de leurs dons
+async function fetchDestinatairesAvecDons(typeDestinataire) {
+  const isAngers = typeDestinataire === 'donateurs_angers_global';
+  const isJoue   = typeDestinataire === 'donateurs_joue';
+
+  const donateursMap = new Map(); // email → { prenom, nom, email, contactId, dons[], totalDons }
+  let cursor = null;
+
+  while (true) {
+    await sleep(OHME_DELAY_MS);
+    const url = cursor
+      ? `${CONFIG.ohmeBase}/api/v1/payments?payment_type_id=1&limit=250&since_date=2025-01-01&cursor=${encodeURIComponent(cursor)}`
+      : `${CONFIG.ohmeBase}/api/v1/payments?payment_type_id=1&limit=250&since_date=2025-01-01`;
+    const r = await fetchOhmeWithRetry(url, { headers: { 'Accept': 'application/json', 'client-name': CONFIG.ohmeClientName, 'client-secret': CONFIG.ohmeClientSecret } });
+    if (!r || !r.ok) break;
+    const j = await r.json();
+    const items = j.data || [];
+
+    for (const p of items) {
+      const cf = p.custom_fields || p;
+      const montant = parseFloat(p.amount || 0);
+      if (montant <= 0) continue;
+      const eventNom = (p.nom_de_levent || cf.nom_de_levent || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+
+      // Filtre event selon le type
+      // Filtre event selon le type
+      if (isAngers && !(eventNom.includes('angers2026') || eventNom.includes('global'))) continue;
+      if (isJoue   && !eventNom.includes('joue')) continue;
+      // Récupérer le contact
+      if (!p.contact_id) continue;
+      await sleep(OHME_CONTACT_DELAY_MS);
+      let contact = contactsCache.get(String(p.contact_id));
+      if (!contact) {
+        contact = await fetchOhmeContactById(p.contact_id);
+        if (contact) contactsCache.set(String(p.contact_id), contact);
+      }
+      if (!contact?.email) continue;
+
+      const email  = contact.email.toLowerCase().trim();
+      const prenom = contact.firstname || contact.first_name || '';
+      const nom    = contact.lastname  || contact.last_name  || '';
+
+      if (!donateursMap.has(email)) {
+        donateursMap.set(email, { prenom, nom, email, contactId: contact.id, dons: [], totalDons: 0 });
+      }
+
+      const coureurParraine = (cf.coureur_parraine || '').trim();
+      const equipeParraine  = (cf.equipe_parraine  || '').trim();
+      const dateStr = (p.date || p.created_at) ? new Date(p.date || p.created_at).toLocaleDateString('fr-FR') : '';
+
+      // Classement du coureur/équipe parrainé(e)
+      let classementInfo = '';
+      if (coureurParraine) {
+        const ci = Object.values(CLASSEMENT_INDIVIDUEL).find(c => c.nom === coureurParraine);
+        if (ci) classementInfo = ` — ${ci.classement}e sur ${NB_COUREURS_ANGERS} coureurs (${ci.kms} km) — court pour ${ci.equipe}`;
+      } else if (equipeParraine && CLASSEMENT_EQUIPES[equipeParraine]) {
+        const ce = CLASSEMENT_EQUIPES[equipeParraine];
+        classementInfo = ` — ${ce.classement}e sur ${NB_EQUIPES_ANGERS} équipes (${ce.kms} km)`;
+      }
+
+      const don = { montant, dateStr, coureurParraine, equipeParraine, classementInfo };
+      donateursMap.get(email).dons.push(don);
+      donateursMap.get(email).totalDons += montant;
+    }
+    if (items.length < 250) break;
+    cursor = j.cursor || (items.length > 0 ? String(items[items.length - 1].id) : null);
+    if (!cursor) break;
+  }
+
+  // Construire l'historique HTML pour chaque donateur
+  const result = [];
+  for (const [, d] of donateursMap) {
+    const historiqueHtml = d.dons.map(don => {
+      const parrainage = don.coureurParraine
+        ? `<span style="color:#7c3aed;font-weight:600">🏃 ${don.coureurParraine}</span>${don.classementInfo ? `<span style="font-size:.78rem;color:#888"> ${don.classementInfo}</span>` : ''}`
+        : don.equipeParraine
+        ? `<span style="color:#ef6135;font-weight:600">🏆 ${don.equipeParraine}</span>${don.classementInfo ? `<span style="font-size:.78rem;color:#888"> ${don.classementInfo}</span>` : ''}`
+        : '<span style="color:#888">Don général</span>';
+      return `<div style="display:flex;justify-content:space-between;align-items:flex-start;padding:8px 0;border-bottom:1px solid #f5dced;font-size:.82rem;color:#3d1830"><div><span style="color:#888;font-size:.75rem">${don.dateStr}</span><br>${parrainage}</div><div style="font-weight:700;color:#fb0089;white-space:nowrap;padding-left:8px">${don.montant.toFixed(2)} €</div></div>`;
+    }).join('');
+    result.push({ ...d, historiqueHtml });
+  }
+
+  addLog(`✅ ${result.length} donateur(s) trouvés`, 'ok');
+  return result;
+}
+
 // ── Récupérer les promettants avec leurs promesses pour Jour J
 async function fetchPromettantsAvecPromesses() {
   const promettantsMap = new Map(); // email → { prenom, nom, email, contactId, promesses[] }
@@ -4829,6 +5061,8 @@ app.post('/api/envoi-groupe/preview', async (req, res) => {
     envoiGroupeLog(`🔍 Comptage : ${typeDestinataire}…`, 'info');
     const tous = typeDestinataire === 'promettants_angers'
       ? (await fetchPromettantsAvecPromesses()).map(p => ({ prenom: p.prenom, nom: p.nom, email: p.email, contactId: p.contactId, extra_promesses: p.promesses }))
+      : ['donateurs_angers_global','donateurs_joue'].includes(typeDestinataire)
+      ? (await fetchDestinatairesAvecDons(typeDestinataire)).map(p => ({ prenom: p.prenom, nom: p.nom, email: p.email, contactId: p.contactId, extra_historique: p.historiqueHtml, extra_total: p.totalDons, extra_nb: p.dons.length }))
       : await fetchDestinataires({ typeDestinataire, filtreEquipe, depuisFrance, nbJours });
     const dejaEnvoyes = await getContactsDejaEnvoyes(`custom_${typeDestinataire}_${template}`);
     const nouveaux = tous.filter(p => !dejaEnvoyes.has(String(p.contactId)));
@@ -4932,6 +5166,10 @@ app.post('/api/envoi-groupe/start', async (req, res) => {
           const promettants = await fetchPromettantsAvecPromesses();
           return promettants.map(p => ({ prenom: p.prenom, nom: p.nom, email: p.email, contactId: p.contactId, extra_promesses: p.promesses }));
         }
+        if (['donateurs_angers_global','donateurs_joue'].includes(typeDestinataire)) {
+          const donateurs = await fetchDestinatairesAvecDons(typeDestinataire);
+          return donateurs.map(p => ({ prenom: p.prenom, nom: p.nom, email: p.email, contactId: p.contactId, extra_historique: p.historiqueHtml, extra_total: p.totalDons, extra_nb: p.dons.length }));
+        }
         return fetchDestinataires({ typeDestinataire, filtreEquipe, depuisFrance, nbJours });
       };
 
@@ -4986,6 +5224,9 @@ app.post('/api/envoi-groupe/start', async (req, res) => {
             urlDon:              await buildUrlPageCoureur(p.contactId, p.eventName),
             urlProm:             await buildUrlPromesseCoureur(p.contactId, p.eventName),
             promesses:           p.extra_promesses || [],
+            historiqueHtml:      p.extra_historique || '',
+            totalDons:           p.extra_total || 0,
+            nbDons:              p.extra_nb || 0,
             // Classements depuis Ohme (contacts + structures)
             kmsPerso:            p.kmsPerso            || 0,
             classementPerso:     p.classementPerso     || 0,
@@ -5002,6 +5243,10 @@ app.post('/api/envoi-groupe/start', async (req, res) => {
             sujetFinal = `🏁 Bravo ${p.prenom || nomComplet}${equipeLabel} — votre bilan Défi Enfance Angers 2026 !`;
           } else if (['groupe_j10_joue_coureurs','groupe_j10_joue_coureurs_v2'].includes(template)) {
             sujetFinal = `🏁 ${p.prenom || 'Coureur'}, dans ${nbJours || 10} jours c'est votre tour — Défi Enfance Joué 2026 !`;
+          } else if (template === 'groupe_merci_donateurs_angers') {
+            sujetFinal = `❤️ Merci ${p.prenom || ''} — vous êtes les pionniers du Défi Enfance Angers 2026 !`;
+          } else if (template === 'groupe_merci_donateurs_joue') {
+            sujetFinal = `🏁 ${p.prenom || ''}, Angers a couru — Joué-lès-Tours entre en scène !`;
           } else {
             if (nbJours) sujetBase = sujetBase ? sujetBase.replace(/\$\{j\}/g, nbJours).replace(/\d+ jours?/gi, `${nbJours} jours`) : template;
             sujetFinal = sujetBase ? sujetBase.replace(/\$\{prenom\}/g, p.prenom || 'Participant') : template;
