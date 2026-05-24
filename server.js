@@ -2201,8 +2201,8 @@ function tplGroupeJ2ReferentsJoue({ prenom, nbJours, urlPromesseEquipe, urlPageE
 <div style="font-size:.85rem;color:#3d1830;line-height:1.7;margin-bottom:16px;text-align:left">Chers référents d'équipe de coureurs,<br><br>À seulement <strong>${j} jours</strong> de notre rendez-vous au Parc des Bretonnières à Joué-lès-Tours, notre enthousiasme est au maximum ! En tant que référents d'équipe, vous êtes les <strong>ambassadeurs clés</strong> pour faire grimper notre compteur de solidarité et votre collecte d'équipe pour les associations que vous soutenez !</div>
 
 <div style="background-color:#fff0f8;border:2px solid #fb0089;border-radius:12px;padding:16px 20px;margin-bottom:20px;text-align:left">
-  <div style="font-size:.75rem;font-weight:700;color:#fb0089;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">🎥 Mini-webinaire référents — mardi 27 mai 12h-12h30</div>
-  <div style="font-size:.84rem;color:#3d1830;line-height:1.7;margin-bottom:12px">Rejoignez-nous <strong>mardi 27 mai de 12h à 12h30</strong> pour un mini-webinaire de 30 minutes dédié aux référents d'équipe. Vous aurez accès à toutes les infos pratiques sur la course et saurez exactement comment booster votre collecte de dons d'ici le 29 mai !</div>
+  <div style="font-size:.75rem;font-weight:700;color:#fb0089;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">🎥 Mini-webinaire référents — mardi 26 mai 12h-12h30</div>
+  <div style="font-size:.84rem;color:#3d1830;line-height:1.7;margin-bottom:12px">Rejoignez-nous <strong>mardi 26 mai de 12h à 12h30</strong> pour un mini-webinaire de 30 minutes dédié aux référents d'équipe. Vous aurez accès à toutes les infos pratiques sur la course et saurez exactement comment booster votre collecte de dons d'ici le 29 mai !</div>
   <a href="https://luma.com/webi-defi-joue-j-3" style="display:inline-block;background-color:#fb0089;color:#ffffff;text-decoration:none;padding:10px 22px;border-radius:99px;font-weight:700;font-size:.82rem;font-family:Arial,sans-serif">🎥 Je m'inscris au webinaire</a>
 </div>
 
@@ -2291,8 +2291,8 @@ function tplGroupeJ2ReferentsJoue({ prenom, nbJours, urlPromesseEquipe, urlPageE
 
 ${BLOC_RECUS_FISCAUX}${BLOC_IFI}
 <div class="divider"></div>
-<div style="font-size:.86rem;color:#3d1830;text-align:left;margin-bottom:8px">Si vous avez la moindre question, n'hésitez pas à contacter Victor directement au <strong><a href="tel:0603021945" style="color:#fb0089">06 03 02 19 45</a></strong>.</div>
-<div style="font-size:.84rem;color:#3d1830;font-style:italic;margin-bottom:8px;text-align:left">Merci pour votre incroyable engagement — rendez-vous jeudi sur la ligne de départ !</div>
+<div style="font-size:.86rem;color:#3d1830;text-align:left;margin-bottom:8px">Si vous avez la moindre question, n'hésitez pas à m'appeler directement au <strong><a href="tel:0603021945" style="color:#fb0089">06 03 02 19 45</a></strong>.</div>
+<div style="font-size:.84rem;color:#3d1830;font-style:italic;margin-bottom:8px;text-align:left">Merci pour votre incroyable engagement — rendez-vous vendredi sur la ligne de départ pour une magnifique course. <strong>Record à battre : 6 000 km parcourus par les coureurs d'Angers vendredi dernier et un peu plus de 35 000 € collectés</strong> (en intégrant les promesses de dons restants à valider) !</div>
 <div style="font-size:.84rem;color:#fb0089;font-weight:700;margin-bottom:4px;text-align:left">Haut les cœurs,</div>
 <div style="font-size:.82rem;color:#3d1830;text-align:left">Victor Vieilfault<br>Responsable du Défi Enfance · <a href="tel:0603021945" style="color:#fb0089">06 03 02 19 45</a></div>
 
