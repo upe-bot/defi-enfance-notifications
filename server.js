@@ -4611,27 +4611,46 @@ async function fetchDestinatairesAvecDons(typeDestinataire) {
       const cf = p.custom_fields || p;
       const montant = parseFloat(p.amount || 0);
       if (montant <= 0) continue;
+      // Exclure les dons "don attendu" (non encore reçus)
+      const qualite = (cf.qualite_du_participant || '').toLowerCase().trim();
+      if (qualite === 'don attendu') continue;
       const eventNom = (p.nom_de_levent || cf.nom_de_levent || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 
       // Filtre event selon le type (eventNom déjà normalisé lowercase sans accents)
       if (isAngers && !(eventNom.includes('angers2026') || eventNom.includes('global') || eventNom.includes('defi enfance global'))) continue;
       if (isJoue   && !eventNom.includes('joue')) continue;
-      // Récupérer le contact
-      if (!p.contact_id) continue;
-      await sleep(OHME_CONTACT_DELAY_MS);
-      let contact = contactsCache.get(String(p.contact_id));
-      if (!contact) {
-        contact = await fetchOhmeContactById(p.contact_id);
-        if (contact) contactsCache.set(String(p.contact_id), contact);
+      // Récupérer le contact (ou le référent de la structure si pas de contact_id)
+      let email, prenom, nom, contactId;
+      if (p.contact_id) {
+        let contact = contactsCache.get(String(p.contact_id));
+        if (!contact) {
+          await sleep(OHME_CONTACT_DELAY_MS);
+          contact = await fetchOhmeContactById(p.contact_id);
+          if (contact) contactsCache.set(String(p.contact_id), contact);
+        }
+        if (!contact?.email) continue;
+        email     = contact.email.toLowerCase().trim();
+        prenom    = contact.firstname || contact.first_name || '';
+        nom       = contact.lastname  || contact.last_name  || '';
+        contactId = contact.id;
+      } else if (p.structure_id) {
+        // Paiement lié à une structure → utiliser le référent
+        const structure = structuresParNom.get(p.structure_name || '')
+          || [...structuresParNom.values()].find(s => String(s.id) === String(p.structure_id));
+        if (!structure) continue;
+        const cfS = structure.custom_fields || structure;
+        const emailRef = (cfS.email_referent_defi_enfance || '').trim();
+        if (!emailRef) continue;
+        email     = emailRef.toLowerCase();
+        prenom    = cfS.prenom_du_referent_defi_enfance || structure.name || '';
+        nom       = cfS.nom_du_referent_defi_enfance || '';
+        contactId = `struct_${p.structure_id}`;
+      } else {
+        continue;
       }
-      if (!contact?.email) continue;
-
-      const email  = contact.email.toLowerCase().trim();
-      const prenom = contact.firstname || contact.first_name || '';
-      const nom    = contact.lastname  || contact.last_name  || '';
 
       if (!donateursMap.has(email)) {
-        donateursMap.set(email, { prenom, nom, email, contactId: contact.id, dons: [], totalDons: 0 });
+        donateursMap.set(email, { prenom, nom, email, contactId, dons: [], totalDons: 0 });
       }
 
       const coureurParraine = (cf.coureur_parraine || '').trim();
@@ -5314,6 +5333,55 @@ app.post('/api/envoi-groupe/start', async (req, res) => {
     } catch(e) { envoiGroupeLog(`Exception : ${e.message}`, 'error'); }
     finally { envoiGroupe.running = false; envoiGroupe.finishedAt = new Date().toISOString(); }
   })();
+});
+
+// ── POST /api/envoi-groupe/test-contact — envoyer à un email de choix avant l'envoi général
+app.post('/api/envoi-groupe/test-contact', async (req, res) => {
+  const { template, typeDestinataire, filtreEquipe, depuisFrance, nbJours, emailTest } = req.body;
+  if (!template || !emailTest) return res.json({ success: false, error: 'template et emailTest requis' });
+
+  try {
+    envoiGroupeLog(`🧪 Envoi test contact : ${emailTest}…`, 'info');
+
+    // Récupérer la liste des destinataires
+    let tous;
+    if (typeDestinataire === 'promettants_angers') {
+      const promettants = await fetchPromettantsAvecPromesses();
+      tous = promettants.map(p => ({ prenom: p.prenom, nom: p.nom, email: p.email, contactId: p.contactId, extra_promesses: p.promesses }));
+    } else if (['donateurs_angers_global','donateurs_joue'].includes(typeDestinataire)) {
+      const donateurs = await fetchDestinatairesAvecDons(typeDestinataire);
+      tous = donateurs.map(p => ({ prenom: p.prenom, nom: p.nom, email: p.email, contactId: p.contactId, extra_historique: p.historiqueHtml, extra_total: p.totalDons, extra_nb: p.dons.length }));
+    } else {
+      tous = await fetchDestinataires({ typeDestinataire, filtreEquipe, depuisFrance, nbJours });
+    }
+
+    if (!tous.length) return res.json({ success: false, error: 'Aucun destinataire trouvé' });
+
+    // Prendre le premier destinataire comme modèle
+    const modele = tous[0];
+    const tplFn = getTemplateFunction(template);
+    if (!tplFn) return res.json({ success: false, error: `Template "${template}" introuvable` });
+
+    const sujet = `🧪 [TEST] ${template} — données de ${modele.prenom || 'Participant'} ${modele.nom || ''}`.trim();
+    const extra = {
+      nomAsso: modele.nomAsso || '', nomEquipe: modele.nomEquipe || '',
+      urlPageCoureur: URL_COUREURS, urlPromesseCoureur: URL_PROMESSE_FALLBACK,
+      urlPageEquipe: URL_EQUIPES, numeroDossard: modele.numeroDossard || '',
+      promesses: modele.extra_promesses || [],
+      historiqueHtml: modele.extra_historique || '',
+      totalDons: modele.extra_total || 0, nbDons: modele.extra_nb || 0,
+      kmsPerso: modele.kmsPerso || 0, classementPerso: modele.classementPerso || 0,
+      kmsEquipe: modele.kmsEquipe || 0, classementEquipe: modele.classementEquipe || 0,
+    };
+    const html = tplFn(modele.prenom || 'Participant', nbJours, extra);
+
+    await sendBrevo(emailTest, sujet, html);
+    envoiGroupeLog(`✅ Email test envoyé à ${emailTest} (données de ${modele.prenom || ''} ${modele.nom || ''})`, 'ok');
+    res.json({ success: true, emailTest, modele: `${modele.prenom || ''} ${modele.nom || ''}`.trim() });
+  } catch(e) {
+    envoiGroupeLog(`❌ Erreur envoi test contact : ${e.message}`, 'error');
+    res.json({ success: false, error: e.message });
+  }
 });
 
 // ── POST /api/envoi-groupe/test — envoyer à Victor uniquement
