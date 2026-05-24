@@ -2176,6 +2176,123 @@ ${BLOC_RECUS_FISCAUX}${BLOC_IFI}${BLOC_SOCIAUX}
 </div></td></tr></table></body></html>`;
 }
 
+
+function tplGroupeJ2ReferentsJoue({ prenom, nbJours, urlPromesseEquipe, urlPageEquipe }) {
+  const j      = nbJours || 7;
+  const urlProm = urlPromesseEquipe || 'https://defienfance.fr/suivre-la-collecte-defi-enfance/?de_promise=1';
+  const urlDon  = 'https://defienfance.fr/faire-un-don/';
+  const urlPage = urlPageEquipe || 'https://defienfance.fr/suivre-la-collecte-defi-enfance/?de_view=teams&de_event=all';
+  const URL_DOSSARD = 'https://upe-bot.github.io/defi-enfance-dossard/index.html';
+  const IMG1 =  + IMG1 + r;
+  const IMG2 =  + IMG2 + r;
+  const IMG3 =  + IMG3 + r;
+
+  return `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Antonio:wght@700&display=swap" rel="stylesheet"><style>${CSS_COMMUN}
+  .action-item{display:flex;align-items:flex-start;gap:14px;padding:14px 0;border-bottom:1px solid #f5dced;font-size:.84rem;color:#3d1830;text-align:left}
+  .action-item:last-child{border-bottom:none}
+  .action-num{width:28px;height:28px;border-radius:50%;background-color:#fb0089;color:#fff;font-weight:700;font-size:.78rem;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  </style></head><body bgcolor="#f5f0f3" style="background-color:#f5f0f3;margin:0;padding:0"><table class="bg-wrap" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#f5f0f3" style="background-color:#f5f0f3"><tr><td align="center" bgcolor="#f5f0f3" style="background-color:#f5f0f3"><div class="outer">
+
+<div class="logo-header"><div class="logo-text">🤝 Défi Enfance</div><div class="logo-sub">Générateur de victoires pour l'enfance</div></div>
+<table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td bgcolor="#fb0089" style="background-color:#fb0089;padding:24px 32px;text-align:center;border-radius:0"><h1 style="font-family:Arial,sans-serif;font-size:1.3rem;font-weight:700;color:#ffffff;margin:0 0 6px">🏃 J-${j} — Boostons<br>nos collectes de dons !</h1><p style="font-size:.8rem;color:rgba(255,255,255,.8);margin:0">Message spécial référents d'équipe · Joué-lès-Tours · 29 mai 2026</p></td></tr></table>
+
+<div class="body">
+<div style="font-size:1rem;font-weight:600;color:#3d1830;margin-bottom:12px;text-align:left">Bonjour ${prenom} 👋</div>
+<div style="font-size:.85rem;color:#3d1830;line-height:1.7;margin-bottom:20px;text-align:left">Chers référents d'équipe de coureurs,<br><br>À seulement <strong>${j} jours</strong> de notre rendez-vous au Parc des Bretonnières à Joué-lès-Tours, notre enthousiasme est au maximum ! En tant que référents d'équipe, vous êtes les <strong>ambassadeurs clés</strong> pour faire grimper notre compteur de solidarité et votre collecte d'équipe pour les associations que vous soutenez !</div>
+
+<div style="background-color:#fff0f8;border:2px solid #fb0089;border-radius:14px;padding:18px 22px;margin-bottom:20px;text-align:left">
+  <div style="font-size:.75rem;font-weight:700;color:#fb0089;text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px">🏁 Ce qui s'est passé à Angers le 22 mai</div>
+  <div style="font-size:.84rem;color:#3d1830;line-height:1.7;margin-bottom:14px;text-align:left">La <strong>2e édition du Défi Enfance à Angers</strong> a été une transformation réussie. Près de <strong>600 coureurs participants, des centaines de supporters et de nombreux bénévoles</strong> ont envahi le Parc Saint-Serge sous un soleil radieux. Des dizaines d'équipes d'entreprises, d'écoles, d'associations et d'institutions côte à côte.</div>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:8px"><tr>
+    <td width="49%" style="padding-right:4px;vertical-align:top"><img src="${IMG1}" alt="Défi Enfance Angers 2026" width="100%" style="border-radius:8px;display:block"></td>
+    <td width="49%" style="padding-left:4px;vertical-align:top"><img src="${IMG3}" alt="Défi Enfance Angers 2026" width="100%" style="border-radius:8px;display:block"></td>
+  </tr></table>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:14px"><tr>
+    <td><img src="${IMG2}" alt="Défi Enfance Angers 2026" width="100%" style="border-radius:8px;display:block"></td>
+  </tr></table>
+  <div style="background-color:#fff;border-left:3px solid #fb0089;border-radius:0 8px 8px 0;padding:12px 16px;font-size:.83rem;color:#3d1830;font-style:italic;text-align:left">
+    💬 <strong>Témoignage d'un chef d'entreprise angevin :</strong><br>
+    "Course incroyable. Moment super avec les équipes. On a déjà motivé une entreprise partenaire de venir l'année prochaine !"
+  </div>
+</div>
+
+<div style="background-color:#f0fff5;border:1.5px solid rgba(34,197,94,0.3);border-radius:12px;padding:16px 20px;margin-bottom:20px;text-align:left">
+  <div style="font-size:.75rem;font-weight:700;color:#16a34a;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">🏆 Angers vs Joué — l'émulation est lancée !</div>
+  <div style="font-size:.84rem;color:#3d1830;line-height:1.7;text-align:left">Angers a posé la barre. <strong>Joué-lès-Tours peut faire mieux !</strong> Collecte de dons, km parcourus, énergie collective — tout est encore ouvert. C'est votre tour de montrer ce que la Touraine a dans les jambes pour l'enfance. 💚</div>
+</div>
+
+<div class="card" style="margin-bottom:22px">
+  <h3 style="text-align:left">🚀 Comment mobiliser dès aujourd'hui ?</h3>
+  <div class="action-item">
+    <div class="action-num">1</div>
+    <div style="text-align:left">
+      <strong style="color:#7c3aed">Activez les promesses de dons</strong><br>
+      Encouragez vos proches et réseaux pro à promettre un montant par km parcouru par votre équipe ou l'un de vos coureurs. Cela donne un véritable <em>"pouvoir d'agir"</em> à vos coureurs. Le soir de la course à <strong>20h</strong>, ils recevront un e-mail automatique avec le montant du don à réaliser selon les km réels parcourus par leur coureur ou équipe parrainé(e). Chaque donateur peut bien sûr réaliser plusieurs promesses de dons !<br>
+      <div style="margin-top:10px"><a href="${urlProm}" style="display:inline-block;background-color:#7c3aed;color:#ffffff;text-decoration:none;padding:9px 20px;border-radius:99px;font-weight:700;font-size:.78rem;font-family:Arial,sans-serif">🏅 Promettre un don au km pour mon équipe</a></div>
+    </div>
+  </div>
+  <div class="action-item">
+    <div class="action-num">2</div>
+    <div style="text-align:left">
+      <strong style="color:#fb0089">Soutenez vos causes</strong><br>
+      Pour rappel, <strong>50% des dons</strong> collectés sur vos pages d'équipe ou les pages de vos coureurs seront directement fléchés vers les associations que vous avez choisies à l'inscription.<br>
+      <div style="margin-top:10px"><a href="${urlDon}" style="display:inline-block;background-color:#fb0089;color:#ffffff;text-decoration:none;padding:9px 20px;border-radius:99px;font-weight:700;font-size:.78rem;font-family:Arial,sans-serif">❤️ Page de don Défi Enfance</a></div>
+    </div>
+  </div>
+  <div class="action-item">
+    <div class="action-num">3</div>
+    <div style="text-align:left">
+      <strong style="color:#ef6135">Zéro gestion pour vous</strong><br>
+      L'organisation s'occupe de tout. Les donateurs reçoivent immédiatement leur reçu fiscal par email, et <strong>vous êtes notifié à chaque nouveau don</strong>.
+    </div>
+  </div>
+  <div class="action-item">
+    <div class="action-num">4</div>
+    <div style="text-align:left">
+      <strong style="color:#3d1830">Osez le téléphone !</strong><br>
+      Partager sa page par email ou sur LinkedIn est une bonne base, mais <strong>appeler directement un ami, un client ou un fournisseur</strong> pour lui présenter votre cause reste le moyen le plus efficace pour déclencher un don.
+    </div>
+  </div>
+</div>
+
+<div style="background-color:#fff0f8;border:1.5px solid rgba(251,0,137,0.2);border-radius:12px;padding:16px 20px;margin-bottom:20px;text-align:left">
+  <div style="font-size:.75rem;font-weight:700;color:#fb0089;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">🎽 Numéros de dossard de votre équipe</div>
+  <div style="font-size:.84rem;color:#3d1830;line-height:1.7;margin-bottom:12px;text-align:left">En tant que référent, vous aurez accès à la liste complète des numéros de dossard de <strong>tous les coureurs de votre équipe</strong> via le lien ci-dessous, disponible la veille de la course.</div>
+  <a href="${URL_DOSSARD}" style="display:inline-block;background-color:#3d1830;color:#ffffff;text-decoration:none;padding:10px 22px;border-radius:99px;font-weight:700;font-size:.8rem;font-family:Arial,sans-serif">🎽 Dossards &amp; classements de mon équipe</a>
+</div>
+
+<div style="background-color:#fff5ef;border:1.5px solid rgba(239,97,53,0.3);border-radius:12px;padding:16px 20px;margin-bottom:20px;text-align:left">
+  <div style="font-size:.75rem;font-weight:700;color:#ef6135;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">🏆 Votre page d'équipe</div>
+  <a href="${urlPage}" style="display:inline-block;background-color:#ef6135;color:#ffffff;text-decoration:none;padding:10px 22px;border-radius:99px;font-weight:700;font-size:.8rem;font-family:Arial,sans-serif">🏆 Voir la page de mon équipe</a>
+</div>
+
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:20px"><tr><td bgcolor="#1a0a12" style="background-color:#1a0a12;border-radius:14px;padding:20px 24px">
+  <div style="font-size:.75rem;font-weight:700;color:#fb0089;text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">✉️ Email prêt à partager à vos proches</div>
+  <div style="font-size:.72rem;color:#aaaaaa;margin-bottom:16px">Copiez-collez ce message à vos coureurs pour qu'ils le partagent autour d'eux</div>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td bgcolor="#ffffff" style="background-color:#ffffff;border-radius:10px;padding:20px 22px">
+    <div style="font-size:.7rem;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">Objet</div>
+    <div style="font-size:.84rem;font-weight:700;color:#3d1830;margin-bottom:16px;border-bottom:1px solid #f5dced;padding-bottom:12px">Plus qu'un défi sportif, une urgence pour l'enfance 🏁</div>
+    <div style="font-size:.82rem;color:#3d1830;line-height:1.8;text-align:left">
+      <p style="margin:0 0 12px">Bonjour [Prénom],</p>
+      <p style="margin:0 0 12px">Je t'écris parce que j'ai décidé de relever un défi qui me tient particulièrement à cœur : le <strong>Défi Enfance</strong>.</p>
+      <p style="margin:0 0 12px">Le secteur de l'aide à l'enfance traverse une crise sans précédent. Le Défi Enfance finance des projets innovants pour <strong>casser les silos</strong> et placer l'intérêt de l'enfant au centre.</p>
+      <p style="margin:0 0 12px"><strong>J'ai besoin de ton aide.</strong> Pour me soutenir : 👉 <a href="${urlDon}" style="color:#fb0089;font-weight:600">Faire un don</a> ou <a href="${urlProm}" style="color:#7c3aed;font-weight:600">promettre un don au km</a></p>
+      <div style="background-color:#fff0f8;border-left:3px solid #fb0089;padding:10px 14px;border-radius:0 8px 8px 0;margin:12px 0;font-size:.8rem">💡 <strong>Ton don est défiscalisé à hauteur de 66%.</strong> Un don de 50€ ne te coûte réellement que <strong>17€</strong> après réduction d'impôt.</div>
+      <p style="margin:0">À très vite, <strong>${prenom}</strong></p>
+    </div>
+  </td></tr></table>
+</td></tr></table>
+
+${BLOC_RECUS_FISCAUX}${BLOC_IFI}
+<div class="divider"></div>
+<div style="font-size:.86rem;color:#3d1830;text-align:left;margin-bottom:8px">Si vous avez la moindre question, n'hésitez pas à contacter Victor directement au <strong><a href="tel:0603021945" style="color:#fb0089">06 03 02 19 45</a></strong>.</div>
+<div style="font-size:.84rem;color:#3d1830;font-style:italic;margin-bottom:8px;text-align:left">Merci pour votre incroyable engagement — rendez-vous jeudi sur la ligne de départ !</div>
+<div style="font-size:.84rem;color:#fb0089;font-weight:700;margin-bottom:4px;text-align:left">Haut les cœurs,</div>
+<div style="font-size:.82rem;color:#3d1830;text-align:left">Victor Vieilfault<br>Responsable du Défi Enfance · <a href="tel:0603021945" style="color:#fb0089">06 03 02 19 45</a></div>
+
+</div><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td bgcolor="#3d1830" style="background-color:#3d1830;padding:16px;text-align:center;border-radius:0 0 14px 14px"><div style="font-family:Arial,sans-serif;font-size:1.1rem;font-weight:700;color:#fb0089;letter-spacing:.08em;margin-bottom:6px">DÉFI ENFANCE</div><div style="font-size:.82rem;color:rgba(255,255,255,.5)">Générateur de victoires pour l'enfance<br>contact@defienfance.fr</div></td></tr></table></div></td></tr></table></body></html>`;
+}
+
 function tplGroupeJourJPromesses({ prenom, promesses }) {
   // promesses = [{ type: 'coureur'|'equipe', nom, montantKm, kmParcourus, montantDu, urlDon }]
   const totalDu = promesses.reduce((s, p) => s + (p.montantDu || 0), 0);
@@ -5305,6 +5422,8 @@ app.post('/api/envoi-groupe/start', async (req, res) => {
             sujetFinal = `❤️ Merci ${p.prenom || ''} — vous êtes les pionniers du Défi Enfance Angers 2026 !`;
           } else if (template === 'groupe_merci_donateurs_joue') {
             sujetFinal = `🏁 ${p.prenom || ''}, Angers a couru — Joué-lès-Tours entre en scène !`;
+          } else if (template === 'groupe_j2_referents_joue') {
+            sujetFinal = `🏃 ${p.prenom || ''} — Boost collecte Joué ! Dans ${nbJours || 7} jours, c'est votre tour !`;
           } else {
             if (nbJours) sujetBase = sujetBase ? sujetBase.replace(/\$\{j\}/g, nbJours).replace(/\d+ jours?/gi, `${nbJours} jours`) : template;
             sujetFinal = sujetBase ? sujetBase.replace(/\$\{prenom\}/g, p.prenom || 'Participant') : template;
