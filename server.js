@@ -2198,7 +2198,13 @@ function tplGroupeJ2ReferentsJoue({ prenom, nbJours, urlPromesseEquipe, urlPageE
 
 <div class="body">
 <div style="font-size:1rem;font-weight:600;color:#3d1830;margin-bottom:12px;text-align:left">Bonjour ${prenom} 👋</div>
-<div style="font-size:.85rem;color:#3d1830;line-height:1.7;margin-bottom:20px;text-align:left">Chers référents d'équipe de coureurs,<br><br>À seulement <strong>${j} jours</strong> de notre rendez-vous au Parc des Bretonnières à Joué-lès-Tours, notre enthousiasme est au maximum ! En tant que référents d'équipe, vous êtes les <strong>ambassadeurs clés</strong> pour faire grimper notre compteur de solidarité et votre collecte d'équipe pour les associations que vous soutenez !</div>
+<div style="font-size:.85rem;color:#3d1830;line-height:1.7;margin-bottom:16px;text-align:left">Chers référents d'équipe de coureurs,<br><br>À seulement <strong>${j} jours</strong> de notre rendez-vous au Parc des Bretonnières à Joué-lès-Tours, notre enthousiasme est au maximum ! En tant que référents d'équipe, vous êtes les <strong>ambassadeurs clés</strong> pour faire grimper notre compteur de solidarité et votre collecte d'équipe pour les associations que vous soutenez !</div>
+
+<div style="background-color:#fff0f8;border:2px solid #fb0089;border-radius:12px;padding:16px 20px;margin-bottom:20px;text-align:left">
+  <div style="font-size:.75rem;font-weight:700;color:#fb0089;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">🎥 Mini-webinaire référents — mardi 27 mai 12h-12h30</div>
+  <div style="font-size:.84rem;color:#3d1830;line-height:1.7;margin-bottom:12px">Rejoignez-nous <strong>mardi 27 mai de 12h à 12h30</strong> pour un mini-webinaire de 30 minutes dédié aux référents d'équipe. Vous aurez accès à toutes les infos pratiques sur la course et saurez exactement comment booster votre collecte de dons d'ici le 29 mai !</div>
+  <a href="https://luma.com/webi-defi-joue-j-3" style="display:inline-block;background-color:#fb0089;color:#ffffff;text-decoration:none;padding:10px 22px;border-radius:99px;font-weight:700;font-size:.82rem;font-family:Arial,sans-serif">🎥 Je m'inscris au webinaire</a>
+</div>
 
 <div style="background-color:#fff0f8;border:2px solid #fb0089;border-radius:14px;padding:18px 22px;margin-bottom:20px;text-align:left">
   <div style="font-size:.75rem;font-weight:700;color:#fb0089;text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px">🏁 Ce qui s'est passé à Angers le 22 mai</div>
@@ -4173,6 +4179,7 @@ const TEMPLATES_SUJETS = {
   'groupe_j4_angers_coureurs':    '🚀 C\'est le moment de faire décoller ta collecte !',
   'groupe_j10_angers_coureurs':   '🎽 Dans ${j} jours, on court pour l\'enfance à Angers — tout ce qu\'il faut savoir !',
   'groupe_j2_referents_angers':   '🏃 Boostons nos collectes de dons — Défi Enfance Angers !',
+  'groupe_j2_referents_joue':      null, // sujet dynamique
   'groupe_j10_joue_coureurs':      '🎽 Dans ${j} jours, on court pour l\'enfance à Joué-lès-Tours — tout ce qu\'il faut savoir !',
   'groupe_j1_angers_coureurs':    '🎽 Demain, c\'est le jour J ! 🎽',
   'groupe_j1_donateurs':          '❤️ Merci pour votre soutien — demain c\'est le grand jour !',
@@ -4195,6 +4202,7 @@ function getTemplateFunction(templateId) {
     'groupe_j4_angers_coureurs':  (prenom, nbJours, extra) => tplGroupeJ4Angers({ prenom, nbJours, ...extra }),
     'groupe_j10_angers_coureurs': (prenom, nbJours, extra) => tplGroupeJ10Angers({ prenom, nbJours, urlPageCoureur: extra?.urlPageCoureur, urlPromesseCoureur: extra?.urlPromesseCoureur }),
     'groupe_j2_referents_angers':  (prenom, nbJours, extra) => tplGroupeJ2Referents({ prenom, urlPromesseEquipe: extra?.urlPromesseEquipe, urlPageEquipe: extra?.urlPageEquipe }),
+    'groupe_j2_referents_joue':     (prenom, nbJours, extra) => tplGroupeJ2ReferentsJoue({ prenom, nbJours, urlPromesseEquipe: extra?.urlPromesseEquipe || extra?.urlPromesseCoureur, urlPageEquipe: extra?.urlPageEquipe }),
     'groupe_j10_joue_coureurs':    (prenom, nbJours, extra) => tplGroupeJ10Joue({ prenom, nbJours, urlPageCoureur: extra?.urlPageCoureur, urlPromesseCoureur: extra?.urlPromesseCoureur }),
     'groupe_j10_joue_coureurs_v2':  (prenom, nbJours, extra) => tplGroupeJ10JoueV2({ prenom, nbJours, urlPageCoureur: extra?.urlPageCoureur, urlPromesseCoureur: extra?.urlPromesseCoureur }),
     'groupe_j1_angers_coureurs':  (prenom, nbJours, extra) => tplGroupeJ1Angers({ prenom, numeroDossard: extra?.numeroDossard, urlPageCoureur: extra?.urlPageCoureur, urlPromesseCoureur: extra?.urlPromesseCoureur }),
