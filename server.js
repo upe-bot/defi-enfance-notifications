@@ -2183,9 +2183,9 @@ function tplGroupeJ2ReferentsJoue({ prenom, nbJours, urlPromesseEquipe, urlPageE
   const urlDon  = 'https://defienfance.fr/faire-un-don/';
   const urlPage = urlPageEquipe || 'https://defienfance.fr/suivre-la-collecte-defi-enfance/?de_view=teams&de_event=all';
   const URL_DOSSARD = 'https://upe-bot.github.io/defi-enfance-dossard/index.html';
-  const IMG1 =  + IMG1 + r;
-  const IMG2 =  + IMG2 + r;
-  const IMG3 =  + IMG3 + r;
+  const IMG1 = 'https://raw.githubusercontent.com/upe-bot/defi-enfance-dossard/main/WhatsApp%20Image%202026-05-22%20at%2016.52.36.jpeg';
+  const IMG2 = 'https://raw.githubusercontent.com/upe-bot/defi-enfance-dossard/main/WhatsApp%20Image%202026-05-22%20at%2016.53.42.jpeg';
+  const IMG3 = 'https://raw.githubusercontent.com/upe-bot/defi-enfance-dossard/main/WhatsApp%20Image%202026-05-22%20at%2016.54.49.jpeg';
 
   return `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Antonio:wght@700&display=swap" rel="stylesheet"><style>${CSS_COMMUN}
   .action-item{display:flex;align-items:flex-start;gap:14px;padding:14px 0;border-bottom:1px solid #f5dced;font-size:.84rem;color:#3d1830;text-align:left}
