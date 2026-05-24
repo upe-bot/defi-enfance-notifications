@@ -326,8 +326,20 @@
     <div id="confirmEnvoi" style="display:none;background:rgba(255,214,0,0.06);border:1px solid rgba(255,214,0,0.25);border-radius:12px;padding:18px 20px;margin-bottom:16px">
       <div style="font-size:.88rem;font-weight:600;color:var(--warning);margin-bottom:8px">⚠️ Confirmation d'envoi</div>
       <div id="confirmTexte" style="font-size:.84rem;color:var(--text-muted);margin-bottom:14px;line-height:1.6"></div>
+
+      <!-- Test sur un contact de choix -->
+      <div style="background:rgba(251,0,137,0.08);border:1px solid rgba(251,0,137,0.3);border-radius:8px;padding:12px 16px;margin-bottom:14px">
+        <div style="font-size:.72rem;font-weight:700;color:#fb0089;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">🧪 Tester sur un email avant l'envoi général</div>
+        <div style="font-size:.76rem;color:#aaa;margin-bottom:8px">Le système envoie à cet email avec les données du 1er destinataire de la liste.</div>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+          <input id="egEmailTest" type="email" placeholder="votre@email.com" style="flex:1;min-width:180px;padding:7px 12px;border-radius:8px;border:1px solid #444;background:#2d1020;color:#fff;font-size:.8rem">
+          <button class="btn btn-sm btn-secondary" onclick="egEnvoyerTestContact()" style="white-space:nowrap">📧 Tester</button>
+        </div>
+        <div id="egTestContactResult" style="margin-top:6px;font-size:.76rem;color:#aaa"></div>
+      </div>
+
       <div style="display:flex;gap:10px;flex-wrap:wrap">
-        <button class="btn btn-sm btn-success" onclick="confirmerEnvoiGroupe()">🚀 Lancer l'envoi</button>
+        <button class="btn btn-sm btn-success" onclick="confirmerEnvoiGroupe()">🚀 Lancer l'envoi général</button>
         <button class="btn btn-sm btn-secondary" onclick="annulerConfirmGroupe()">Annuler</button>
       </div>
     </div>
@@ -1004,6 +1016,39 @@ async function confirmerEnvoiGroupe() {
 function annulerConfirmGroupe() {
   egPendingConfig = null;
   document.getElementById('confirmEnvoi').style.display = 'none';
+}
+
+async function egEnvoyerTestContact() {
+  const cfg = egGetConfig();
+  const emailTest = document.getElementById('egEmailTest').value.trim();
+  if (!emailTest) { showToast('❌ Email requis', 'Saisissez un email de test'); return; }
+  const result = document.getElementById('egTestContactResult');
+  result.textContent = '⏳ Envoi en cours…';
+  result.style.color = '#aaa';
+  try {
+    const r = await apiFetch('/api/envoi-groupe/test-contact', {
+      method: 'POST',
+      body: JSON.stringify({
+        template: cfg.template,
+        typeDestinataire: cfg.typeDestinataire || cfg.destinataires,
+        filtreEquipe: cfg.filtreEquipe,
+        depuisFrance: cfg.depuisFrance,
+        nbJours: cfg.nbJours,
+        emailTest
+      })
+    });
+    const d = await r.json();
+    if (d.success) {
+      result.textContent = `✅ Envoyé à ${emailTest} avec les données de "${d.modele}"`;
+      result.style.color = '#4ade80';
+    } else {
+      result.textContent = `❌ ${d.error}`;
+      result.style.color = '#f87171';
+    }
+  } catch(e) {
+    result.textContent = `❌ ${e.message}`;
+    result.style.color = '#f87171';
+  }
 }
 
 async function egLancer() {
