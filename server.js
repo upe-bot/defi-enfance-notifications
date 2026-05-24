@@ -5357,27 +5357,31 @@ app.post('/api/envoi-groupe/test-contact', async (req, res) => {
 
     if (!tous.length) return res.json({ success: false, error: 'Aucun destinataire trouvé' });
 
-    // Prendre le premier destinataire comme modèle
-    const modele = tous[0];
     const tplFn = getTemplateFunction(template);
     if (!tplFn) return res.json({ success: false, error: `Template "${template}" introuvable` });
 
-    const sujet = `🧪 [TEST] ${template} — données de ${modele.prenom || 'Participant'} ${modele.nom || ''}`.trim();
-    const extra = {
-      nomAsso: modele.nomAsso || '', nomEquipe: modele.nomEquipe || '',
-      urlPageCoureur: URL_COUREURS, urlPromesseCoureur: URL_PROMESSE_FALLBACK,
-      urlPageEquipe: URL_EQUIPES, numeroDossard: modele.numeroDossard || '',
-      promesses: modele.extra_promesses || [],
-      historiqueHtml: modele.extra_historique || '',
-      totalDons: modele.extra_total || 0, nbDons: modele.extra_nb || 0,
-      kmsPerso: modele.kmsPerso || 0, classementPerso: modele.classementPerso || 0,
-      kmsEquipe: modele.kmsEquipe || 0, classementEquipe: modele.classementEquipe || 0,
-    };
-    const html = tplFn(modele.prenom || 'Participant', nbJours, extra);
-
-    await sendBrevo(emailTest, sujet, html);
-    envoiGroupeLog(`✅ Email test envoyé à ${emailTest} (données de ${modele.prenom || ''} ${modele.nom || ''})`, 'ok');
-    res.json({ success: true, emailTest, modele: `${modele.prenom || ''} ${modele.nom || ''}`.trim() });
+    // Envoyer les 2 premiers destinataires à l'email de test
+    const modeles = tous.slice(0, 2);
+    const nomModeles = [];
+    for (const modele of modeles) {
+      const sujet = `🧪 [TEST ${modeles.indexOf(modele)+1}/2] ${template} — données de ${modele.prenom || 'Participant'} ${modele.nom || ''}`.trim();
+      const extra = {
+        nomAsso: modele.nomAsso || '', nomEquipe: modele.nomEquipe || '',
+        urlPageCoureur: URL_COUREURS, urlPromesseCoureur: URL_PROMESSE_FALLBACK,
+        urlPageEquipe: URL_EQUIPES, numeroDossard: modele.numeroDossard || '',
+        promesses: modele.extra_promesses || [],
+        historiqueHtml: modele.extra_historique || '',
+        totalDons: modele.extra_total || 0, nbDons: modele.extra_nb || 0,
+        kmsPerso: modele.kmsPerso || 0, classementPerso: modele.classementPerso || 0,
+        kmsEquipe: modele.kmsEquipe || 0, classementEquipe: modele.classementEquipe || 0,
+      };
+      const html = tplFn(modele.prenom || 'Participant', nbJours, extra);
+      await sendBrevo(emailTest, sujet, html);
+      await sleep(2000);
+      nomModeles.push(`${modele.prenom || ''} ${modele.nom || ''}`.trim());
+    }
+    envoiGroupeLog(`✅ 2 emails test envoyés à ${emailTest} (${nomModeles.join(' + ')})`, 'ok');
+    res.json({ success: true, emailTest, modele: nomModeles.join(' + ') });
   } catch(e) {
     envoiGroupeLog(`❌ Erreur envoi test contact : ${e.message}`, 'error');
     res.json({ success: false, error: e.message });
