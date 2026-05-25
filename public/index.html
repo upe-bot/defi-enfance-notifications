@@ -234,31 +234,16 @@
       <div>
         <label style="font-size:.72rem;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:6px">👥 Destinataires</label>
         <select id="egTypeDestinataire" style="width:100%;padding:9px 12px;background:rgba(0,0,0,0.35);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:#fff;font-family:'Poppins',sans-serif;font-size:.82rem">
-          <optgroup label="── COUREURS ────────────────────">
-            <option value="angers_coureurs">🏃 Coureurs Angers</option>
-            <option value="joue_coureurs">🏃 Coureurs Joué-lès-Tours</option>
-            <option value="joue_coureurs_equipe">🏃 Coureurs Joué (avec équipe)</option>
-            <option value="global_coureurs">🏃 Coureurs Défi Global (Angers + Joué)</option>
+          <optgroup label="── Angers ──">
+            <option value="angers_coureurs">[Angers] Coureurs (dossards officiels)</option>
+            <option value="referents_equipe_angers">[Angers] Référents d'équipe</option>
+            <option value="promettants_angers">[Angers] Promettants de dons</option>
+            <option value="donateurs_angers_global">[Angers] Donateurs Angers + Global</option>
           </optgroup>
-          <optgroup label="── SUPPORTERS ──────────────────">
-            <option value="angers_supporters">👏 Supporters Angers</option>
-            <option value="joue_supporters">👏 Supporters Joué</option>
-            <option value="global_supporters">👏 Supporters Défi Global</option>
-          </optgroup>
-          <optgroup label="── AUTRES ──────────────────────">
-            <option value="dejeuner">🥗 Inscrits déjeuner</option>
-            <option value="referents_equipe_angers">🏆 Référents d'équipe — Angers</option>
-            <option value="referents_equipe_joue">🏆 Référents d'équipe — Joué</option>
-            <option value="referents_equipe">🏆 Référents d'équipe — Tous</option>
-            <option value="coureurs_solo_angers">🏃 Coureurs solo Angers (sans équipe)</option>
-            <option value="coureurs_solo_joue">🏃 Coureurs solo Joué (sans équipe)</option>
-            <option value="coureurs_solo_global">🏃 Coureurs solo Défi Global</option>
-            <option value="assos_soutenues">🏳️ Associations soutenues</option>
-            <option value="donateurs">❤️ Donateurs</option>
-        <option value="promettants_angers">🏅 Promettants Angers</option>
-        <option value="donateurs_angers_global">❤️ Donateurs Angers + Global</option>
-        <option value="donateurs_joue">❤️ Donateurs Joué</option>
-        <option value="angers_coureurs_referents">🏆 Coureurs + Référents Angers</option>
+          <optgroup label="── Joué ──">
+            <option value="joue_coureurs_equipe">[Joué] Coureurs avec équipe</option>
+            <option value="referents_equipe_joue">[Joué] Référents d'équipe</option>
+            <option value="donateurs_joue">[Joué] Donateurs Joué</option>
           </optgroup>
         </select>
       </div>
@@ -266,26 +251,21 @@
       <div>
         <label style="font-size:.72rem;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:6px">📋 Template email</label>
         <select id="egTemplate" style="width:100%;padding:9px 12px;background:rgba(0,0,0,0.35);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:#fff;font-family:'Poppins',sans-serif;font-size:.82rem">
-          <option value="groupe_j4_angers_coureurs">🏃 Go dons et promesses</option>
-          <option value="groupe_j2_referents_angers">🏆 Référents Angers boost collecte</option>
-          <option value="groupe_j2_referents_joue">🏃 Référents Joué boost collecte</option>
-          <option value="groupe_j1_angers_coureurs">🎽 J-1 avant course Angers</option>
-          <option value="groupe_j1_donateurs">❤️ J-1 Merci donateurs (récap dons)</option>
-          <option value="groupe_jourj_promesses">🏁 Jour J 20h — Promesses en dons</option>
-          <option value="groupe_merci_donateurs_angers">❤️ Merci donateurs Angers + Global</option>
-          <option value="groupe_merci_donateurs_joue">❤️ Merci donateurs Joué</option>
-          <option value="groupe_merci_coureurs_angers">🏆 Merci coureurs Angers (bilan kms)</option>
-          <option value="groupe_merci_coureurs_angers" data-type="angers_coureurs_referents">🏆 Merci coureurs + référents Angers</option>
-          <option value="groupe_j10_angers_coureurs">🎽 Infos pratiques Angers</option>
-          <option value="groupe_j10_joue_coureurs">🎽 Infos pratiques Joué (ancien)</option>
-          <option value="groupe_j10_joue_coureurs_v2">🏁 J-10 Joué — Angers + promesse game changer</option>
-          <option value="inscription_coureur">🚀 Bienvenue coureur</option>
-          <option value="inscription_supporter">🚀 Bienvenue supporter</option>
-          <option value="inscription_asso">🏃 Nouveau coureur → Association</option>
-          <option value="merci_donateur">🙏 Merci donateur</option>
-          <option value="merci_donateur_equipe">🙏 Merci donateur équipe</option>
-          <option value="nouveau_coureur_equipe">🏅 Nouveau coureur → Promettants</option>
-          <option value="placeholder">📢 Placeholder</option>
+          <optgroup label="── Angers ──">
+            <option value="groupe_j10_angers_coureurs">[Angers] J-10 coureurs — infos pratiques</option>
+            <option value="groupe_j4_angers_coureurs">[Angers] J-4 coureurs — go dons et promesses</option>
+            <option value="groupe_j1_angers_coureurs">[Angers] J-1 coureurs — dernière ligne droite</option>
+            <option value="groupe_j2_referents_angers">[Angers] Référents d'équipe — boost collecte</option>
+            <option value="groupe_j1_donateurs">[Angers] J-1 donateurs — récap dons</option>
+            <option value="groupe_jourj_promesses">[Angers] Jour J 20h — promesses en dons</option>
+            <option value="groupe_merci_coureurs_angers">[Angers] Merci coureurs — bilan kms</option>
+            <option value="groupe_merci_donateurs_angers">[Angers] Merci donateurs Angers + Global</option>
+          </optgroup>
+          <optgroup label="── Joué ──">
+            <option value="groupe_j10_joue_coureurs_v2">[Joué] J-10 coureurs — Angers + promesse game changer</option>
+            <option value="groupe_j2_referents_joue">[Joué] Référents d'équipe — boost collecte</option>
+            <option value="groupe_merci_donateurs_joue">[Joué] Merci donateurs Joué</option>
+          </optgroup>
         </select>
       </div>
 
@@ -430,6 +410,15 @@
             <option value="groupe_joue_jourj_coureurs">📢 Jour J Joué — Coureurs</option>
             <option value="groupe_joue_jp1_coureurs">📢 J+1 Joué — Coureurs</option>
             <option value="groupe_joue_jp10_coureurs">📢 J+10 Joué — Coureurs</option>
+          </optgroup>
+          <optgroup label="── Nouveaux templates ──">
+            <option value="merci_concretisation_promesse">🙏 Concrétisation promesse — coureur</option>
+            <option value="merci_concretisation_equipe">🙏 Concrétisation promesse — équipe</option>
+            <option value="groupe_jourj_promesses">🏁 Jour J 20h — Promesses en dons</option>
+            <option value="groupe_merci_donateurs_angers">❤️ Merci donateurs Angers + Global</option>
+            <option value="groupe_merci_donateurs_joue">❤️ Merci donateurs Joué</option>
+            <option value="groupe_j2_referents_joue">🏃 Référents Joué boost collecte</option>
+            <option value="groupe_merci_coureurs_angers">🏆 Merci coureurs Angers (bilan kms)</option>
           </optgroup>
         </select>
       </div>
