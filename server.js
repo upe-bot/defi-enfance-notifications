@@ -911,6 +911,8 @@ const URL_DEJEUNER_ANGERS = 'https://luma.com/defi-dejeuner-angers2026';
 
 function tplGroupeJ10Angers({ prenom, nbJours, urlPageCoureur, urlPromesseCoureur }) {
   const j = nbJours || 8;
+  const urlDon  = urlPageCoureur     || 'https://defienfance.fr/faire-un-don/';
+  const urlProm = urlPromesseCoureur || 'https://defienfance.fr/suivre-la-collecte-defi-enfance/?de_promise=1';
   return `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Antonio:wght@700&display=swap" rel="stylesheet"><style>${CSS_COMMUN}
     .programme-item{display:flex;align-items:flex-start;gap:12px;padding:10px 0;border-bottom:1px solid #f5dced;font-size:.84rem;color:#3d1830}
     .programme-item:last-child{border-bottom:none}
@@ -3794,24 +3796,19 @@ app.post('/api/test-email', async (req, res) => {
     merci_donateur_fidele:    { subject: '🧪 Test — 🏅 Super Badge Donateur (2ème don) !',          html: tplMerciDonateurFidele({ prenomDonateur: 'Jean-Claude', montant: '50', historiqueHtml: '' }) },
     merci_ambassadeur:        { subject: '🧪 Test — 🎖️ Merci Ambassadeur du Défi Enfance !',        html: tplMerciDonateurAmbassadeur({ prenomDonateur: 'Jean-Claude', montant: '50', coureurPrenom: 'Pierre', coureurNom: 'Martin', association: 'Les Enfants du Soleil', historiqueHtml: '' }) },
     merci_structure:       { subject: '🧪 Test — ❤️ Merci pour le don de votre entreprise !',     html: tplMerciDonateurStructure({ prenomDonateur: 'Sophie', montant: '200', nomStructure: 'Entreprise XYZ', coureurPrenom: 'Pierre', coureurNom: 'Martin', association: 'Les Enfants du Soleil' }) },
-    // ── ENVOIS GROUPÉS — renvoie le vrai template si disponible, sinon placeholder
-    groupe_angers_j10_coureurs:  { subject: '🧪 Test — 🎽 J-8 Angers Coureurs',        html: tplGroupeJ10Angers({ prenom: 'Sophie' }) },
-    groupe_angers_j4_coureurs:   { subject: '🧪 Test — 📢 J-4 Angers Coureurs',          html: tplGroupePlaceholder({ prenom: 'Sophie', nomTemplate: 'J-4 Coureurs Angers' }) },
-    groupe_angers_j4_supporters: { subject: '🧪 Test — 📢 J-4 Angers Supporters',        html: tplGroupePlaceholder({ prenom: 'Sophie', nomTemplate: 'J-4 Supporters Angers' }) },
-    groupe_angers_j1_coureurs:   { subject: '🧪 Test — 🎽 J-1 Angers — Dernières infos', html: tplGroupeJ1Angers({ prenom: 'Victor', numeroDossard: '42', urlPageCoureur: URL_COUREURS, urlPromesseCoureur: URL_PROMESSE_FALLBACK }) },
-    groupe_angers_j1_supporters: { subject: '🧪 Test — 📢 J-1 Angers Supporters',        html: tplGroupePlaceholder({ prenom: 'Sophie', nomTemplate: 'J-1 Supporters Angers' }) },
-    groupe_angers_jourj_coureurs:{ subject: '🧪 Test — 📢 Jour J Angers Coureurs',        html: tplGroupePlaceholder({ prenom: 'Sophie', nomTemplate: 'Jour J Coureurs Angers' }) },
-    groupe_angers_jp1_coureurs:  { subject: '🧪 Test — 📢 J+1 Angers Coureurs',          html: tplGroupePlaceholder({ prenom: 'Sophie', nomTemplate: 'J+1 Coureurs Angers' }) },
-    groupe_angers_jp10_coureurs: { subject: '🧪 Test — 📢 J+10 Angers Coureurs',         html: tplGroupePlaceholder({ prenom: 'Sophie', nomTemplate: 'J+10 Coureurs Angers' }) },
-    groupe_joue_j10_coureurs:    { subject: '🧪 Test — 🎽 J-10 Joué Coureurs',           html: tplGroupePlaceholder({ prenom: 'Sophie', nomTemplate: 'J-10 Coureurs Joué' }) },
-    groupe_joue_j4_coureurs:     { subject: '🧪 Test — 📢 J-4 Joué Coureurs',            html: tplGroupePlaceholder({ prenom: 'Sophie', nomTemplate: 'J-4 Coureurs Joué' }) },
-    groupe_joue_j4_supporters:   { subject: '🧪 Test — 📢 J-4 Joué Supporters',          html: tplGroupePlaceholder({ prenom: 'Sophie', nomTemplate: 'J-4 Supporters Joué' }) },
-    groupe_joue_j1_coureurs:     { subject: '🧪 Test — 📢 J-1 Joué Coureurs',            html: tplGroupePlaceholder({ prenom: 'Sophie', nomTemplate: 'J-1 Coureurs Joué' }) },
-    groupe_joue_j1_supporters:   { subject: '🧪 Test — 📢 J-1 Joué Supporters',          html: tplGroupePlaceholder({ prenom: 'Sophie', nomTemplate: 'J-1 Supporters Joué' }) },
-    groupe_joue_jourj_coureurs:  { subject: '🧪 Test — 📢 Jour J Joué Coureurs',          html: tplGroupePlaceholder({ prenom: 'Sophie', nomTemplate: 'Jour J Coureurs Joué' }) },
-    groupe_joue_jp1_coureurs:    { subject: '🧪 Test — 📢 J+1 Joué Coureurs',            html: tplGroupePlaceholder({ prenom: 'Sophie', nomTemplate: 'J+1 Coureurs Joué' }) },
-    groupe_joue_jp10_coureurs:   { subject: '🧪 Test — 📢 J+10 Joué Coureurs',           html: tplGroupePlaceholder({ prenom: 'Sophie', nomTemplate: 'J+10 Coureurs Joué' }) },
-    // Nouveaux templates
+    // ── ENVOIS GROUPÉS — clés alignées sur getTemplateFunction
+    groupe_j10_angers_coureurs:  { subject: '🧪 Test — 🎽 J-8 Angers Coureurs',             html: tplGroupeJ10Angers({ prenom: 'Sophie' }) },
+    groupe_j4_angers_coureurs:   { subject: '🧪 Test — 📢 J-4 Angers Coureurs',             html: tplGroupePlaceholder({ prenom: 'Sophie', nomTemplate: 'J-4 Coureurs Angers' }) },
+    groupe_j1_angers_coureurs:   { subject: '🧪 Test — 🎽 J-1 Angers — Dernières infos',   html: tplGroupeJ1Angers({ prenom: 'Victor', numeroDossard: '42', urlPageCoureur: URL_COUREURS, urlPromesseCoureur: URL_PROMESSE_FALLBACK }) },
+    groupe_j2_referents_angers:  { subject: '🧪 Test — 🏆 Référents Angers boost collecte', html: tplGroupeJ2Referents({ prenom: 'Sophie', urlPromesseEquipe: URL_PROMESSE_FALLBACK, urlPageEquipe: URL_EQUIPES }) },
+    groupe_j1_donateurs:         { subject: '🧪 Test — ❤️ J-1 Merci donateurs',             html: tplGroupeJ1Donateurs({ prenom: 'Marie', historiqueHtml: '', urlDon: URL_COUREURS, urlProm: URL_PROMESSE_FALLBACK }) },
+    groupe_jourj_promesses:      { subject: '🧪 Test — 🏁 Jour J promesses en dons',        html: tplGroupeJourJPromesses({ prenom: 'Marie', promesses: [{ type: 'coureur', nom: 'Victor Vieilfault', montantKm: 2, kmParcourus: 14.8, montantDu: 29.60, urlDon: URL_COUREURS }] }) },
+    groupe_merci_coureurs_angers:{ subject: '🧪 Test — 🏆 Merci coureurs Angers bilan kms', html: tplGroupeMerciCoureurAngers({ prenom: 'Victor', dossard: 42, nomCoureur: 'Victor Vieilfault', equipe: 'FSDV', kmsPerso: 14.8, classementPerso: 81, kmsEquipe: 360.8, classementEquipe: 3, estSolo: false }) },
+    groupe_merci_donateurs_angers:{ subject: '🧪 Test — ❤️ Merci donateurs Angers',         html: tplGroupeMerciDonateurAngers({ prenom: 'Marie', historiqueHtml: '', totalDons: 50, nbDons: 1 }) },
+    groupe_j10_joue_coureurs_v2: { subject: '🧪 Test — 🏁 J-10 Joué coureurs',             html: tplGroupeJ10JoueV2({ prenom: 'Sophie', nbJours: 10, urlPageCoureur: URL_COUREURS, urlPromesseCoureur: URL_PROMESSE_FALLBACK }) },
+    groupe_j2_referents_joue:    { subject: '🧪 Test — 🏃 Référents Joué boost collecte',   html: tplGroupeJ2ReferentsJoue({ prenom: 'Sophie', nbJours: 3, urlPromesseEquipe: URL_PROMESSE_FALLBACK, urlPageEquipe: URL_EQUIPES }) },
+    groupe_merci_donateurs_joue: { subject: '🧪 Test — ❤️ Merci donateurs Joué',            html: tplGroupeMerciDonateurJoue({ prenom: 'Jean-Paul', historiqueHtml: '', totalDons: 40, nbDons: 1 }) },
+    // Concrétisation promesse
     merci_concretisation_promesse: { subject: '🧪 Test — 🙏 Concrétisation promesse coureur', html: tplMerciConcretisationPromesse({ prenomDonateur: 'Marie', montantDon: 29.60, montantParKm: 2, nomCible: 'Victor Vieilfault', typeCible: 'coureur', kmsParcourus: 14.8, montantCalcule: 29.60, urlPage: 'https://defienfance.fr' }) },
     merci_concretisation_equipe:   { subject: '🧪 Test — 🙏 Concrétisation promesse équipe', html: tplMerciConcretisationPromesse({ prenomDonateur: 'Jean-Paul', montantDon: 99.55, montantParKm: 0.1, nomCible: 'FSDV', typeCible: 'equipe', kmsParcourus: 995.5, montantCalcule: 99.55, urlPage: 'https://defienfance.fr' }) },
     groupe_jourj_promesses:        { subject: '🧪 Test — 🏁 Jour J promesses en dons',     html: tplGroupeJourJPromesses({ prenom: 'Marie', promesses: [{ type: 'coureur', nom: 'Victor Vieilfault', montantKm: 2, kmParcourus: 14.8, montantDu: 29.60, urlDon: 'https://defienfance.fr' }, { type: 'equipe', nom: 'FSDV', montantKm: 0.1, kmParcourus: 995.5, montantDu: 99.55, urlDon: 'https://defienfance.fr' }] }) },
@@ -4326,7 +4323,6 @@ const TEMPLATES_SUJETS = {
   'groupe_j10_angers_coureurs':   '🎽 Dans ${j} jours, on court pour l\'enfance à Angers — tout ce qu\'il faut savoir !',
   'groupe_j2_referents_angers':   '🏃 Boostons nos collectes de dons — Défi Enfance Angers !',
   'groupe_j2_referents_joue':      null, // sujet dynamique
-  'groupe_j10_joue_coureurs':      '🎽 Dans ${j} jours, on court pour l\'enfance à Joué-lès-Tours — tout ce qu\'il faut savoir !',
   'groupe_j1_angers_coureurs':    '🎽 Demain, c\'est le jour J ! 🎽',
   'groupe_j1_donateurs':          '❤️ Merci pour votre soutien — demain c\'est le grand jour !',
   'groupe_jourj_promesses':        '🏁 Vos promesses de don — le Défi Enfance a couru pour l\'enfance !',
@@ -4349,7 +4345,6 @@ function getTemplateFunction(templateId) {
     'groupe_j10_angers_coureurs': (prenom, nbJours, extra) => tplGroupeJ10Angers({ prenom, nbJours, urlPageCoureur: extra?.urlPageCoureur, urlPromesseCoureur: extra?.urlPromesseCoureur }),
     'groupe_j2_referents_angers':  (prenom, nbJours, extra) => tplGroupeJ2Referents({ prenom, urlPromesseEquipe: extra?.urlPromesseEquipe, urlPageEquipe: extra?.urlPageEquipe }),
     'groupe_j2_referents_joue':     (prenom, nbJours, extra) => tplGroupeJ2ReferentsJoue({ prenom, nbJours, urlPromesseEquipe: extra?.urlPromesseEquipe || extra?.urlPromesseCoureur, urlPageEquipe: extra?.urlPageEquipe }),
-    'groupe_j10_joue_coureurs':    (prenom, nbJours, extra) => tplGroupeJ10Joue({ prenom, nbJours, urlPageCoureur: extra?.urlPageCoureur, urlPromesseCoureur: extra?.urlPromesseCoureur }),
     'groupe_j10_joue_coureurs_v2':  (prenom, nbJours, extra) => tplGroupeJ10JoueV2({ prenom, nbJours, urlPageCoureur: extra?.urlPageCoureur, urlPromesseCoureur: extra?.urlPromesseCoureur }),
     'groupe_j1_angers_coureurs':  (prenom, nbJours, extra) => tplGroupeJ1Angers({ prenom, numeroDossard: extra?.numeroDossard, urlPageCoureur: extra?.urlPageCoureur, urlPromesseCoureur: extra?.urlPromesseCoureur }),
     'groupe_j1_donateurs':        (prenom, nbJours, extra) => tplGroupeJ1Donateurs({ prenom, historiqueHtml: extra?.historiqueHtml || '', urlDon: extra?.urlDon, urlProm: extra?.urlProm }),
