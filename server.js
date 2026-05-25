@@ -625,6 +625,28 @@ function blocScenariosKm(montantParKm) {
   </div>`;
 }
 
+// ── Projection pour une équipe : base 10km/coureur en 2h, avec note si plus
+function blocProjectionEquipe(montantParKm, nbCoureurs) {
+  const m = parseFloat(montantParKm) || 0;
+  const n = parseInt(nbCoureurs) || 0;
+  if (!m || !n) return '';
+  const kmBase   = n * 10;
+  const donBase  = m * kmBase;
+  const kmMieux  = n * 15;
+  const donMieux = m * kmMieux;
+  const kmTop    = n * 20;
+  const donTop   = m * kmTop;
+  return `<div class="promesse-scenario">
+    <div style="font-size:.78rem;font-weight:700;color:#7c3aed;margin-bottom:4px;text-transform:uppercase;letter-spacing:.06em">💡 Projection — base 10 km/coureur en 2h</div>
+    <div style="font-size:.75rem;color:#888;margin-bottom:10px">Équipe de <strong>${n} coureur${n > 1 ? 's' : ''}</strong> inscrits</div>
+    <div class="sc-line"><span>Base (${n} × 10 km = ${kmBase} km)</span><span><strong>${donBase.toFixed(0)} €</strong></span></div>
+    <div class="sc-line"><span>Si 15 km/coureur (${kmMieux} km)</span><span><strong>${donMieux.toFixed(0)} €</strong></span></div>
+    <div class="sc-line"><span>Si 20 km/coureur (${kmTop} km)</span><span><strong>${donTop.toFixed(0)} €</strong></span></div>
+    <div style="font-size:.75rem;color:#ef6135;margin-top:8px;font-style:italic">😉 Il est possible que l'équipe court plus de 10 km/coureur en moyenne. Dans ce cas, <strong>tenez-vous prêt à donner plus !</strong></div>
+    <div style="font-size:.75rem;color:#7c3aed;margin-top:6px">📩 Si un nouveau coureur s'inscrit dans l'équipe, vous recevrez automatiquement un email de mise à jour de cette projection.</div>
+  </div>`;
+}
+
 // ══════════════════════════════════════════════════════
 //  TEMPLATES EMAIL — DONS (inchangés v67)
 // ══════════════════════════════════════════════════════
@@ -720,17 +742,68 @@ ${recap}
 <div class="divider"></div><div style="font-size:.75rem;color:#888;text-align:center">Email envoyé automatiquement dans les 10 minutes suivant la promesse.</div></div>${BLOC_IFI}<div class="footer"><div style="font-family:Arial,sans-serif;font-size:1.1rem;font-weight:700;color:#fb0089;letter-spacing:.08em;margin-bottom:6px">DÉFI ENFANCE</div><div class="footer-sub">Générateur de victoires pour l'enfance<br>contact@defienfance.fr</div></div></div></td></tr></table></body></html>`;
 }
 
-function tplPromesseEquipe({ chefPrenom, chefNom, nomEquipe, donateur, montantParKm, email_donateur, motEncouragement, nbPromessesEquipe, totalKmParEquipe, urlPromesseEquipe, urlPageEquipe }) {
+function tplPromesseEquipe({ chefPrenom, chefNom, nomEquipe, donateur, montantParKm, email_donateur, motEncouragement, nbPromessesEquipe, totalKmParEquipe, urlPromesseEquipe, urlPageEquipe, nbCoureurs }) {
   const motLine  = motEncouragement ? `<div class="note violet" style="margin-top:16px">💬 <strong>Message de ${donateur} :</strong><br><em>"${motEncouragement}"</em></div>` : '';
   const recap    = blocRecapPromesses({ nbPromessesCoureur: 0, totalKmParCoureur: 0, nbPromessesEquipe, totalKmParEquipe, isCoureur: false });
-  const scenarios = blocScenariosKm(montantParKm);
+  const scenarios = nbCoureurs ? blocProjectionEquipe(montantParKm, nbCoureurs) : blocScenariosKm(montantParKm);
   return `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Antonio:wght@700&display=swap" rel="stylesheet"><style>${CSS_COMMUN}</style></head><body bgcolor="#f5f0f3" style="background-color:#f5f0f3;margin:0;padding:0"><table class="bg-wrap" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#f5f0f3" style="background-color:#f5f0f3"><tr><td align="center" bgcolor="#f5f0f3" style="background-color:#f5f0f3"><div class="outer"><div class="logo-header"><div class="logo-text">🤝 Défi Enfance</div><div class="logo-sub">Générateur de victoires pour l'enfance</div></div><div class="header violet"><h1>🏅 Promesse de don<br>pour votre équipe !</h1><p>Générateur de victoires pour l'enfance</p></div><div class="body"><div class="greeting">Bonjour ${chefPrenom} 👋</div><div style="margin-bottom:16px"><span class="badge violet">🏃 Équipe ${nomEquipe}</span></div><div class="intro">Excellente nouvelle ! <strong>${donateur}</strong> s'engage à faire un don pour votre équipe — <strong>le soir même de la course</strong> — proportionnellement aux kilomètres cumulés par vos coureurs !</div><div class="promesse-box"><div class="promesse-km">${montantParKm} €</div><div class="promesse-label">promis par km couru — pour l'équipe ${nomEquipe}</div></div>${scenarios}${motLine}<div class="note violet">🚀 <strong>Chaque km couru par chacun de vos coureurs compte !</strong><br>Plus votre équipe performe collectivement, plus ${donateur} donnera pour l'enfance le soir même.</div>${recap}<div class="card violet"><h3 class="violet">📋 Coordonnées du supporter</h3><div class="row"><span class="ic">👤</span><div><strong>Nom :</strong> ${donateur}</div></div><div class="row"><span class="ic">✉️</span><div><strong>Email :</strong> <a href="mailto:${email_donateur}" style="color:#7c3aed">${email_donateur}</a></div></div></div><div class="note magenta">💌 <strong>Transmettez cette promesse à vos coureurs</strong> pour les motiver encore davantage — chaque foulée supplémentaire a un prix pour l'enfance !</div><div class="cta-box violet"><p>✨ <strong>Mobilisez l'équipe !</strong><br>Partagez cette promesse de don avec tous vos coureurs pour décupler leur motivation le jour J.</p><a href="${urlPromesseEquipe || URL_PROMESSE_FALLBACK}" class="cta-btn violet">🏅 Promettre un don au km</a></div><div style="text-align:center;margin-top:10px"><a href="${urlPageEquipe || URL_EQUIPES}" style="display:inline-block;background:linear-gradient(135deg,#ef6135,#ff8533);color:#fff!important;text-decoration:none;padding:10px 22px;border-radius:99px;font-weight:700;font-size:.82rem">🏆 Voir la page de l'équipe</a></div><div class="divider"></div><div style="font-size:.75rem;color:#888;text-align:center">Promesse enregistrée automatiquement. Le don sera effectif après la course.</div></div>${BLOC_IFI}<div class="footer"><div style="font-family:Arial,sans-serif;font-size:1.1rem;font-weight:700;color:#fb0089;letter-spacing:.08em;margin-bottom:6px">DÉFI ENFANCE</div><div class="footer-sub">Générateur de victoires pour l'enfance<br>contact@defienfance.fr</div></div></div></td></tr></table></body></html>`;
 }
 
 /**
  * Merci au prometteur (donateur) après sa promesse → coureur
  */
-function tplMerciPrometteurCoureur({ prenomDonateur, montantParKm, coureurPrenom, coureurNom, association, historiqueHtml }) {
+
+function tplMerciConcretisationPromesse({ prenomDonateur, montantDon, montantParKm, nomCible, typeCible, kmsParcourus, montantCalcule, urlPage }) {
+  const valorisation = kmsParcourus > 0 ? (montantDon / kmsParcourus).toFixed(2) : null;
+  const isCoureur = typeCible === 'coureur';
+  const couleur = isCoureur ? '#7c3aed' : '#ef6135';
+  const emoji   = isCoureur ? '🏃' : '🏆';
+  return `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Antonio:wght@700&display=swap" rel="stylesheet"><style>${CSS_COMMUN}</style></head><body bgcolor="#f5f0f3" style="background-color:#f5f0f3;margin:0;padding:0"><table class="bg-wrap" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#f5f0f3" style="background-color:#f5f0f3"><tr><td align="center" bgcolor="#f5f0f3" style="background-color:#f5f0f3"><div class="outer">
+<div class="logo-header"><div class="logo-text">🤝 Défi Enfance</div><div class="logo-sub">Générateur de victoires pour l'enfance</div></div>
+<table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td bgcolor="${couleur}" style="background-color:${couleur};padding:24px 32px;text-align:center;border-radius:0"><h1 style="font-family:Arial,sans-serif;font-size:1.2rem;font-weight:700;color:#fff;margin:0 0 6px">🙏 Merci d'avoir concrétisé<br>votre promesse de don !</h1><p style="font-size:.8rem;color:rgba(255,255,255,.8);margin:0">Défi Enfance · 2026</p></td></tr></table>
+<div class="body">
+<div style="font-size:1rem;font-weight:600;color:#3d1830;margin-bottom:12px">Bonjour ${prenomDonateur} 👋</div>
+<div style="font-size:.85rem;color:#3d1830;line-height:1.7;margin-bottom:20px">Vous aviez promis <strong>${montantParKm} €/km</strong> pour ${emoji} <strong>${nomCible}</strong>. Aujourd'hui, vous avez décidé de concrétiser cet engagement avec un don de <strong style="color:${couleur}">${montantDon} €</strong>. Merci du fond du cœur.</div>
+
+<div style="background-color:#f9f7ff;border:2px solid ${couleur};border-radius:14px;padding:18px 22px;margin-bottom:20px;text-align:center">
+  <div style="font-size:.72rem;font-weight:700;color:${couleur};text-transform:uppercase;letter-spacing:.08em;margin-bottom:14px">${emoji} Récapitulatif de votre engagement</div>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+      <td style="padding:8px 0;border-bottom:1px solid #ede8ff;font-size:.84rem;color:#3d1830;text-align:left">Promesse initiale</td>
+      <td style="padding:8px 0;border-bottom:1px solid #ede8ff;font-size:.84rem;font-weight:700;color:${couleur};text-align:right">${montantParKm} €/km</td>
+    </tr>
+    ${kmsParcourus > 0 ? `<tr>
+      <td style="padding:8px 0;border-bottom:1px solid #ede8ff;font-size:.84rem;color:#3d1830;text-align:left">Km parcourus ${isCoureur ? 'par ' + nomCible : 'par l\'équipe'}</td>
+      <td style="padding:8px 0;border-bottom:1px solid #ede8ff;font-size:.84rem;font-weight:700;color:#3d1830;text-align:right">${kmsParcourus} km</td>
+    </tr>` : ''}
+    ${montantCalcule > 0 ? `<tr>
+      <td style="padding:8px 0;border-bottom:1px solid #ede8ff;font-size:.84rem;color:#3d1830;text-align:left">Don calculé selon les km</td>
+      <td style="padding:8px 0;border-bottom:1px solid #ede8ff;font-size:.84rem;color:#3d1830;text-align:right">${montantCalcule.toFixed(2)} €</td>
+    </tr>` : ''}
+    <tr>
+      <td style="padding:10px 0;font-size:.9rem;font-weight:700;color:#3d1830;text-align:left">Votre don réalisé</td>
+      <td style="padding:10px 0;font-size:1.1rem;font-weight:700;color:${couleur};text-align:right">${montantDon} €</td>
+    </tr>
+    ${valorisation ? `<tr>
+      <td colspan="2" style="padding:6px 0;font-size:.75rem;color:#888;font-style:italic;text-align:center">Soit une valorisation de <strong>${valorisation} €/km parcouru</strong></td>
+    </tr>` : ''}
+  </table>
+</div>
+
+<div style="font-size:.85rem;color:#3d1830;line-height:1.7;margin-bottom:20px">Votre geste dépasse un simple don — c'est la preuve qu'<strong>une promesse tenue change la vie d'enfants vulnérables</strong>. Vous faites partie de l'aventure Défi Enfance et nous en sommes immensément reconnaissants.</div>
+
+${urlPage ? `<div style="text-align:center;margin-bottom:20px"><a href="${urlPage}" style="display:inline-block;background-color:${couleur};color:#fff;text-decoration:none;padding:11px 24px;border-radius:99px;font-weight:700;font-size:.84rem;font-family:Arial,sans-serif">${emoji} Voir la page de ${isCoureur ? nomCible : 'l\'équipe'}</a></div>` : ''}
+
+${BLOC_RECUS_FISCAUX}${BLOC_IFI}
+<div class="divider"></div>
+<div style="font-size:.84rem;color:#3d1830;text-align:center;font-style:italic;margin-bottom:6px">Merci d'avoir tenu votre promesse. On continue ensemble. 🤝</div>
+<div style="font-size:.82rem;color:#fb0089;font-weight:600;text-align:center">— Team Défi Enfance</div>
+</div>
+<table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td bgcolor="#3d1830" style="background-color:#3d1830;padding:16px;text-align:center;border-radius:0 0 14px 14px"><div style="font-family:Arial,sans-serif;font-size:1.1rem;font-weight:700;color:#fb0089;letter-spacing:.08em;margin-bottom:6px">DÉFI ENFANCE</div><div style="font-size:.82rem;color:rgba(255,255,255,.5)">Générateur de victoires pour l'enfance · contact@defienfance.fr</div></td></tr></table>
+</div></td></tr></table></body></html>`;
+}
+
+function tplMerciPrometteurCoureur({ prenomDonateur, montantParKm, coureurPrenom, coureurNom, association, historiqueHtml, nbCoureurs }) {
   const scenarios = blocScenariosKm(montantParKm);
   return `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Antonio:wght@700&display=swap" rel="stylesheet"><style>${CSS_COMMUN}</style></head><body bgcolor="#f5f0f3" style="background-color:#f5f0f3;margin:0;padding:0"><table class="bg-wrap" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#f5f0f3" style="background-color:#f5f0f3"><tr><td align="center" bgcolor="#f5f0f3" style="background-color:#f5f0f3"><div class="outer"><div class="logo-header"><div class="logo-text">🤝 Défi Enfance</div><div class="logo-sub">Générateur de victoires pour l'enfance</div></div><div class="header violet"><h1>🙏 Merci pour votre<br>promesse de don !</h1><p>Générateur de victoires pour l'enfance</p></div><div class="body"><div class="greeting">Bonjour ${prenomDonateur} 👋</div><div class="intro">Votre promesse de <strong>${montantParKm} € par km</strong> pour <strong>${coureurPrenom} ${coureurNom || ''}</strong>${association ? ` et l'Association <strong>${association}</strong>` : ''} est enregistrée. Elle sera transformée en don réel — <strong>le soir même de la course</strong> — selon les kilomètres courus.</div><div class="promesse-box"><div class="promesse-km">${montantParKm} €</div><div class="promesse-label">par km couru par ${coureurPrenom}</div></div>${scenarios}<div class="note violet">💡 <strong>Comment ça fonctionne ?</strong><br>Le soir de la course, vous recevrez un email récapitulatif avec le résultat de ${coureurPrenom}. Il vous suffira alors de cliquer sur le lien de don et de saisir le montant correspondant aux km courus.</div><div style="text-align:center;background:linear-gradient(135deg,#f5f0ff,#fdf0f8);border-radius:14px;padding:22px;margin-bottom:24px"><div style="margin-bottom:12px;font-size:.78rem;font-weight:700;color:#7c3aed;text-transform:uppercase;letter-spacing:.08em">L'impact de votre engagement</div><div style="display:flex;justify-content:center;gap:24px;flex-wrap:wrap"><div class="impact-stat"><span class="num" style="color:#7c3aed">+20 000</span><span class="lbl">enfants accompagnés</span></div><div class="impact-stat"><span class="num" style="color:#7c3aed">+40</span><span class="lbl">associations soutenues</span></div></div></div>${BLOC_TEMOIGNAGES}${BLOC_SOCIAUX}<div class="cta-box violet"><p>✨ <strong>Envie d'aller encore plus loin ?</strong><br>Partagez cette initiative autour de vous — vos proches peuvent aussi promettre un don par km !</p><a href="${URL_DON}" class="cta-btn violet">❤️ Page de don Défi Enfance</a></div><div class="divider"></div>${historiqueHtml || ""}<div style="font-size:.75rem;color:#888;text-align:center">Promesse de don enregistrée — le don sera réalisé après la course.<br>contact@defienfance.fr — defienfance.fr</div></div>${BLOC_IFI}<div class="footer"><div style="font-family:Arial,sans-serif;font-size:1.1rem;font-weight:700;color:#fb0089;letter-spacing:.08em;margin-bottom:6px">DÉFI ENFANCE</div><div class="footer-sub">Générateur de victoires pour l'enfance<br>contact@defienfance.fr</div></div></div></td></tr></table></body></html>`;
 }
@@ -738,8 +811,8 @@ function tplMerciPrometteurCoureur({ prenomDonateur, montantParKm, coureurPrenom
 /**
  * Merci au prometteur (donateur) après sa promesse → équipe
  */
-function tplMerciPrometteurEquipe({ prenomDonateur, montantParKm, nomEquipe, historiqueHtml }) {
-  const scenarios = blocScenariosKm(montantParKm);
+function tplMerciPrometteurEquipe({ prenomDonateur, montantParKm, nomEquipe, historiqueHtml, nbCoureurs }) {
+  const scenarios = nbCoureurs ? blocProjectionEquipe(montantParKm, nbCoureurs) : blocScenariosKm(montantParKm);
   return `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Antonio:wght@700&display=swap" rel="stylesheet"><style>${CSS_COMMUN}</style></head><body bgcolor="#f5f0f3" style="background-color:#f5f0f3;margin:0;padding:0"><table class="bg-wrap" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#f5f0f3" style="background-color:#f5f0f3"><tr><td align="center" bgcolor="#f5f0f3" style="background-color:#f5f0f3"><div class="outer"><div class="logo-header"><div class="logo-text">🤝 Défi Enfance</div><div class="logo-sub">Générateur de victoires pour l'enfance</div></div><div class="header violet"><h1>🙏 Merci pour votre<br>promesse de don !</h1><p>Générateur de victoires pour l'enfance</p></div><div class="body"><div class="greeting">Bonjour ${prenomDonateur} 👋</div><div class="intro">Votre promesse de <strong>${montantParKm} € par km</strong> pour l'équipe <strong>${nomEquipe}</strong> est enregistrée. Elle sera transformée en don réel — <strong>le soir même de la course</strong> — selon les kilomètres cumulés par les coureurs de l'équipe.</div><div class="promesse-box"><div class="promesse-km">${montantParKm} €</div><div class="promesse-label">par km couru — équipe ${nomEquipe}</div></div>${scenarios}<div class="note violet">💡 <strong>Comment ça fonctionne ?</strong><br>Le soir de la course, vous recevrez un email récapitulatif avec le résultat de l'équipe ${nomEquipe}. Il vous suffira alors de cliquer sur le lien de don et de saisir le montant correspondant.</div>${BLOC_TEMOIGNAGES}${BLOC_SOCIAUX}<div class="cta-box violet"><p>✨ <strong>Mobilisez votre entourage !</strong><br>Plus il y a de promesses sur cette équipe, plus leur motivation le jour J est décuplée !</p><a href="${URL_DON}" class="cta-btn violet">❤️ Page de don Défi Enfance</a></div><div class="divider"></div><div style="font-size:.75rem;color:#888;text-align:center">Promesse de don enregistrée — le don sera réalisé après la course.<br>contact@defienfance.fr — defienfance.fr</div></div>${BLOC_IFI}<div class="footer"><div style="font-family:Arial,sans-serif;font-size:1.1rem;font-weight:700;color:#fb0089;letter-spacing:.08em;margin-bottom:6px">DÉFI ENFANCE</div><div class="footer-sub">Générateur de victoires pour l'enfance<br>contact@defienfance.fr</div></div></div></td></tr></table></body></html>`;
 }
 
@@ -3133,25 +3206,39 @@ async function fetchTotalPromessesCoureur(contactId) {
 
 // ── Récupérer le total des promesses de dons pour une équipe (nom)
 async function fetchTotalPromessesEquipe(nomEquipe) {
-  if (!nomEquipe) return { nb: 0, total: 0 };
+  if (!nomEquipe) return { nb: 0, total: 0, promettants: [] };
   try {
     await sleep(OHME_DELAY_MS);
-    const res = await fetch(`${CONFIG.ohmeBase}/api/v1/payments?limit=100&since_date=2026-01-01`, {
+    const res = await fetchOhmeWithRetry(`${CONFIG.ohmeBase}/api/v1/payments?limit=100&since_date=2026-01-01`, {
       headers: { 'Accept': 'application/json', 'client-name': CONFIG.ohmeClientName, 'client-secret': CONFIG.ohmeClientSecret }
     });
-    if (!res.ok) return { nb: 0, total: 0 };
+    if (!res.ok) return { nb: 0, total: 0, promettants: [] };
     const json = await res.json();
     const all = json.data || [];
     let nb = 0, total = 0;
+    const promettants = [];
     for (const p of all) {
       const cf = p.custom_fields || p;
-      const montantPromesse = parseFloat(cf.montant_promesse_don_par_km || 0);
-      if (!montantPromesse) continue;
-      const equipeParraine = (cf.equipe_parraine || '').trim();
-      if (equipeParraine.toLowerCase() === nomEquipe.toLowerCase()) { nb++; total += montantPromesse; }
+      const montantKm = parseFloat(cf.montant_promesse_don_par_km || 0);
+      if (!montantKm) continue;
+      const equipeP = (cf.equipe_parraine || '').trim();
+      if (equipeP.toLowerCase() !== nomEquipe.toLowerCase()) continue;
+      nb++; total += montantKm;
+      // Récupérer email + prénom du promettant
+      if (p.contact_id) {
+        let contact = contactsCache.get(String(p.contact_id));
+        if (!contact) contact = await fetchOhmeContactById(p.contact_id);
+        if (contact?.email) {
+          promettants.push({
+            email: contact.email,
+            prenom: contact.firstname || contact.first_name || '',
+            montantKm,
+          });
+        }
+      }
     }
-    return { nb, total };
-  } catch(e) { return { nb: 0, total: 0 }; }
+    return { nb, total, promettants };
+  } catch(e) { return { nb: 0, total: 0, promettants: [] }; }
 }
 
 // ══════════════════════════════════════════════════════
@@ -3333,6 +3420,16 @@ async function processPayments(payments, ignoreDate = false) {
           const html = tplDonCoureur({ coureurPrenom, donateur, montant, email_donateur: emailDon, association: assoSoutenue, motEncouragement, urlPageCoureur, urlPromesseCoureur });
           const ok = await sendBrevo(emailCoureur, `❤️ [live] ${prenomMerci || donateur.split(' ')[0]} a fait un don pour vous !`, html);
           if (ok) { state.stats.sent++; addLog(`✅ Don ${montant}€ → ${coureurParraine}`, 'ok'); addEvent('❤️', `Don de ${montant} €`, `${donateur} → ${coureurParraine}`, 'don'); sendMerciDonateur({ email: emailDon, prenom: prenomMerci || donateur.split(' ')[0], montant, donateur, coureurPrenom, coureurNom: coureurParraine.split(' ').slice(1).join(' '), association: assoSoutenue, contactId: p.contact_id, isStructure, nomStructure }); }
+          // Vérifier si ce don concrétise une promesse antérieure
+          const concretCoureur = await verifierConcretisationPromesse(p.contact_id, emailDon, coureurParraine, null, eventName, p.date);
+          if (concretCoureur && emailDon) {
+            const cfContact = contact?.custom_fields || contact || {};
+            const kmsParcourus = parseFloat(cfContact.km_parcourus_angers2026 || cfContact.km_parcourus_joue2026 || 0);
+            const montantCalcule = kmsParcourus > 0 ? concretCoureur.montantKm * kmsParcourus : 0;
+            const htmlConcret = tplMerciConcretisationPromesse({ prenomDonateur: prenomMerci || donateur.split(' ')[0], montantDon: parseFloat(montant), montantParKm: concretCoureur.montantKm, nomCible: coureurParraine, typeCible: 'coureur', kmsParcourus, montantCalcule, urlPage: urlPageCoureur });
+            const okC = await sendBrevo(emailDon, `🙏 Merci d'avoir concrétisé votre promesse pour ${coureurPrenom} !`, htmlConcret);
+            if (okC) addLog(`✅ Email concrétisation promesse → ${donateur} (${coureurParraine})`, 'ok');
+          }
           const equipe = await fetchEquipeCoureur(contact?.id);
           if (equipe) {
             const structure = await fetchOhmeStructureByName(equipe);
@@ -3357,6 +3454,17 @@ async function processPayments(payments, ignoreDate = false) {
           const html = tplDonEquipe({ chefPrenom, chefNom, nomEquipe: equipeParraine, donateur, montant, email_donateur: emailDon, motEncouragement, urlPageEquipe: urlPageEquipeDirect });
           const ok = await sendBrevo(chefEmail, `❤️ Don pour votre équipe de ${donateur} !`, html);
           if (ok) { state.stats.sent++; addLog(`✅ Don ${montant}€ → équipe ${equipeParraine}`, 'ok'); addEvent('🏆', `Don ${montant}€ équipe`, `${donateur} → ${equipeParraine}`, 'don'); sendMerciDonateur({ email: emailDon, prenom: prenomMerci || donateur.split(' ')[0], montant, donateur, nomEquipe: equipeParraine, contactId: p.contact_id, isStructure, nomStructure }); }
+          // Vérifier si ce don concrétise une promesse antérieure sur l'équipe
+          const concretEquipe = await verifierConcretisationPromesse(p.contact_id, emailDon, null, equipeParraine, eventName, p.date);
+          if (concretEquipe && emailDon) {
+            const cfStruct2 = structure?.custom_fields || structure || {};
+            const kmsEquipe = parseFloat(cfStruct2.km_parcourus_equipe_angers_2026 || 0);
+            const montantCalcule2 = kmsEquipe > 0 ? concretEquipe.montantKm * kmsEquipe : 0;
+            const urlPageEquipeC = await buildUrlPageEquipe(null, equipeParraine, eventName);
+            const htmlConcret2 = tplMerciConcretisationPromesse({ prenomDonateur: prenomMerci || donateur.split(' ')[0], montantDon: parseFloat(montant), montantParKm: concretEquipe.montantKm, nomCible: equipeParraine, typeCible: 'equipe', kmsParcourus: kmsEquipe, montantCalcule: montantCalcule2, urlPage: urlPageEquipeC });
+            const okC2 = await sendBrevo(emailDon, `🙏 Merci d'avoir concrétisé votre promesse pour l'équipe ${equipeParraine} !`, htmlConcret2);
+            if (okC2) addLog(`✅ Email concrétisation promesse → ${donateur} (équipe ${equipeParraine})`, 'ok');
+          }
         } else { addLog(`⚠️ Équipe "${equipeParraine}" — référent introuvable`, 'warn'); }
       } else {
         addLog(`⏸️ Don ${montant}€ de ${donateur} — non fléché, mis en attente`, 'warn');
@@ -3433,19 +3541,31 @@ async function processPayments(payments, ignoreDate = false) {
         const chefNom    = structure?.nom_du_referent_defi_enfance || '';
         const promEquipe = await fetchTotalPromessesEquipe(equipeParraine);
 
+        // Récupérer nb coureurs inscrits dans l'équipe pour la projection
+        const cfStruct = structure?.custom_fields || structure || {};
+        let nbCoureurs = 0;
+        try {
+          // Compter les contacts avec cette équipe dans leur paiement billetterie
+          const nbCoureursCaches = [...contactsCache.values()].filter(c => {
+            const cf2 = c.custom_fields || c;
+            return equipeParContactId.get(String(c.id)) === equipeParraine;
+          }).length;
+          nbCoureurs = nbCoureursCaches || 0;
+        } catch(e) { nbCoureurs = 0; }
+
         if (chefEmail) {
           // URLs personnalisées équipe
           const urlPromesseEquipe = await buildUrlPromesseEquipe(null, equipeParraine, eventName);
           const urlPageEquipe     = await buildUrlPageEquipe(null, equipeParraine, eventName);
           // 1. Email au chef d'équipe
-          const html = tplPromesseEquipe({ chefPrenom, chefNom, nomEquipe: equipeParraine, donateur, montantParKm: montantKm, email_donateur: emailDon, motEncouragement, nbPromessesEquipe: promEquipe.nb, totalKmParEquipe: promEquipe.total, urlPromesseEquipe, urlPageEquipe });
-          const ok = await sendBrevo(chefEmail, `🏅 Promesse de don pour votre équipe — ${montantKm}€/km !`, html);
-          if (ok) { state.stats.sent++; addLog(`✅ Promesse ${montantKm}€/km → équipe ${equipeParraine}`, 'ok'); addEvent('🏅', `Promesse ${montantKm}€/km équipe`, `${donateur} → ${equipeParraine}`, 'don'); }
+          const html = tplPromesseEquipe({ chefPrenom, chefNom, nomEquipe: equipeParraine, donateur, montantParKm: montantKm, email_donateur: emailDon, motEncouragement, nbPromessesEquipe: promEquipe.nb, totalKmParEquipe: promEquipe.total, urlPromesseEquipe, urlPageEquipe, nbCoureurs });
+          const ok = await sendBrevo(chefEmail, `🏅 Promesse de ${donateur} pour l'équipe ${equipeParraine} — ${montantKm}€/km !`, html);
+          if (ok) { state.stats.sent++; addLog(`✅ Promesse ${montantKm}€/km → équipe ${equipeParraine} (${nbCoureurs} coureurs)`, 'ok'); addEvent('🏅', `Promesse ${montantKm}€/km équipe`, `${donateur} → ${equipeParraine}`, 'don'); }
 
-          // 2. Email merci au prometteur
+          // 2. Email merci au prometteur avec projection équipe
           const histPromE = await fetchHistoriqueDons(p.contact_id);
           const histPromHtmlE = formatHistoriqueDons(histPromE);
-          const htmlMerci = tplMerciPrometteurEquipe({ prenomDonateur: prenomMerci || donateur.split(' ')[0], montantParKm: montantKm, nomEquipe: equipeParraine, historiqueHtml: histPromHtmlE });
+          const htmlMerci = tplMerciPrometteurEquipe({ prenomDonateur: prenomMerci || donateur.split(' ')[0], montantParKm: montantKm, nomEquipe: equipeParraine, historiqueHtml: histPromHtmlE, nbCoureurs });
           const okMerci = await sendBrevo(emailDon, `🙏 Merci pour votre promesse de don à l'équipe ${equipeParraine} !`, htmlMerci);
           if (okMerci) { state.stats.sent++; addLog(`✅ Merci promesse envoyé à ${donateur}`, 'ok'); }
         } else { addLog(`⚠️ Promesse → équipe "${equipeParraine}" — référent introuvable`, 'warn'); }
@@ -3546,7 +3666,26 @@ async function processPayments(payments, ignoreDate = false) {
       if (isSupporter) {
         if (emailCoureur) { const html = tplInscriptionSupporter({ prenom: prenomC || coureur }); const ok = await sendBrevo(emailCoureur, `${prenomC || coureur} : Heureux de votre inscription au Défi Enfance !`, html); if (ok) { state.stats.sent++; addLog(`✅ Bienvenue supporter → ${coureur}`, 'ok'); addEvent('🚀', `Bienvenue supporter`, coureur, 'bill'); } }
       } else {
-        if (emailCoureur) { const html = tplInscriptionCoureur({ prenom: prenomC || coureur, nomComplet: coureur, nomAsso }); const ok = await sendBrevo(emailCoureur, `${prenomC || coureur} : Heureux de votre inscription au Défi Enfance !`, html); if (ok) { state.stats.sent++; addLog(`✅ Bienvenue coureur → ${coureur}`, 'ok'); addEvent('🚀', `Bienvenue coureur`, coureur, 'bill'); } }
+        if (emailCoureur) {
+            const html = tplInscriptionCoureur({ prenom: prenomC || coureur, nomComplet: coureur, nomAsso });
+            const ok = await sendBrevo(emailCoureur, `${prenomC || coureur} : Heureux de votre inscription au Défi Enfance !`, html);
+            if (ok) { state.stats.sent++; addLog(`✅ Bienvenue coureur → ${coureur}`, 'ok'); addEvent('🚀', `Bienvenue coureur`, coureur, 'bill'); }
+
+            // Notifier les promettants de l'équipe si nouveau coureur
+            if (equipe) {
+              try {
+                const promessesSurEquipe = await fetchTotalPromessesEquipe(equipe);
+                if (promessesSurEquipe.nb > 0 && promessesSurEquipe.promettants?.length) {
+                  const nbCoureursNouv = ([...contactsCache.values()].filter(c => equipeParContactId.get(String(c.id)) === equipe).length) + 1;
+                  for (const prom of promessesSurEquipe.promettants) {
+                    const htmlNotif = tplMerciPrometteurEquipe({ prenomDonateur: prom.prenom, montantParKm: prom.montantKm, nomEquipe: equipe, historiqueHtml: '', nbCoureurs: nbCoureursNouv });
+                    await sendBrevo(prom.email, `📢 Mise à jour — ${nbCoureursNouv} coureurs dans l'équipe ${equipe} !`, htmlNotif);
+                    addLog(`📢 Notif promettant ${prom.email} — ${nbCoureursNouv} coureurs dans ${equipe}`, 'info');
+                  }
+                }
+              } catch(e) { addLog(`⚠️ Notif promettants équipe : ${e.message}`, 'warn'); }
+            }
+          }
 
         // ── Notifier les promettants de l'équipe si le coureur rejoint une équipe
         if (equipeC) {
@@ -3672,6 +3811,13 @@ app.post('/api/test-email', async (req, res) => {
     groupe_joue_jourj_coureurs:  { subject: '🧪 Test — 📢 Jour J Joué Coureurs',          html: tplGroupePlaceholder({ prenom: 'Sophie', nomTemplate: 'Jour J Coureurs Joué' }) },
     groupe_joue_jp1_coureurs:    { subject: '🧪 Test — 📢 J+1 Joué Coureurs',            html: tplGroupePlaceholder({ prenom: 'Sophie', nomTemplate: 'J+1 Coureurs Joué' }) },
     groupe_joue_jp10_coureurs:   { subject: '🧪 Test — 📢 J+10 Joué Coureurs',           html: tplGroupePlaceholder({ prenom: 'Sophie', nomTemplate: 'J+10 Coureurs Joué' }) },
+    // Nouveaux templates
+    merci_concretisation_promesse: { subject: '🧪 Test — 🙏 Concrétisation promesse coureur', html: tplMerciConcretisationPromesse({ prenomDonateur: 'Marie', montantDon: 29.60, montantParKm: 2, nomCible: 'Victor Vieilfault', typeCible: 'coureur', kmsParcourus: 14.8, montantCalcule: 29.60, urlPage: 'https://defienfance.fr' }) },
+    merci_concretisation_equipe:   { subject: '🧪 Test — 🙏 Concrétisation promesse équipe', html: tplMerciConcretisationPromesse({ prenomDonateur: 'Jean-Paul', montantDon: 99.55, montantParKm: 0.1, nomCible: 'FSDV', typeCible: 'equipe', kmsParcourus: 995.5, montantCalcule: 99.55, urlPage: 'https://defienfance.fr' }) },
+    groupe_jourj_promesses:        { subject: '🧪 Test — 🏁 Jour J promesses en dons',     html: tplGroupeJourJPromesses({ prenom: 'Marie', promesses: [{ type: 'coureur', nom: 'Victor Vieilfault', montantKm: 2, kmParcourus: 14.8, montantDu: 29.60, urlDon: 'https://defienfance.fr' }, { type: 'equipe', nom: 'FSDV', montantKm: 0.1, kmParcourus: 995.5, montantDu: 99.55, urlDon: 'https://defienfance.fr' }] }) },
+    groupe_merci_donateurs_angers: { subject: '🧪 Test — ❤️ Merci donateurs Angers',       html: tplGroupeMerciDonateurAngers({ prenom: 'Marie', historiqueHtml: '<div style="padding:8px 0;font-size:12px;color:#3d1830;border-bottom:1px solid #f5dced"><div><span style="color:#888;font-size:11px">15/03/2026</span><br><span style="color:#7c3aed;font-weight:600">🏃 Victor Vieilfault</span><br><span style="font-size:11px;color:#888">81e / 589 — 14.8 km</span></div><div style="font-weight:700;color:#fb0089">50.00 €</div></div>', totalDons: 50, nbDons: 1 }) },
+    groupe_merci_donateurs_joue:   { subject: '🧪 Test — ❤️ Merci donateurs Joué',         html: tplGroupeMerciDonateurJoue({ prenom: 'Jean-Paul', historiqueHtml: '<div style="padding:8px 0;font-size:12px;color:#3d1830"><span style="color:#888;font-size:11px">10/04/2026</span><br><span style="color:#888">Don général</span><div style="font-weight:700;color:#fb0089">40.00 €</div></div>', totalDons: 40, nbDons: 1 }) },
+    groupe_j2_referents_joue:      { subject: '🧪 Test — 🏃 Référents Joué boost collecte', html: tplGroupeJ2ReferentsJoue({ prenom: 'Sophie', nbJours: 3, urlPromesseEquipe: 'https://defienfance.fr', urlPageEquipe: 'https://defienfance.fr' }) },
   };
 
   const tpl = TEMPLATES[template] || TEMPLATES['don_coureur'];
@@ -3787,10 +3933,10 @@ app.post('/api/dons-attente/:paiementId/valider', async (req, res) => {
       const emailC  = contact?.email || '';
       if (emailC) {
         const html = tplPromesseCoureur({ coureurPrenom: coureurParraine.split(' ')[0], donateur, montantParKm: montantKm, email_donateur: emailDon, nbPromessesCoureur: 0, totalKmParCoureur: 0, nbPromessesEquipe: 0, totalKmParEquipe: 0 });
-        ok = await sendBrevo(emailC, `🏅 Promesse de don pour ton Défi Enfance !`, html);
+        ok = await sendBrevo(emailC, `🏅 ${donateur} promet ${montantKm}€/km pour toi — ${coureurPrenom} !`, html);
         if (ok) { state.stats.sent++; addLog(`✅ Promesse validée → coureur ${coureurParraine}`, 'ok'); }
         const htmlMerci = tplMerciPrometteurCoureur({ prenomDonateur: prenomPrometteur, montantParKm: montantKm, coureurPrenom: coureurParraine.split(' ')[0], coureurNom: coureurParraine.split(' ').slice(1).join(' ') });
-        const okMerci = await sendBrevo(emailDon, `🙏 Merci pour votre promesse de don au coureur ${coureurParraine.split(' ')[0]} !`, htmlMerci);
+        const okMerci = await sendBrevo(emailDon, `🙏 Merci pour votre promesse de ${montantKm}€/km pour ${coureurParraine} !`, htmlMerci);
         if (okMerci) { state.stats.sent++; }
 
         // 3. Email au référent d'équipe du coureur
@@ -3820,7 +3966,7 @@ app.post('/api/dons-attente/:paiementId/valider', async (req, res) => {
       const chefNom    = structure?.nom_du_referent_defi_enfance || '';
       if (chefEmail) {
         const html = tplPromesseEquipe({ chefPrenom, chefNom, nomEquipe: equipeParraine, donateur, montantParKm: montantKm, email_donateur: emailDon, nbPromessesEquipe: 0, totalKmParEquipe: 0 });
-        ok = await sendBrevo(chefEmail, `🏅 Promesse de don pour votre équipe !`, html);
+        ok = await sendBrevo(chefEmail, `🏅 Promesse de ${donateur} pour votre équipe ${equipeParraine} !`, html);
         if (ok) { state.stats.sent++; addLog(`✅ Promesse validée → équipe ${equipeParraine}`, 'ok'); }
       } else { return res.json({ success: false, error: `Équipe "${equipeParraine}" introuvable` }); }
     } else { return res.json({ success: false, error: 'Promesse non fléchée — mettez à jour dans Ohme' }); }
@@ -3835,7 +3981,7 @@ app.post('/api/dons-attente/:paiementId/valider', async (req, res) => {
       ok = await sendBrevo(emailC, '❤️ Nouveau don pour ton Défi Enfance !', html);
       if (ok) { state.stats.sent++; addLog(`✅ Don validé → ${coureurParraine}`, 'ok'); sendMerciDonateur({ email: emailDon, prenom: prenomMerciValider, montant, donateur, coureurPrenom: coureurParraine.split(' ')[0], coureurNom: coureurParraine.split(' ').slice(1).join(' '), association: (cf.asso_soutenue || '').trim(), contactId: paiement.contact_id, isStructure: infosValider.isStructure, nomStructure: infosValider.nomStructure }); }
       const equipe = await fetchEquipeCoureur(contact?.id);
-      if (equipe) { const s = await fetchOhmeStructureByName(equipe); if (s?.email_referent_defi_enfance) { const htmlE = tplDonEquipe({ chefPrenom: s.prenom_du_referent_defi_enfance || 'Bonjour', chefNom: s.nom_du_referent_defi_enfance || '', nomEquipe: equipe, donateur, montant, email_donateur: emailDon, coureurPrenom: coureurParraine.split(' ')[0], coureurNom: coureurParraine.split(' ').slice(1).join(' ') }); const okE = await sendBrevo(s.email_referent_defi_enfance, `❤️ Don de ${donateur} pour ${coureurParraine.split(' ')[0]} — équipe ${equipe} !`, htmlE); if (okE) { state.stats.sent++; } } }
+      if (equipe) { const s = await fetchOhmeStructureByName(equipe); if (s?.email_referent_defi_enfance) { const htmlE = tplDonEquipe({ chefPrenom: s.prenom_du_referent_defi_enfance || 'Bonjour', chefNom: s.nom_du_referent_defi_enfance || '', nomEquipe: equipe, donateur, montant, email_donateur: emailDon, coureurPrenom: coureurParraine.split(' ')[0], coureurNom: coureurParraine.split(' ').slice(1).join(' ') }); const okE = await sendBrevo(s.email_referent_defi_enfance, `❤️ Don de ${donateur} pour ${coureurParraine} — équipe ${equipe} !`, htmlE); if (okE) { state.stats.sent++; } } }
     } else { return res.json({ success: false, error: `Coureur "${coureurParraine}" introuvable` }); }
 
   } else if (equipeParraine) {
@@ -4798,9 +4944,10 @@ async function fetchDestinatairesAvecDons(typeDestinataire) {
             });
         if (contactCoureur) {
           const cfC = contactCoureur.custom_fields || contactCoureur;
-          kmsParraine   = parseFloat(cfC.km_parcourus_angers2026   || 0);
-          classParraine = parseInt(cfC.classement_angers2026        || 0);
-          equipeParraine2 = cfC.lequipe_defi_enfance_dont_je_suis_le_referent || '';
+          kmsParraine   = parseFloat(cfC.km_parcourus_angers2026 || 0);
+          classParraine = parseInt(cfC.classement_angers2026     || 0);
+          // Trouver l'équipe via equipeParContactId (paiements billetterie)
+          equipeParraine2 = equipeParContactId.get(String(contactCoureur.id)) || '';
         }
         // Fallback index codé en dur
         if (!kmsParraine) {
@@ -4853,6 +5000,44 @@ async function fetchDestinatairesAvecDons(typeDestinataire) {
 
   addLog(`✅ ${result.length} donateur(s) trouvés`, 'ok');
   return result;
+}
+
+// ── Vérifier si un don concrétise une promesse antérieure du même donateur
+async function verifierConcretisationPromesse(contactId, emailDon, coureurParraine, equipeParraine, eventName, dateDon) {
+  if (!contactId && !emailDon) return null;
+  try {
+    // Dates seuil selon l'événement
+    const normalize = s => s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+    const eventN = normalize(eventName);
+    const isAngers = eventN.includes('angers');
+    const isJoue   = eventN.includes('joue');
+    const dateSeuil = isAngers ? new Date('2026-05-22') : isJoue ? new Date('2026-05-29') : null;
+    if (!dateSeuil) return null;
+    const dateD = new Date(dateDon || Date.now());
+    if (dateD < dateSeuil) return null;
+
+    // Chercher les promesses du même contact sur le même coureur/équipe
+    await sleep(OHME_DELAY_MS);
+    const url = contactId
+      ? `${CONFIG.ohmeBase}/api/v1/payments?contact_id=${contactId}&limit=50&since_date=2025-01-01`
+      : `${CONFIG.ohmeBase}/api/v1/payments?limit=250&since_date=2025-01-01`;
+    const r = await fetchOhmeWithRetry(url, { headers: { 'Accept': 'application/json', 'client-name': CONFIG.ohmeClientName, 'client-secret': CONFIG.ohmeClientSecret } });
+    if (!r?.ok) return null;
+    const j = await r.json();
+    const paiements = j.data || [];
+
+    for (const pmt of paiements) {
+      const cf = pmt.custom_fields || pmt;
+      const montantKm = parseFloat(cf.montant_promesse_don_par_km || 0);
+      if (!montantKm) continue;
+      const coureurProm = (cf.coureur_parraine || '').trim();
+      const equipeProm  = (cf.equipe_parraine  || '').trim();
+      // Correspondance coureur ou équipe
+      if (coureurParraine && coureurProm && coureurProm.toLowerCase() === coureurParraine.toLowerCase()) return { montantKm, typeCible: 'coureur', nomCible: coureurParraine };
+      if (equipeParraine  && equipeProm  && equipeProm.toLowerCase()  === equipeParraine.toLowerCase())  return { montantKm, typeCible: 'equipe',  nomCible: equipeParraine };
+    }
+    return null;
+  } catch(e) { return null; }
 }
 
 // ── Récupérer les promettants avec leurs promesses pour Jour J
