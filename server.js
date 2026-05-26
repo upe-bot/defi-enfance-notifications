@@ -753,7 +753,7 @@ function tplPromesseEquipe({ chefPrenom, chefNom, nomEquipe, donateur, montantPa
  * Merci au prometteur (donateur) après sa promesse → coureur
  */
 
-function tplMerciConcretisationPromesse({ prenomDonateur, montantDon, montantParKm, nomCible, typeCible, kmsParcourus, montantCalcule, urlPage }) {
+function tplMerciConcretisationPromesse({ prenomDonateur, montantDon, montantParKm, nomCible, typeCible, kmsParcourus, montantCalcule, urlPage, motEncouragement, recapHtml }) {
   const valorisation = kmsParcourus > 0 ? (montantDon / kmsParcourus).toFixed(2) : null;
   const isCoureur = typeCible === 'coureur';
   const couleur = isCoureur ? '#7c3aed' : '#ef6135';
@@ -794,6 +794,8 @@ function tplMerciConcretisationPromesse({ prenomDonateur, montantDon, montantPar
 
 ${urlPage ? `<div style="text-align:center;margin-bottom:20px"><a href="${urlPage}" style="display:inline-block;background-color:${couleur};color:#fff;text-decoration:none;padding:11px 24px;border-radius:99px;font-weight:700;font-size:.84rem;font-family:Arial,sans-serif">${emoji} Voir la page de ${isCoureur ? nomCible : 'l\'équipe'}</a></div>` : ''}
 
+${motEncouragement ? `<div style="background-color:#fff0f8;border-left:3px solid #fb0089;border-radius:0 8px 8px 0;padding:12px 16px;margin-bottom:16px;font-size:.84rem;color:#3d1830;font-style:italic">💬 <strong>Votre message d'encouragement :</strong><br>${motEncouragement}</div>` : ''}
+${recapHtml || ''}
 ${BLOC_RECUS_FISCAUX}${BLOC_IFI}
 <div class="divider"></div>
 <div style="font-size:.84rem;color:#3d1830;text-align:center;font-style:italic;margin-bottom:6px">Merci d'avoir tenu votre promesse. On continue ensemble. 🤝</div>
@@ -805,7 +807,7 @@ ${BLOC_RECUS_FISCAUX}${BLOC_IFI}
 
 
 // ── Notification au coureur/référent quand une promesse est concrétisée
-function tplNotifConcretisationCoureur({ prenomCible, donateur, montantDon, montantParKm, kmsParcourus, urlPage }) {
+function tplNotifConcretisationCoureur({ prenomCible, donateur, montantDon, montantParKm, kmsParcourus, urlPage, motEncouragement, recapHtml }) {
   const couleur = '#7c3aed';
   return `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet"><style>${CSS_COMMUN}</style></head><body bgcolor="#f5f0f3" style="background-color:#f5f0f3;margin:0;padding:0"><table class="bg-wrap" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#f5f0f3" style="background-color:#f5f0f3"><tr><td align="center" bgcolor="#f5f0f3" style="background-color:#f5f0f3"><div class="outer">
 <div class="logo-header"><div class="logo-text">🤝 Défi Enfance</div><div class="logo-sub">Générateur de victoires pour l'enfance</div></div>
@@ -828,6 +830,8 @@ function tplNotifConcretisationCoureur({ prenomCible, donateur, montantDon, mont
 
 ${urlPage ? `<div style="text-align:center;margin-bottom:20px"><a href="${urlPage}" style="display:inline-block;background-color:${couleur};color:#fff;text-decoration:none;padding:11px 24px;border-radius:99px;font-weight:700;font-size:.84rem;font-family:Arial,sans-serif">🏃 Voir ma page de collecte</a></div>` : ''}
 
+${motEncouragement ? `<div style="background-color:#fff0f8;border-left:3px solid #fb0089;border-radius:0 8px 8px 0;padding:12px 16px;margin-bottom:16px;font-size:.84rem;color:#3d1830;font-style:italic">💬 <strong>Message d'encouragement :</strong><br>${motEncouragement}</div>` : ''}
+${recapHtml || ''}
 <div class="divider"></div>
 <div style="font-size:.84rem;color:#3d1830;text-align:center;font-style:italic;margin-bottom:6px">Merci pour votre engagement. On continue ensemble. 🤝</div>
 <div style="font-size:.82rem;color:#fb0089;font-weight:600;text-align:center">— Team Défi Enfance</div>
@@ -838,7 +842,7 @@ ${urlPage ? `<div style="text-align:center;margin-bottom:20px"><a href="${urlPag
 
 
 // ── Notification au référent d'équipe quand une promesse sur un de ses coureurs est concrétisée
-function tplNotifConcretisationReferent({ chefPrenom, nomEquipe, coureurPrenom, coureurNom, donateur, montantDon, montantParKm, kmsParcourus, urlPageEquipe }) {
+function tplNotifConcretisationReferent({ chefPrenom, nomEquipe, coureurPrenom, coureurNom, donateur, montantDon, montantParKm, kmsParcourus, urlPageEquipe, motEncouragement, recapHtml }) {
   const couleur = '#ef6135';
   const nomCoureur = `${coureurPrenom} ${coureurNom || ''}`.trim();
   return `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet"><style>${CSS_COMMUN}</style></head><body bgcolor="#f5f0f3" style="background-color:#f5f0f3;margin:0;padding:0"><table class="bg-wrap" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#f5f0f3" style="background-color:#f5f0f3"><tr><td align="center" bgcolor="#f5f0f3" style="background-color:#f5f0f3"><div class="outer">
@@ -864,6 +868,44 @@ function tplNotifConcretisationReferent({ chefPrenom, nomEquipe, coureurPrenom, 
 
 ${urlPageEquipe ? `<div style="text-align:center;margin-bottom:20px"><a href="${urlPageEquipe}" style="display:inline-block;background-color:${couleur};color:#fff;text-decoration:none;padding:11px 24px;border-radius:99px;font-weight:700;font-size:.84rem;font-family:Arial,sans-serif">🏆 Voir la page de mon équipe</a></div>` : ''}
 
+${motEncouragement ? `<div style="background-color:#fff5ef;border-left:3px solid #ef6135;border-radius:0 8px 8px 0;padding:12px 16px;margin-bottom:16px;font-size:.84rem;color:#3d1830;font-style:italic">💬 <strong>Message de ${donateur.split(' ')[0]} pour ${coureurPrenom} :</strong><br>${motEncouragement}</div>` : ''}
+${recapHtml || ''}
+<div class="divider"></div>
+<div style="font-size:.84rem;color:#3d1830;text-align:center;font-style:italic;margin-bottom:6px">Merci pour votre engagement. On continue ensemble. 🤝</div>
+<div style="font-size:.82rem;color:#fb0089;font-weight:600;text-align:center">— Team Défi Enfance</div>
+</div>
+<table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td bgcolor="#3d1830" style="background-color:#3d1830;padding:16px;text-align:center;border-radius:0 0 14px 14px"><div style="font-family:Arial,sans-serif;font-size:1.1rem;font-weight:700;color:#fb0089;letter-spacing:.08em;margin-bottom:6px">DÉFI ENFANCE</div><div style="font-size:.82rem;color:rgba(255,255,255,.5)">Générateur de victoires pour l'enfance · contact@defienfance.fr</div></td></tr></table>
+</div></td></tr></table></body></html>`;
+}
+
+
+function tplRelancePromesse({ prenomDonateur, montantKm, nomCible, typeCible, kmsParcourus, montantDu, urlDon }) {
+  const couleur = typeCible === 'coureur' ? '#7c3aed' : '#ef6135';
+  const emoji   = typeCible === 'coureur' ? '🏃' : '🏆';
+  const hasDu = montantDu > 0;
+  return `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet"><style>${CSS_COMMUN}</style></head><body bgcolor="#f5f0f3" style="background-color:#f5f0f3;margin:0;padding:0"><table class="bg-wrap" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#f5f0f3" style="background-color:#f5f0f3"><tr><td align="center" bgcolor="#f5f0f3" style="background-color:#f5f0f3"><div class="outer">
+<div class="logo-header"><div class="logo-text">🤝 Défi Enfance</div><div class="logo-sub">Générateur de victoires pour l'enfance</div></div>
+<table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td bgcolor="${couleur}" style="background-color:${couleur};padding:24px 32px;text-align:center;border-radius:0"><h1 style="font-family:Arial,sans-serif;font-size:1.2rem;font-weight:700;color:#fff;margin:0 0 6px">🏅 Votre promesse de don<br>attend d'être concrétisée !</h1><p style="font-size:.8rem;color:rgba(255,255,255,.8);margin:0">Défi Enfance · 2026</p></td></tr></table>
+<div class="body">
+<div style="font-size:1rem;font-weight:600;color:#3d1830;margin-bottom:12px">Bonjour ${prenomDonateur} 👋</div>
+<div style="font-size:.85rem;color:#3d1830;line-height:1.7;margin-bottom:20px">Vous avez promis <strong>${montantKm} €/km</strong> pour ${emoji} <strong>${nomCible}</strong> lors du Défi Enfance. La course est terminée — il est maintenant temps de concrétiser votre engagement ! 💪</div>
+
+<div style="background-color:#f9f7ff;border:2px solid ${couleur};border-radius:14px;padding:18px 22px;margin-bottom:20px">
+  <div style="font-size:.75rem;font-weight:700;color:${couleur};text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px">${emoji} Récapitulatif de votre promesse</div>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr><td style="padding:8px 0;border-bottom:1px solid #ede8ff;font-size:.84rem;color:#3d1830;text-align:left">Votre promesse</td><td style="padding:8px 0;border-bottom:1px solid #ede8ff;font-size:.84rem;font-weight:700;color:${couleur};text-align:right">${montantKm} €/km</td></tr>
+    ${kmsParcourus > 0 ? `<tr><td style="padding:8px 0;border-bottom:1px solid #ede8ff;font-size:.84rem;color:#3d1830;text-align:left">Km parcourus</td><td style="padding:8px 0;border-bottom:1px solid #ede8ff;font-size:.84rem;font-weight:700;color:#3d1830;text-align:right">${kmsParcourus} km</td></tr>` : ''}
+    ${hasDu ? `<tr><td style="padding:10px 0;font-size:.9rem;font-weight:700;color:#3d1830;text-align:left">Montant à donner</td><td style="padding:10px 0;font-size:1.2rem;font-weight:700;color:${couleur};text-align:right">${montantDu.toFixed(2)} €</td></tr>` : ''}
+  </table>
+</div>
+
+<div style="font-size:.85rem;color:#3d1830;line-height:1.7;margin-bottom:20px">Votre don, même symbolique, fait une vraie différence pour les enfants vulnérables soutenus par le Défi Enfance. <strong>Chaque promesse tenue renforce la confiance et l'élan collectif.</strong></div>
+
+<div style="text-align:center;margin-bottom:20px">
+  <a href="${urlDon}" style="display:inline-block;background-color:${couleur};color:#fff;text-decoration:none;padding:14px 32px;border-radius:99px;font-weight:700;font-size:.9rem;font-family:Arial,sans-serif">❤️ Je concrétise ma promesse${hasDu ? ' — ' + montantDu.toFixed(2) + ' €' : ''}</a>
+</div>
+
+${BLOC_RECUS_FISCAUX}${BLOC_IFI}
 <div class="divider"></div>
 <div style="font-size:.84rem;color:#3d1830;text-align:center;font-style:italic;margin-bottom:6px">Merci pour votre engagement. On continue ensemble. 🤝</div>
 <div style="font-size:.82rem;color:#fb0089;font-weight:600;text-align:center">— Team Défi Enfance</div>
@@ -3490,20 +3532,27 @@ async function processPayments(payments, ignoreDate = false) {
           const urlPromesseCoureur = await buildUrlPromesseCoureur(contact?.id, eventName);
           const html = tplDonCoureur({ coureurPrenom, donateur, montant, email_donateur: emailDon, association: assoSoutenue, motEncouragement, urlPageCoureur, urlPromesseCoureur });
           const ok = await sendBrevo(emailCoureur, `❤️ [live] ${prenomMerci || donateur.split(' ')[0]} a fait un don pour vous !`, html);
-          if (ok) { state.stats.sent++; addLog(`✅ Don ${montant}€ → ${coureurParraine}`, 'ok'); addEvent('❤️', `Don de ${montant} €`, `${donateur} → ${coureurParraine}`, 'don'); sendMerciDonateur({ email: emailDon, prenom: prenomMerci || donateur.split(' ')[0], montant, donateur, coureurPrenom, coureurNom: coureurParraine.split(' ').slice(1).join(' '), association: assoSoutenue, contactId: p.contact_id, isStructure, nomStructure }); }
-          // Vérifier si ce don concrétise une promesse antérieure
+          // Vérifier si ce don concrétise une promesse antérieure (avant d'envoyer le merci classique)
           const concretCoureur = await verifierConcretisationPromesse(p.contact_id, emailDon, coureurParraine, null, eventName, p.date);
+          if (ok) { state.stats.sent++; addLog(`✅ Don ${montant}€ → ${coureurParraine}`, 'ok'); addEvent('❤️', `Don de ${montant} €`, `${donateur} → ${coureurParraine}`, 'don'); }
+          // Envoyer merci donateur classique SEULEMENT si ce n'est pas une concrétisation
+          if (ok && !concretCoureur) { sendMerciDonateur({ email: emailDon, prenom: prenomMerci || donateur.split(' ')[0], montant, donateur, coureurPrenom, coureurNom: coureurParraine.split(' ').slice(1).join(' '), association: assoSoutenue, contactId: p.contact_id, isStructure, nomStructure }); }
           if (concretCoureur && emailDon) {
             const cfContact = contact?.custom_fields || contact || {};
             const kmsParcourus = parseFloat(cfContact.km_parcourus_angers2026 || cfContact.km_parcourus_joue2026 || 0);
             const montantCalcule = kmsParcourus > 0 ? concretCoureur.montantKm * kmsParcourus : 0;
+            // Récupérer récap + mot d'encouragement
+            const { motEncouragement: motC, recapHtml: recapC } = await buildRecapDonateurCible(p.contact_id, coureurParraine, 'coureur', eventName);
             // Email au donateur
-            const htmlConcret = tplMerciConcretisationPromesse({ prenomDonateur: prenomMerci || donateur.split(' ')[0], montantDon: parseFloat(montant), montantParKm: concretCoureur.montantKm, nomCible: coureurParraine, typeCible: 'coureur', kmsParcourus, montantCalcule, urlPage: urlPageCoureur });
+            const htmlConcret = tplMerciConcretisationPromesse({ prenomDonateur: prenomMerci || donateur.split(' ')[0], montantDon: parseFloat(montant), montantParKm: concretCoureur.montantKm, nomCible: coureurParraine, typeCible: 'coureur', kmsParcourus, montantCalcule, urlPage: urlPageCoureur, motEncouragement: motC, recapHtml: recapC });
             const okC = await sendBrevo(emailDon, `🙏 Merci d'avoir concrétisé votre promesse pour ${coureurPrenom} !`, htmlConcret);
             if (okC) addLog(`✅ Email concrétisation promesse → ${donateur} (${coureurParraine})`, 'ok');
+            // Marquer la promesse comme concrétisée dans l'état mémoire
+            const promItem = promessesState.items.find(pr => !pr.concretise && String(pr.contactId) === String(p.contact_id) && pr.cible.toLowerCase() === coureurParraine.toLowerCase());
+            if (promItem) { promItem.concretise = true; promItem.dateDon = p.date; promItem.montantDon = parseFloat(montant); }
             // Email au coureur parrainé
             if (emailCoureur) {
-              const htmlNotifCoureur = tplNotifConcretisationCoureur({ prenomCible: coureurPrenom, donateur, montantDon: parseFloat(montant), montantParKm: concretCoureur.montantKm, kmsParcourus, urlPage: urlPageCoureur });
+              const htmlNotifCoureur = tplNotifConcretisationCoureur({ prenomCible: coureurPrenom, donateur, montantDon: parseFloat(montant), montantParKm: concretCoureur.montantKm, kmsParcourus, urlPage: urlPageCoureur, motEncouragement: motC, recapHtml: recapC });
               const okN = await sendBrevo(emailCoureur, `🎉 ${donateur.split(' ')[0]} a concrétisé sa promesse de don pour toi !`, htmlNotifCoureur);
               if (okN) addLog(`✅ Notif concrétisation → coureur ${coureurPrenom}`, 'ok');
             }
@@ -3516,7 +3565,7 @@ async function processPayments(payments, ignoreDate = false) {
               const urlPageEquipeC2 = await buildUrlPageEquipe(null, equipeC, eventName);
               if (chefEmailC) {
                 const coureurNomC = coureurParraine.split(' ').slice(1).join(' ');
-                const htmlNotifRef = tplNotifConcretisationReferent({ chefPrenom: chefPrenomC, nomEquipe: equipeC, coureurPrenom, coureurNom: coureurNomC, donateur, montantDon: parseFloat(montant), montantParKm: concretCoureur.montantKm, kmsParcourus, urlPageEquipe: urlPageEquipeC2 });
+                const htmlNotifRef = tplNotifConcretisationReferent({ chefPrenom: chefPrenomC, nomEquipe: equipeC, coureurPrenom, coureurNom: coureurNomC, donateur, montantDon: parseFloat(montant), montantParKm: concretCoureur.montantKm, kmsParcourus, urlPageEquipe: urlPageEquipeC2, motEncouragement: motC, recapHtml: recapC });
                 const okR = await sendBrevo(chefEmailC, `🎉 ${donateur.split(' ')[0]} a concrétisé sa promesse pour ${coureurPrenom} — équipe ${equipeC} !`, htmlNotifRef);
                 if (okR) addLog(`✅ Notif concrétisation → référent équipe ${equipeC}`, 'ok');
               }
@@ -3545,21 +3594,28 @@ async function processPayments(payments, ignoreDate = false) {
           const urlPageEquipeDirect = await buildUrlPageEquipe(null, equipeParraine, eventName);
           const html = tplDonEquipe({ chefPrenom, chefNom, nomEquipe: equipeParraine, donateur, montant, email_donateur: emailDon, motEncouragement, urlPageEquipe: urlPageEquipeDirect });
           const ok = await sendBrevo(chefEmail, `❤️ Don pour votre équipe de ${donateur} !`, html);
-          if (ok) { state.stats.sent++; addLog(`✅ Don ${montant}€ → équipe ${equipeParraine}`, 'ok'); addEvent('🏆', `Don ${montant}€ équipe`, `${donateur} → ${equipeParraine}`, 'don'); sendMerciDonateur({ email: emailDon, prenom: prenomMerci || donateur.split(' ')[0], montant, donateur, nomEquipe: equipeParraine, contactId: p.contact_id, isStructure, nomStructure }); }
           // Vérifier si ce don concrétise une promesse antérieure sur l'équipe
           const concretEquipe = await verifierConcretisationPromesse(p.contact_id, emailDon, null, equipeParraine, eventName, p.date);
+          if (ok) { state.stats.sent++; addLog(`✅ Don ${montant}€ → équipe ${equipeParraine}`, 'ok'); addEvent('🏆', `Don ${montant}€ équipe`, `${donateur} → ${equipeParraine}`, 'don'); }
+          // Envoyer merci donateur classique SEULEMENT si ce n'est pas une concrétisation
+          if (ok && !concretEquipe) { sendMerciDonateur({ email: emailDon, prenom: prenomMerci || donateur.split(' ')[0], montant, donateur, nomEquipe: equipeParraine, contactId: p.contact_id, isStructure, nomStructure }); }
           if (concretEquipe && emailDon) {
             const cfStruct2 = structure?.custom_fields || structure || {};
             const kmsEquipe = parseFloat(cfStruct2.km_parcourus_equipe_angers_2026 || 0);
             const montantCalcule2 = kmsEquipe > 0 ? concretEquipe.montantKm * kmsEquipe : 0;
             const urlPageEquipeC = await buildUrlPageEquipe(null, equipeParraine, eventName);
+            // Récupérer récap + mot d'encouragement
+            const { motEncouragement: motE, recapHtml: recapE } = await buildRecapDonateurCible(p.contact_id, equipeParraine, 'equipe', eventName);
             // Email au donateur
-            const htmlConcret2 = tplMerciConcretisationPromesse({ prenomDonateur: prenomMerci || donateur.split(' ')[0], montantDon: parseFloat(montant), montantParKm: concretEquipe.montantKm, nomCible: equipeParraine, typeCible: 'equipe', kmsParcourus: kmsEquipe, montantCalcule: montantCalcule2, urlPage: urlPageEquipeC });
+            const htmlConcret2 = tplMerciConcretisationPromesse({ prenomDonateur: prenomMerci || donateur.split(' ')[0], montantDon: parseFloat(montant), montantParKm: concretEquipe.montantKm, nomCible: equipeParraine, typeCible: 'equipe', kmsParcourus: kmsEquipe, montantCalcule: montantCalcule2, urlPage: urlPageEquipeC, motEncouragement: motE, recapHtml: recapE });
             const okC2 = await sendBrevo(emailDon, `🙏 Merci d'avoir concrétisé votre promesse pour l'équipe ${equipeParraine} !`, htmlConcret2);
             if (okC2) addLog(`✅ Email concrétisation promesse → ${donateur} (équipe ${equipeParraine})`, 'ok');
+            // Marquer la promesse comme concrétisée dans l'état mémoire
+            const promItem2 = promessesState.items.find(pr => !pr.concretise && String(pr.contactId) === String(p.contact_id) && pr.cible.toLowerCase() === equipeParraine.toLowerCase());
+            if (promItem2) { promItem2.concretise = true; promItem2.dateDon = p.date; promItem2.montantDon = parseFloat(montant); }
             // Email au référent d'équipe
             if (chefEmail) {
-              const htmlNotifRef2 = tplNotifConcretisationCoureur({ prenomCible: chefPrenom, donateur, montantDon: parseFloat(montant), montantParKm: concretEquipe.montantKm, kmsParcourus: kmsEquipe, urlPage: urlPageEquipeC });
+              const htmlNotifRef2 = tplNotifConcretisationCoureur({ prenomCible: chefPrenom, donateur, montantDon: parseFloat(montant), montantParKm: concretEquipe.montantKm, kmsParcourus: kmsEquipe, urlPage: urlPageEquipeC, motEncouragement: motE, recapHtml: recapE });
               const okR2 = await sendBrevo(chefEmail, `🎉 ${donateur.split(' ')[0]} a concrétisé sa promesse de don pour l'équipe ${equipeParraine} !`, htmlNotifRef2);
               if (okR2) addLog(`✅ Notif concrétisation → référent équipe ${equipeParraine}`, 'ok');
             }
@@ -3906,6 +3962,7 @@ app.post('/api/test-email', async (req, res) => {
     groupe_j2_referents_joue:    { subject: '🧪 Test — 🏃 Référents Joué boost collecte',   html: tplGroupeJ2ReferentsJoue({ prenom: 'Sophie', nbJours: 3, urlPromesseEquipe: URL_PROMESSE_FALLBACK, urlPageEquipe: URL_EQUIPES }) },
     groupe_merci_donateurs_joue: { subject: '🧪 Test — ❤️ Merci donateurs Joué',            html: tplGroupeMerciDonateurJoue({ prenom: 'Jean-Paul', historiqueHtml: '', totalDons: 40, nbDons: 1 }) },
     // Concrétisation promesse
+    relance_promesse:              { subject: '🧪 Test — 🏅 Relance promesse de don',             html: tplRelancePromesse({ prenomDonateur: 'Marie', montantKm: 2, nomCible: 'Victor Vieilfault', typeCible: 'coureur', kmsParcourus: 14.8, montantDu: 29.60, urlDon: URL_COUREURS }) },
     notif_concretisation_coureur:  { subject: '🧪 Test — 🎉 Notif concrétisation → coureur',   html: tplNotifConcretisationCoureur({ prenomCible: 'Victor', donateur: 'Marie Dupont', montantDon: 29.60, montantParKm: 2, kmsParcourus: 14.8, urlPage: 'https://defienfance.fr' }) },
     notif_concretisation_referent: { subject: '🧪 Test — 🎉 Notif concrétisation → référent équipe', html: tplNotifConcretisationReferent({ chefPrenom: 'Sophie', nomEquipe: 'FSDV', coureurPrenom: 'Victor', coureurNom: 'Vieilfault', donateur: 'Jean-Paul Martin', montantDon: 29.60, montantParKm: 2, kmsParcourus: 14.8, urlPageEquipe: 'https://defienfance.fr' }) },
     merci_concretisation_promesse: { subject: '🧪 Test — 🙏 Concrétisation promesse coureur', html: tplMerciConcretisationPromesse({ prenomDonateur: 'Marie', montantDon: 29.60, montantParKm: 2, nomCible: 'Victor Vieilfault', typeCible: 'coureur', kmsParcourus: 14.8, montantCalcule: 29.60, urlPage: 'https://defienfance.fr' }) },
@@ -4878,6 +4935,96 @@ async function fetchDestinataires({ typeDestinataire, filtreEquipe, depuisFrance
   return destinataires;
 }
 
+// ── État des promesses de don (reconstruit au démarrage)
+const promessesState = {
+  items: [], // { id, event, eventLabel, donateur, email, contactId, cible, typeCible, montantKm, dateProm, concretise, dateDon, montantDon }
+  loaded: false,
+};
+
+async function chargerPromesses() {
+  if (promessesState.loaded) return;
+  addLog('📋 Chargement des promesses de don…', 'info');
+  let cursor = null;
+  const DATE_SEUIL_ANGERS = new Date('2026-05-22');
+  const DATE_SEUIL_JOUE   = new Date('2026-05-29');
+
+  // Charger tous les paiements type 1 avec promesse_don_par_km > 0
+  const promesses = [];
+  while (true) {
+    await sleep(OHME_DELAY_MS);
+    const url = cursor
+      ? `${CONFIG.ohmeBase}/api/v1/payments?payment_type_id=1&limit=250&since_date=2025-01-01&cursor=${encodeURIComponent(cursor)}`
+      : `${CONFIG.ohmeBase}/api/v1/payments?payment_type_id=1&limit=250&since_date=2025-01-01`;
+    const r = await fetchOhmeWithRetry(url, { headers: { 'Accept': 'application/json', 'client-name': CONFIG.ohmeClientName, 'client-secret': CONFIG.ohmeClientSecret } });
+    if (!r?.ok) break;
+    const j = await r.json();
+    const items = j.data || [];
+    for (const p of items) {
+      const cf = p.custom_fields || p;
+      const montantKm = parseFloat(cf.montant_promesse_don_par_km || 0);
+      if (!montantKm) continue;
+      const eventNom = (p.nom_de_levent || cf.nom_de_levent || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+      const isAngers = eventNom.includes('angers2026') || eventNom.includes('global');
+      const isJoue   = eventNom.includes('joue');
+      if (!isAngers && !isJoue) continue;
+      const cible     = (cf.coureur_parraine || cf.equipe_parraine || '').trim();
+      const typeCible = cf.coureur_parraine ? 'coureur' : 'equipe';
+      if (!cible) continue;
+      // Récupérer infos contact
+      let donateur = '', email = '', contactId = p.contact_id;
+      const contact = contactsCache.get(String(p.contact_id || ''));
+      if (contact) {
+        donateur = `${contact.firstname || ''} ${contact.lastname || ''}`.trim();
+        email = contact.email || '';
+      }
+      promesses.push({
+        id: p.id, event: isAngers ? 'angers' : 'joue',
+        eventLabel: isAngers ? 'Angers' : 'Joué',
+        donateur, email, contactId,
+        cible, typeCible, montantKm,
+        dateProm: p.date || p.created_at,
+        concretise: false, dateDon: null, montantDon: null,
+      });
+    }
+    if (items.length < 250) break;
+    cursor = j.cursor || (items.length > 0 ? String(items[items.length - 1].id) : null);
+    if (!cursor) break;
+  }
+
+  // Vérifier les concrétisations — chercher un don (type 1 sans montant_promesse_don_par_km)
+  // du même contact sur la même cible après la date seuil
+  await sleep(OHME_DELAY_MS);
+  const rDons = await fetchOhmeWithRetry(`${CONFIG.ohmeBase}/api/v1/payments?payment_type_id=1&limit=250&since_date=2026-05-22`, {
+    headers: { 'Accept': 'application/json', 'client-name': CONFIG.ohmeClientName, 'client-secret': CONFIG.ohmeClientSecret }
+  });
+  if (rDons?.ok) {
+    const jDons = await rDons.json();
+    const dons = (jDons.data || []).filter(d => !parseFloat((d.custom_fields || d).montant_promesse_don_par_km || 0));
+    for (const prom of promesses) {
+      const seuil = prom.event === 'angers' ? DATE_SEUIL_ANGERS : DATE_SEUIL_JOUE;
+      const don = dons.find(d => {
+        const cf = d.custom_fields || d;
+        const dateDon = new Date(d.date || d.created_at || 0);
+        if (dateDon < seuil) return false;
+        if (String(d.contact_id) !== String(prom.contactId)) return false;
+        const cibleDon = (cf.coureur_parraine || cf.equipe_parraine || '').trim().toLowerCase();
+        return cibleDon === prom.cible.toLowerCase();
+      });
+      if (don) {
+        prom.concretise = true;
+        prom.dateDon = don.date || don.created_at;
+        prom.montantDon = parseFloat(don.amount || 0);
+      }
+    }
+  }
+
+  promessesState.items = promesses;
+  promessesState.loaded = true;
+  const nb = promesses.length;
+  const nbC = promesses.filter(p => p.concretise).length;
+  addLog(`✅ ${nb} promesse(s) chargée(s) — ${nbC} concrétisée(s)`, 'ok');
+}
+
 // ── Cache bulk des structures par nom (chargé en une seule pagination)
 const structuresParNom = new Map(); // nomStructure → structure
 
@@ -5097,6 +5244,66 @@ async function fetchDestinatairesAvecDons(typeDestinataire) {
 }
 
 // ── Vérifier si un don concrétise une promesse antérieure du même donateur
+
+// ── Construire le récap dons + promesses d'un donateur pour les emails de concrétisation
+async function buildRecapDonateurCible(contactId, cible, typeCible, eventName) {
+  try {
+    await sleep(OHME_DELAY_MS);
+    const url = `${CONFIG.ohmeBase}/api/v1/payments?contact_id=${contactId}&payment_type_id=1&limit=50&since_date=2025-01-01`;
+    const r = await fetchOhmeWithRetry(url, { headers: { 'Accept': 'application/json', 'client-name': CONFIG.ohmeClientName, 'client-secret': CONFIG.ohmeClientSecret } });
+    if (!r?.ok) return { motEncouragement: '', recapHtml: '' };
+    const j = await r.json();
+    const paiements = j.data || [];
+
+    const normalize = s => s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    const isAngers = normalize(eventName).includes('angers');
+    const DATE_SEUIL = isAngers ? new Date('2026-05-22') : new Date('2026-05-29');
+
+    let motEncouragement = '';
+    const lignes = [];
+
+    for (const p of paiements) {
+      const cf = p.custom_fields || p;
+      const montantKm = parseFloat(cf.montant_promesse_don_par_km || 0);
+      const montant   = parseFloat(p.amount || 0);
+      const cibleP    = (cf.coureur_parraine || cf.equipe_parraine || '').trim();
+      const dateP     = new Date(p.date || p.created_at || 0);
+      const dateStr   = dateP.toLocaleDateString('fr-FR');
+
+      // Mot d'encouragement sur le paiement concerné
+      if (!motEncouragement && cf.mot_encouragement_sur_mur && cibleP.toLowerCase() === cible.toLowerCase()) {
+        motEncouragement = cf.mot_encouragement_sur_mur;
+      }
+
+      if (montantKm > 0 && cibleP) {
+        // C'est une promesse
+        const estConcretisee = dateP >= DATE_SEUIL && cibleP.toLowerCase() === cible.toLowerCase() ? false : false;
+        // Vérifier concrétisation dans promessesState
+        const promState = promessesState.items.find(pr => String(pr.contactId) === String(contactId) && pr.cible.toLowerCase() === cibleP.toLowerCase());
+        const check = promState?.concretise ? '✅' : '⏳';
+        lignes.push(`<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #ede8ff;font-size:.8rem;color:#3d1830">
+          <div><span style="font-size:.72rem;color:#888">${dateStr}</span><br>${typeCible === 'coureur' ? '🏃' : '🏆'} <strong>${cibleP}</strong> — Promesse <span style="color:#7c3aed;font-weight:700">${montantKm} €/km</span> ${check}</div>
+        </div>`);
+      } else if (montant > 0 && cibleP) {
+        // C'est un don direct
+        const emoji = typeCible === 'coureur' ? '🏃' : '🏆';
+        lignes.push(`<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #ede8ff;font-size:.8rem;color:#3d1830">
+          <div><span style="font-size:.72rem;color:#888">${dateStr}</span><br>${emoji} <strong>${cibleP}</strong> — Don</div>
+          <div style="font-weight:700;color:#fb0089;white-space:nowrap;padding-left:8px">${montant.toFixed(2)} €</div>
+        </div>`);
+      }
+    }
+
+    const recapHtml = lignes.length ? `
+<div style="background-color:#f9f7ff;border:1.5px solid rgba(124,58,237,0.2);border-radius:10px;padding:14px 18px;margin-bottom:16px">
+  <div style="font-size:.72rem;font-weight:700;color:#7c3aed;text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">📋 Vos dons & promesses au Défi Enfance</div>
+  ${lignes.join('')}
+</div>` : '';
+
+    return { motEncouragement, recapHtml };
+  } catch(e) { return { motEncouragement: '', recapHtml: '' }; }
+}
+
 async function verifierConcretisationPromesse(contactId, emailDon, coureurParraine, equipeParraine, eventName, dateDon) {
   if (!contactId && !emailDon) return null;
   try {
@@ -5741,6 +5948,69 @@ app.post('/api/envoi-groupe/start', async (req, res) => {
   })();
 });
 
+// ── POST /api/promesses/:idx/relancer — envoyer email de relance à un promettant
+app.post('/api/promesses/:idx/relancer', requireAuth, async (req, res) => {
+  const idx = parseInt(req.params.idx);
+  const prom = promessesState.items[idx];
+  if (!prom) return res.json({ success: false, error: 'Promesse introuvable' });
+  if (prom.concretise) return res.json({ success: false, error: 'Déjà concrétisée' });
+  if (!prom.email) return res.json({ success: false, error: 'Email donateur manquant' });
+
+  try {
+    // Récupérer les kms et montant calculé
+    let kmsParcourus = 0, urlDon = URL_COUREURS;
+    if (prom.typeCible === 'coureur') {
+      const contact = [...contactsCache.values()].find(c => {
+        const n = `${c.firstname||''} ${c.lastname||''}`.trim();
+        return n.toLowerCase() === prom.cible.toLowerCase();
+      });
+      if (contact) {
+        const cf = contact.custom_fields || contact;
+        kmsParcourus = parseFloat(cf.km_parcourus_angers2026 || cf.km_parcourus_joue2026 || 0);
+        urlDon = await buildUrlPageCoureur(contact.id, prom.event === 'angers' ? 'Défi Enfance #Course #Angers2026' : 'DÉFI ENFANCE #COURSE #JOUÉ-LÈS-TOURS2026');
+      }
+    } else {
+      const structure = structuresParNom.get(prom.cible) || structuresParNom.get(prom.cible.toLowerCase());
+      if (structure) {
+        const cfS = structure.custom_fields || structure;
+        kmsParcourus = parseFloat(cfS.km_parcourus_equipe_angers_2026 || 0);
+        urlDon = await buildUrlPageEquipe(null, prom.cible, prom.event === 'angers' ? 'Défi Enfance #Course #Angers2026' : 'DÉFI ENFANCE #COURSE #JOUÉ-LÈS-TOURS2026');
+      }
+    }
+    const montantDu = kmsParcourus > 0 ? Math.round(kmsParcourus * prom.montantKm * 100) / 100 : 0;
+
+    const html = tplRelancePromesse({ prenomDonateur: prom.donateur.split(' ')[0] || 'Cher donateur', montantKm: prom.montantKm, nomCible: prom.cible, typeCible: prom.typeCible, kmsParcourus, montantDu, urlDon: urlDon || URL_COUREURS });
+    const sujet = `🏅 ${prom.donateur.split(' ')[0]}, votre promesse de ${prom.montantKm}€/km pour ${prom.cible} attend d'être concrétisée !`;
+    const ok = await sendBrevo(prom.email, sujet, html);
+    if (ok) {
+      addLog(`✅ Relance promesse envoyée à ${prom.email} (${prom.cible})`, 'ok');
+      res.json({ success: true });
+    } else {
+      res.json({ success: false, error: 'Erreur envoi Brevo' });
+    }
+  } catch(e) {
+    res.json({ success: false, error: e.message });
+  }
+});
+
+// ── GET /api/promesses — liste des promesses avec statut
+app.get('/api/promesses', requireAuth, async (req, res) => {
+  if (!promessesState.loaded) {
+    await chargerContactsBulk();
+    await chargerPromesses();
+  }
+  res.json({ success: true, items: promessesState.items, total: promessesState.items.length, concretises: promessesState.items.filter(p => p.concretise).length });
+});
+
+// ── POST /api/promesses/reload — recharger depuis Ohme
+app.post('/api/promesses/reload', requireAuth, async (req, res) => {
+  promessesState.loaded = false;
+  promessesState.items = [];
+  await chargerContactsBulk();
+  await chargerPromesses();
+  res.json({ success: true, total: promessesState.items.length, concretises: promessesState.items.filter(p => p.concretise).length });
+});
+
 // ── POST /api/envoi-groupe/test-contact — envoyer à un email de choix avant l'envoi général
 app.post('/api/envoi-groupe/test-contact', async (req, res) => {
   const { template, typeDestinataire, filtreEquipe, depuisFrance, nbJours, emailTest } = req.body;
@@ -5921,5 +6191,12 @@ app.listen(PORT, () => {
 });
 
 initFromRedis();
+// Charger les promesses au démarrage (silencieux, après 10s pour laisser Redis se connecter)
+setTimeout(async () => {
+  try {
+    await chargerContactsBulk();
+    await chargerPromesses();
+  } catch(e) { addLog(`⚠️ Chargement promesses : ${e.message}`, 'warn'); }
+}, 10000);
 // Construire l'index équipes après init Redis (délai pour laisser Redis se connecter)
 setTimeout(() => buildEquipeIndex().catch(e => addLog(`⚠️ buildEquipeIndex erreur : ${e.message}`, 'warn')), 5000);
