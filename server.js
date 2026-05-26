@@ -2786,6 +2786,83 @@ ${BLOC_TEMOIGNAGES}${BLOC_SOCIAUX}${BLOC_IFI}${BLOC_RECUS_FISCAUX}<div class="di
 </div><div class="footer"><div style="font-family:Arial,sans-serif;font-size:1.1rem;font-weight:700;color:#fb0089;letter-spacing:.08em;margin-bottom:6px">DÉFI ENFANCE</div><div class="footer-sub">Générateur de victoires pour l'enfance<br>contact@defienfance.fr</div></div></div></td></tr></table></body></html>`;
 }
 
+
+function tplInscriptionReferentEquipe({ chefPrenom, nomEquipe, coureur, emailCoureur, nomAsso, urlPageCoureur }) {
+  return `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet"><style>${CSS_COMMUN}</style></head><body bgcolor="#f5f0f3" style="background-color:#f5f0f3;margin:0;padding:0"><table class="bg-wrap" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#f5f0f3" style="background-color:#f5f0f3"><tr><td align="center" bgcolor="#f5f0f3" style="background-color:#f5f0f3"><div class="outer">
+<div class="logo-header"><div class="logo-text">🤝 Défi Enfance</div><div class="logo-sub">Générateur de victoires pour l'enfance</div></div>
+<table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td bgcolor="#ef6135" style="background-color:#ef6135;padding:24px 32px;text-align:center;border-radius:0"><h1 style="font-family:Arial,sans-serif;font-size:1.2rem;font-weight:700;color:#fff;margin:0 0 6px">🏃 Nouveau coureur<br>dans votre équipe !</h1><p style="font-size:.8rem;color:rgba(255,255,255,.8);margin:0">Défi Enfance · 2026</p></td></tr></table>
+<div class="body">
+<div style="font-size:1rem;font-weight:600;color:#3d1830;margin-bottom:12px;text-align:left">Bonjour ${chefPrenom} 👋</div>
+<div style="font-size:.85rem;color:#3d1830;line-height:1.7;margin-bottom:20px;text-align:left">Excellente nouvelle pour l'équipe <strong>${nomEquipe}</strong> ! <strong>${coureur}</strong> vient de rejoindre vos rangs pour le Défi Enfance. Votre équipe s'agrandit — et la collecte aussi !</div>
+
+<div style="background-color:#fff5ef;border:2px solid #ef6135;border-radius:12px;padding:16px 20px;margin-bottom:20px;text-align:left">
+  <div style="font-size:.75rem;font-weight:700;color:#ef6135;text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">🏃 Nouveau membre de l'équipe</div>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr><td style="padding:6px 0;border-bottom:1px solid #fde8d8;font-size:.84rem;color:#3d1830">Nom</td><td style="padding:6px 0;border-bottom:1px solid #fde8d8;font-size:.84rem;font-weight:700;color:#3d1830;text-align:right">${coureur}</td></tr>
+    ${emailCoureur ? `<tr><td style="padding:6px 0;border-bottom:1px solid #fde8d8;font-size:.84rem;color:#3d1830">Email</td><td style="padding:6px 0;border-bottom:1px solid #fde8d8;font-size:.84rem;color:#7c3aed;text-align:right"><a href="mailto:${emailCoureur}" style="color:#7c3aed">${emailCoureur}</a></td></tr>` : ''}
+    ${nomAsso ? `<tr><td style="padding:6px 0;font-size:.84rem;color:#3d1830">Association soutenue</td><td style="padding:6px 0;font-size:.84rem;font-weight:700;color:#fb0089;text-align:right">${nomAsso}</td></tr>` : ''}
+  </table>
+</div>
+
+<div style="font-size:.85rem;color:#3d1830;line-height:1.7;margin-bottom:20px;text-align:left">N'hésitez pas à <strong>contacter ${coureur.split(' ')[0]} directement</strong> pour l'inviter à mobiliser son réseau et maximiser la collecte de votre équipe. Chaque nouveau coureur est une opportunité supplémentaire de faire grimper votre compteur de solidarité !</div>
+
+${urlPageCoureur ? `<div style="text-align:center;margin-bottom:20px"><a href="${urlPageCoureur}" style="display:inline-block;background-color:#ef6135;color:#fff;text-decoration:none;padding:11px 24px;border-radius:99px;font-weight:700;font-size:.84rem;font-family:Arial,sans-serif">🏃 Voir la page de collecte de ${coureur.split(' ')[0]}</a></div>` : ''}
+
+<div class="divider"></div>
+<div style="font-size:.84rem;color:#3d1830;text-align:center;font-style:italic;margin-bottom:6px">Ensemble pour l'enfance. 🤝</div>
+<div style="font-size:.82rem;color:#fb0089;font-weight:600;text-align:center">— Team Défi Enfance</div>
+</div>
+<table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td bgcolor="#3d1830" style="background-color:#3d1830;padding:16px;text-align:center;border-radius:0 0 14px 14px"><div style="font-family:Arial,sans-serif;font-size:1.1rem;font-weight:700;color:#fb0089;letter-spacing:.08em;margin-bottom:6px">DÉFI ENFANCE</div><div style="font-size:.82rem;color:rgba(255,255,255,.5)">Générateur de victoires pour l'enfance · contact@defienfance.fr</div></td></tr></table>
+</div></td></tr></table></body></html>`;
+}
+
+
+function tplInscriptionReferentAsso({ prenomRef, nomAsso, coureur, emailCoureur, urlPageCoureur }) {
+  return `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet"><style>${CSS_COMMUN}</style></head><body bgcolor="#f5f0f3" style="background-color:#f5f0f3;margin:0;padding:0"><table class="bg-wrap" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#f5f0f3" style="background-color:#f5f0f3"><tr><td align="center" bgcolor="#f5f0f3" style="background-color:#f5f0f3"><div class="outer">
+<div class="logo-header"><div class="logo-text">🤝 Défi Enfance</div><div class="logo-sub">Générateur de victoires pour l'enfance</div></div>
+<table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td bgcolor="#fb0089" style="background-color:#fb0089;padding:24px 32px;text-align:center;border-radius:0"><h1 style="font-family:Arial,sans-serif;font-size:1.2rem;font-weight:700;color:#fff;margin:0 0 6px">❤️ Un coureur court<br>pour votre association !</h1><p style="font-size:.8rem;color:rgba(255,255,255,.8);margin:0">Défi Enfance · 2026</p></td></tr></table>
+<div class="body">
+<div style="font-size:1rem;font-weight:600;color:#3d1830;margin-bottom:12px;text-align:left">Bonjour ${prenomRef} 👋</div>
+<div style="font-size:.85rem;color:#3d1830;line-height:1.7;margin-bottom:20px;text-align:left">Très bonne nouvelle pour <strong>${nomAsso}</strong> ! <strong>${coureur}</strong> vient de s'inscrire au Défi Enfance et a choisi de courir pour votre association. Tous les dons et promesses de don générés sur son dossard vous soutiennent directement !</div>
+
+<div style="background-color:#fff0f8;border:2px solid #fb0089;border-radius:12px;padding:16px 20px;margin-bottom:20px;text-align:left">
+  <div style="font-size:.75rem;font-weight:700;color:#fb0089;text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">🏃 Votre coureur ambassadeur</div>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr><td style="padding:6px 0;border-bottom:1px solid #f5dced;font-size:.84rem;color:#3d1830">Nom</td><td style="padding:6px 0;border-bottom:1px solid #f5dced;font-size:.84rem;font-weight:700;color:#3d1830;text-align:right">${coureur}</td></tr>
+    ${emailCoureur ? `<tr><td style="padding:6px 0;font-size:.84rem;color:#3d1830">Email</td><td style="padding:6px 0;font-size:.84rem;color:#7c3aed;text-align:right"><a href="mailto:${emailCoureur}" style="color:#7c3aed">${emailCoureur}</a></td></tr>` : ''}
+  </table>
+</div>
+
+<div style="background-color:#f0fff5;border:1.5px solid rgba(34,197,94,0.3);border-radius:12px;padding:16px 20px;margin-bottom:20px;text-align:left">
+  <div style="font-size:.75rem;font-weight:700;color:#16a34a;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">💰 Comment fonctionne le fléchage des dons ?</div>
+  <div style="font-size:.84rem;color:#3d1830;line-height:1.7;margin-bottom:8px">Tous les dons et promesses de don réalisés sur la page de collecte de <strong>${coureur.split(' ')[0]}</strong> sont fléchés à :</div>
+  <div style="display:flex;gap:16px;flex-wrap:wrap;margin-top:10px">
+    <div style="flex:1;min-width:120px;background:#fff;border-radius:8px;padding:12px;text-align:center">
+      <div style="font-size:1.4rem;font-weight:700;color:#fb0089;font-family:Arial">50%</div>
+      <div style="font-size:.75rem;color:#3d1830;margin-top:4px">→ <strong>${nomAsso}</strong></div>
+    </div>
+    <div style="flex:1;min-width:120px;background:#fff;border-radius:8px;padding:12px;text-align:center">
+      <div style="font-size:1.4rem;font-weight:700;color:#3d1830;font-family:Arial">50%</div>
+      <div style="font-size:.75rem;color:#3d1830;margin-top:4px">→ Plaidoyer Défi Enfance</div>
+    </div>
+  </div>
+</div>
+
+<div style="background-color:#fff0f8;border-left:3px solid #fb0089;border-radius:0 8px 8px 0;padding:14px 18px;margin-bottom:20px;text-align:left">
+  <div style="font-size:.75rem;font-weight:700;color:#fb0089;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">📣 Ce que vous pouvez faire maintenant</div>
+  <div style="font-size:.84rem;color:#3d1830;line-height:1.7">Contactez <strong>${coureur.split(' ')[0]}</strong> directement à l'adresse <a href="mailto:${emailCoureur}" style="color:#7c3aed">${emailCoureur}</a> pour :<br>• L'inviter à partager sa page de collecte à son réseau pro et perso<br>• Lui présenter votre association et les projets financés<br>• Le remercier de courir pour vous — cela crée un lien fort !</div>
+</div>
+
+${urlPageCoureur ? `<div style="text-align:center;margin-bottom:20px"><a href="${urlPageCoureur}" style="display:inline-block;background-color:#fb0089;color:#fff;text-decoration:none;padding:11px 24px;border-radius:99px;font-weight:700;font-size:.84rem;font-family:Arial,sans-serif">❤️ Voir la page de collecte de ${coureur.split(' ')[0]}</a></div>` : ''}
+
+<div class="divider"></div>
+<div style="font-size:.84rem;color:#3d1830;text-align:center;font-style:italic;margin-bottom:6px">Merci de porter ce bel élan pour l'enfance. 🤝</div>
+<div style="font-size:.82rem;color:#fb0089;font-weight:600;text-align:center">— Team Défi Enfance</div>
+</div>
+<table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td bgcolor="#3d1830" style="background-color:#3d1830;padding:16px;text-align:center;border-radius:0 0 14px 14px"><div style="font-family:Arial,sans-serif;font-size:1.1rem;font-weight:700;color:#fb0089;letter-spacing:.08em;margin-bottom:6px">DÉFI ENFANCE</div><div style="font-size:.82rem;color:rgba(255,255,255,.5)">Générateur de victoires pour l'enfance · contact@defienfance.fr</div></td></tr></table>
+</div></td></tr></table></body></html>`;
+}
+
 function tplInscriptionAsso({ nomAsso, coureur, email_coureur, ville, prenomReferent }) {
   return `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Antonio:wght@700&display=swap" rel="stylesheet"><style>${CSS_COMMUN}</style></head><body bgcolor="#f5f0f3" style="background-color:#f5f0f3;margin:0;padding:0"><table class="bg-wrap" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#f5f0f3" style="background-color:#f5f0f3"><tr><td align="center" bgcolor="#f5f0f3" style="background-color:#f5f0f3"><div class="outer"><div class="logo-header"><div class="logo-text">🤝 Défi Enfance</div><div class="logo-sub">Générateur de victoires pour l'enfance</div></div><div class="header mixed"><h1>🏃 Nouveau coureur<br>pour votre cause !</h1><p>Générateur de victoires pour l'enfance</p></div><div class="body"><div class="greeting">Bonjour ${prenomReferent || ''} 👋</div><div class="intro">Un coureur vient de <strong>choisir votre association ${nomAsso}</strong> pour courir lors du <strong>Défi Enfance${ville ? ' de ' + ville : ''}</strong> !</div><div class="don-box"><div class="don-amount" style="font-size:1.8rem">${coureur}</div><div class="don-label">Nouveau coureur inscrit</div></div><div class="card"><h3>📋 Coordonnées du coureur</h3><div class="row"><span class="ic">👤</span><div><strong>Nom :</strong> ${coureur}</div></div><div class="row"><span class="ic">✉️</span><div><strong>Email :</strong> <a href="mailto:${email_coureur}" style="color:#fb0089">${email_coureur}</a></div></div></div><div class="note magenta">💌 <strong>Prenez contact avec ${coureur}</strong> pour le remercier et l'accueillir chaleureusement !</div><div class="note" style="background:#f5f0f3;border-left-color:#ff8533">💡 Présentez vos actions. Plus le coureur est engagé, plus sa collecte sera importante !</div><div class="divider"></div><div style="font-size:.75rem;color:#888;text-align:center">Association : <strong>${nomAsso}</strong><br>Email envoyé automatiquement dans les 10 minutes suivant l'inscription.</div></div>${BLOC_IFI}<div class="footer"><div style="font-family:Arial,sans-serif;font-size:1.1rem;font-weight:700;color:#fb0089;letter-spacing:.08em;margin-bottom:6px">DÉFI ENFANCE</div><div class="footer-sub">Générateur de victoires pour l'enfance<br>contact@defienfance.fr</div></div></div></td></tr></table></body></html>`;
 }
@@ -3848,8 +3925,9 @@ async function processPayments(payments, ignoreDate = false) {
           const chefEmailE  = structEquipe?.email_referent_defi_enfance || '';
           const chefPrenomE = structEquipe?.prenom_du_referent_defi_enfance || 'Bonjour';
           if (chefEmailE) {
-            const htmlRef = tplInscriptionAsso({ nomAsso: equipeC, coureur, email_coureur: emailCoureur, ville, prenomReferent: chefPrenomE });
-            const okRef = await sendBrevo(chefEmailE, `🏃 [live] ${prenomC || coureur} rejoint votre équipe !`, htmlRef);
+            const urlPageCoureurRef = await buildUrlPageCoureur(contactCoureur?.id, eventName);
+            const htmlRef = tplInscriptionReferentEquipe({ chefPrenom: chefPrenomE, nomEquipe: equipeC, coureur, emailCoureur, nomAsso, urlPageCoureur: urlPageCoureurRef });
+            const okRef = await sendBrevo(chefEmailE, `🏃 [live] ${prenomC || coureur} rejoint votre équipe ${equipeC} !`, htmlRef);
             if (okRef) { state.stats.sent++; addLog(`✅ Inscription ${coureur} → référent équipe ${equipeC}`, 'ok'); }
           }
         }
@@ -3884,8 +3962,9 @@ async function processPayments(payments, ignoreDate = false) {
           const emailAsso = cfAsso.email_referent_defi_enfance || structure?.email_referent_defi_enfance || '';
           const prenomRef = cfAsso.prenom_du_referent_defi_enfance || structure?.prenom_du_referent_defi_enfance || '';
           if (emailAsso) {
-            const html = tplInscriptionAsso({ nomAsso, coureur, email_coureur: emailCoureur, ville, prenomReferent: prenomRef });
-            const ok = await sendBrevo(emailAsso, `🏃 [live] ${prenomC || coureur} court pour vous !`, html);
+          const urlPageCoureurAsso = await buildUrlPageCoureur(contactCoureur?.id, eventName);
+            const html = tplInscriptionReferentAsso({ prenomRef, nomAsso, coureur, emailCoureur, urlPageCoureur: urlPageCoureurAsso });
+            const ok = await sendBrevo(emailAsso, `❤️ [live] ${prenomC || coureur} court pour votre association !`, html);
             if (ok) { state.stats.sent++; addLog(`✅ Inscription ${coureur} → asso ${nomAsso}`, 'ok'); addEvent('🏃', `Inscription de ${coureur}`, `Asso : ${nomAsso}`, 'bill'); }
           } else {
             addLog(`⚠️ Inscription ${coureur} — email asso "${nomAsso}" introuvable (structure trouvée: ${structure ? 'oui' : 'non'})`, 'warn');
@@ -3983,6 +4062,8 @@ app.post('/api/test-email', async (req, res) => {
     groupe_j2_referents_joue:    { subject: '🧪 Test — 🏃 Référents Joué boost collecte',   html: tplGroupeJ2ReferentsJoue({ prenom: 'Sophie', nbJours: 3, urlPromesseEquipe: URL_PROMESSE_FALLBACK, urlPageEquipe: URL_EQUIPES }) },
     groupe_merci_donateurs_joue: { subject: '🧪 Test — ❤️ Merci donateurs Joué',            html: tplGroupeMerciDonateurJoue({ prenom: 'Jean-Paul', historiqueHtml: '', totalDons: 40, nbDons: 1 }) },
     // Concrétisation promesse
+    inscription_referent_equipe: { subject: '🧪 Test — 🏃 Nouveau coureur → référent équipe',   html: tplInscriptionReferentEquipe({ chefPrenom: 'Sophie', nomEquipe: 'FSDV', coureur: 'Victor Vieilfault', emailCoureur: 'victor@test.fr', nomAsso: 'Réseau Entreprendre', urlPageCoureur: URL_COUREURS }) },
+    inscription_referent_asso:   { subject: '🧪 Test — ❤️ Nouveau coureur → référent asso',     html: tplInscriptionReferentAsso({ prenomRef: 'Marie', nomAsso: 'Réseau Entreprendre', coureur: 'Victor Vieilfault', emailCoureur: 'victor@test.fr', urlPageCoureur: URL_COUREURS }) },
     relance_promesse:              { subject: '🧪 Test — 🏅 Relance promesse de don',             html: tplRelancePromesse({ prenomDonateur: 'Marie', montantKm: 2, nomCible: 'Victor Vieilfault', typeCible: 'coureur', kmsParcourus: 14.8, montantDu: 29.60, urlDon: URL_COUREURS }) },
     notif_concretisation_coureur:  { subject: '🧪 Test — 🎉 Notif concrétisation → coureur',   html: tplNotifConcretisationCoureur({ prenomCible: 'Victor', donateur: 'Marie Dupont', montantDon: 29.60, montantParKm: 2, kmsParcourus: 14.8, urlPage: 'https://defienfance.fr' }) },
     notif_concretisation_referent: { subject: '🧪 Test — 🎉 Notif concrétisation → référent équipe', html: tplNotifConcretisationReferent({ chefPrenom: 'Sophie', nomEquipe: 'FSDV', coureurPrenom: 'Victor', coureurNom: 'Vieilfault', donateur: 'Jean-Paul Martin', montantDon: 29.60, montantParKm: 2, kmsParcourus: 14.8, urlPageEquipe: 'https://defienfance.fr' }) },
