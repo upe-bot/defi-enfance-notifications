@@ -4972,10 +4972,32 @@ async function chargerPromesses() {
       if (!cible) continue;
       // Récupérer infos contact
       let donateur = '', email = '', contactId = p.contact_id;
-      const contact = contactsCache.get(String(p.contact_id || ''));
-      if (contact) {
-        donateur = `${contact.firstname || ''} ${contact.lastname || ''}`.trim();
-        email = contact.email || '';
+      if (p.contact_id) {
+        const contact = contactsCache.get(String(p.contact_id));
+        if (contact) {
+          donateur = `${contact.firstname || contact.first_name || ''} ${contact.lastname || contact.last_name || ''}`.trim();
+          email = contact.email || '';
+        } else {
+          // Contact pas en cache — chercher via API
+          await sleep(300);
+          const rc = await fetchOhmeContactById(p.contact_id);
+          if (rc) {
+            donateur = `${rc.firstname || rc.first_name || ''} ${rc.lastname || rc.last_name || ''}`.trim();
+            email = rc.email || '';
+            contactsCache.set(String(p.contact_id), rc);
+          }
+        }
+      } else if (p.structure_id) {
+        // Paiement d'une structure
+        const struct = [...structuresParNom.values()].find(s => String(s.id) === String(p.structure_id));
+        if (struct) {
+          const cf2 = struct.custom_fields || struct;
+          donateur = cf2.prenom_du_referent_defi_enfance
+            ? `${cf2.prenom_du_referent_defi_enfance} ${cf2.nom_du_referent_defi_enfance || ''}`.trim()
+            : struct.name || '';
+          email = cf2.email_referent_defi_enfance || '';
+          contactId = `struct_${p.structure_id}`;
+        }
       }
       promesses.push({
         id: p.id, event: isAngers ? 'angers' : 'joue',
