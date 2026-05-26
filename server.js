@@ -6040,6 +6040,19 @@ app.post('/api/promesses/:idx/relancer', async (req, res) => {
   }
 });
 
+// ── POST /api/promesses/:idx/concretiser — marquer manuellement comme concrétisée
+app.post('/api/promesses/:idx/concretiser', async (req, res) => {
+  const idx = parseInt(req.params.idx);
+  const prom = promessesState.items[idx];
+  if (!prom) return res.json({ success: false, error: 'Promesse introuvable' });
+  const { montantDon } = req.body;
+  prom.concretise = true;
+  prom.dateDon = new Date().toISOString();
+  prom.montantDon = parseFloat(montantDon) || null;
+  addLog(`✅ Promesse marquée manuellement concrétisée : ${prom.donateur} → ${prom.cible}${montantDon ? ' (' + montantDon + ' €)' : ''}`, 'ok');
+  res.json({ success: true });
+});
+
 // ── GET /api/promesses — liste des promesses avec statut
 app.get('/api/promesses', async (req, res) => {
   if (!promessesState.loaded) {
