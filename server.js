@@ -5949,7 +5949,7 @@ app.post('/api/envoi-groupe/start', async (req, res) => {
 });
 
 // ── POST /api/promesses/:idx/relancer — envoyer email de relance à un promettant
-app.post('/api/promesses/:idx/relancer', requireAuth, async (req, res) => {
+app.post('/api/promesses/:idx/relancer', async (req, res) => {
   const idx = parseInt(req.params.idx);
   const prom = promessesState.items[idx];
   if (!prom) return res.json({ success: false, error: 'Promesse introuvable' });
@@ -5994,7 +5994,7 @@ app.post('/api/promesses/:idx/relancer', requireAuth, async (req, res) => {
 });
 
 // ── GET /api/promesses — liste des promesses avec statut
-app.get('/api/promesses', requireAuth, async (req, res) => {
+app.get('/api/promesses', async (req, res) => {
   if (!promessesState.loaded) {
     await chargerContactsBulk();
     await chargerPromesses();
@@ -6003,7 +6003,7 @@ app.get('/api/promesses', requireAuth, async (req, res) => {
 });
 
 // ── POST /api/promesses/reload — recharger depuis Ohme
-app.post('/api/promesses/reload', requireAuth, async (req, res) => {
+app.post('/api/promesses/reload', async (req, res) => {
   promessesState.loaded = false;
   promessesState.items = [];
   await chargerContactsBulk();
