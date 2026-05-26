@@ -4988,15 +4988,37 @@ async function chargerPromesses() {
           }
         }
       } else if (p.structure_id) {
-        // Paiement d'une structure
-        const struct = [...structuresParNom.values()].find(s => String(s.id) === String(p.structure_id));
+        // Paiement d'une structure — lookup par ID (O(1))
+        const struct = structuresParNom.get(`id_${p.structure_id}`);
         if (struct) {
           const cf2 = struct.custom_fields || struct;
-          donateur = cf2.prenom_du_referent_defi_enfance
-            ? `${cf2.prenom_du_referent_defi_enfance} ${cf2.nom_du_referent_defi_enfance || ''}`.trim()
-            : struct.name || '';
-          email = cf2.email_referent_defi_enfance || '';
+          const prenomRef = (cf2.prenom_du_referent_defi_enfance || '').trim();
+          const nomRef    = (cf2.nom_du_referent_defi_enfance    || '').trim();
+          donateur = prenomRef || nomRef ? `${prenomRef} ${nomRef}`.trim() : (struct.name || '');
+          email    = (cf2.email_referent_defi_enfance || '').trim();
           contactId = `struct_${p.structure_id}`;
+        } else {
+          // Structure pas encore en cache → appel API direct
+          await sleep(300);
+          const rs = await fetchOhmeWithRetry(
+            `${CONFIG.ohmeBase}/api/v1/structures/${p.structure_id}`,
+            { headers: { 'Accept': 'application/json', 'client-name': CONFIG.ohmeClientName, 'client-secret': CONFIG.ohmeClientSecret } }
+          );
+          if (rs?.ok) {
+            const js2 = await rs.json();
+            const struct2 = js2.data || js2;
+            const cf2 = struct2.custom_fields || struct2;
+            const prenomRef = (cf2.prenom_du_referent_defi_enfance || '').trim();
+            const nomRef    = (cf2.nom_du_referent_defi_enfance    || '').trim();
+            donateur = prenomRef || nomRef ? `${prenomRef} ${nomRef}`.trim() : (struct2.name || '');
+            email    = (cf2.email_referent_defi_enfance || '').trim();
+            contactId = `struct_${p.structure_id}`;
+            // Mettre en cache
+            if (struct2.name) {
+              structuresParNom.set(struct2.name.trim(), struct2);
+              structuresParNom.set(`id_${p.structure_id}`, struct2);
+            }
+          }
         }
       }
       promesses.push({
@@ -5066,8 +5088,9 @@ async function chargerStructuresBulk() {
     const items = j.data || [];
     for (const s of items) {
       if (s.name) {
-        structuresParNom.set(s.name.trim(), s); // clé exacte
-        structuresParNom.set(s.name.trim().toLowerCase(), s); // clé normalisée
+        structuresParNom.set(s.name.trim(), s);
+        structuresParNom.set(s.name.trim().toLowerCase(), s);
+        if (s.id) structuresParNom.set(`id_${s.id}`, s); // index par ID
         nb++;
       }
     }
@@ -5988,7 +6011,9 @@ app.post('/api/promesses/:idx/relancer', async (req, res) => {
       });
       if (contact) {
         const cf = contact.custom_fields || contact;
-        kmsParcourus = parseFloat(cf.km_parcourus_angers2026 || cf.km_parcourus_joue2026 || 0);
+        kmsParcourus = prom.event === 'angers'
+          ? parseFloat(cf.km_parcourus_angers2026 || 0)
+          : parseFloat(cf.km_parcourus_joue2026   || 0);
         urlDon = await buildUrlPageCoureur(contact.id, prom.event === 'angers' ? 'Défi Enfance #Course #Angers2026' : 'DÉFI ENFANCE #COURSE #JOUÉ-LÈS-TOURS2026');
       }
     } else {
