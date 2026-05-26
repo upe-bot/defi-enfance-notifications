@@ -3827,20 +3827,32 @@ async function processPayments(payments, ignoreDate = false) {
             if (ok) { state.stats.sent++; addLog(`✅ Bienvenue coureur → ${coureur}`, 'ok'); addEvent('🚀', `Bienvenue coureur`, coureur, 'bill'); }
 
             // Notifier les promettants de l'équipe si nouveau coureur
-            if (equipe) {
+            if (equipeC) {
               try {
-                const promessesSurEquipe = await fetchTotalPromessesEquipe(equipe);
+                const promessesSurEquipe = await fetchTotalPromessesEquipe(equipeC);
                 if (promessesSurEquipe.nb > 0 && promessesSurEquipe.promettants?.length) {
-                  const nbCoureursNouv = ([...contactsCache.values()].filter(c => equipeParContactId.get(String(c.id)) === equipe).length) + 1;
+                  const nbCoureursNouv = ([...contactsCache.values()].filter(c => equipeParContactId.get(String(c.id)) === equipeC).length) + 1;
                   for (const prom of promessesSurEquipe.promettants) {
-                    const htmlNotif = tplMerciPrometteurEquipe({ prenomDonateur: prom.prenom, montantParKm: prom.montantKm, nomEquipe: equipe, historiqueHtml: '', nbCoureurs: nbCoureursNouv });
-                    await sendBrevo(prom.email, `📢 Mise à jour — ${nbCoureursNouv} coureurs dans l'équipe ${equipe} !`, htmlNotif);
-                    addLog(`📢 Notif promettant ${prom.email} — ${nbCoureursNouv} coureurs dans ${equipe}`, 'info');
+                    const htmlNotif = tplMerciPrometteurEquipe({ prenomDonateur: prom.prenom, montantParKm: prom.montantKm, nomEquipe: equipeC, historiqueHtml: '', nbCoureurs: nbCoureursNouv });
+                    await sendBrevo(prom.email, `📢 Mise à jour — ${nbCoureursNouv} coureurs dans l'équipe ${equipeC} !`, htmlNotif);
+                    addLog(`📢 Notif promettant ${prom.email} — ${nbCoureursNouv} coureurs dans ${equipeC}`, 'info');
                   }
                 }
               } catch(e) { addLog(`⚠️ Notif promettants équipe : ${e.message}`, 'warn'); }
             }
           }
+
+        // ── Email au référent d'équipe
+        if (equipeC) {
+          const structEquipe = structuresParNom.get(equipeC) || structuresParNom.get(equipeC.toLowerCase()) || await fetchOhmeStructureByName(equipeC);
+          const chefEmailE  = structEquipe?.email_referent_defi_enfance || '';
+          const chefPrenomE = structEquipe?.prenom_du_referent_defi_enfance || 'Bonjour';
+          if (chefEmailE) {
+            const htmlRef = tplInscriptionAsso({ nomAsso: equipeC, coureur, email_coureur: emailCoureur, ville, prenomReferent: chefPrenomE });
+            const okRef = await sendBrevo(chefEmailE, `🏃 [live] ${prenomC || coureur} rejoint votre équipe !`, htmlRef);
+            if (okRef) { state.stats.sent++; addLog(`✅ Inscription ${coureur} → référent équipe ${equipeC}`, 'ok'); }
+          }
+        }
 
         // ── Notifier les promettants de l'équipe si le coureur rejoint une équipe
         if (equipeC) {
@@ -3864,11 +3876,20 @@ async function processPayments(payments, ignoreDate = false) {
 
         if (nomAsso && nomAsso.toLowerCase() === equipeC.toLowerCase()) { addLog(`⏭️ Inscription ${coureur} — asso = équipe, ignoré`, 'info'); }
         else if (nomAsso) {
-          const structure = await fetchOhmeStructureByName(nomAsso);
-          const emailAsso = structure?.email_referent_defi_enfance || '';
-          const prenomRef = structure?.prenom_du_referent_defi_enfance || '';
-          if (emailAsso) { const html = tplInscriptionAsso({ nomAsso, coureur, email_coureur: emailCoureur, ville, prenomReferent: prenomRef }); const ok = await sendBrevo(emailAsso, `🏃 [live] ${prenomC || coureur} court pour vous !`, html); if (ok) { state.stats.sent++; addLog(`✅ Inscription ${coureur} → asso ${nomAsso}`, 'ok'); addEvent('🏃', `Inscription de ${coureur}`, `Asso : ${nomAsso}`, 'bill'); } }
-          else { addLog(`⚠️ Inscription ${coureur} — email asso "${nomAsso}" introuvable`, 'warn'); }
+          // Chercher d'abord dans le cache puis via API
+          const structure = structuresParNom.get(nomAsso)
+            || structuresParNom.get(nomAsso.toLowerCase())
+            || await fetchOhmeStructureByName(nomAsso);
+          const cfAsso    = structure?.custom_fields || structure || {};
+          const emailAsso = cfAsso.email_referent_defi_enfance || structure?.email_referent_defi_enfance || '';
+          const prenomRef = cfAsso.prenom_du_referent_defi_enfance || structure?.prenom_du_referent_defi_enfance || '';
+          if (emailAsso) {
+            const html = tplInscriptionAsso({ nomAsso, coureur, email_coureur: emailCoureur, ville, prenomReferent: prenomRef });
+            const ok = await sendBrevo(emailAsso, `🏃 [live] ${prenomC || coureur} court pour vous !`, html);
+            if (ok) { state.stats.sent++; addLog(`✅ Inscription ${coureur} → asso ${nomAsso}`, 'ok'); addEvent('🏃', `Inscription de ${coureur}`, `Asso : ${nomAsso}`, 'bill'); }
+          } else {
+            addLog(`⚠️ Inscription ${coureur} — email asso "${nomAsso}" introuvable (structure trouvée: ${structure ? 'oui' : 'non'})`, 'warn');
+          }
         }
       }
     }
