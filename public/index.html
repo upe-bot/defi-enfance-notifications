@@ -1080,7 +1080,7 @@ async function chargerPromesses() {
       const i = d.items.indexOf(p);
       const badge = p.concretise
         ? `<span style="background:#16a34a;color:#fff;padding:2px 8px;border-radius:99px;font-size:.72rem">✅ Concrétisée${p.montantDon ? ' — ' + parseFloat(p.montantDon).toFixed(2) + ' €' : ''}</span>`
-        : `<span style="background:#ef6135;color:#fff;padding:2px 8px;border-radius:99px;font-size:.72rem">⏳ En attente</span> <button onclick="relancerPromesse(${i}, this)" style="background:#7c3aed;color:#fff;border:none;padding:2px 8px;border-radius:99px;font-size:.72rem;cursor:pointer;margin-left:4px">📧 Relancer</button>`;
+        : `<span style="background:#ef6135;color:#fff;padding:2px 8px;border-radius:99px;font-size:.72rem">⏳ En attente</span> <button onclick="relancerPromesse(${i}, this)" style="background:#7c3aed;color:#fff;border:none;padding:2px 8px;border-radius:99px;font-size:.72rem;cursor:pointer;margin-left:4px">📧 Relancer</button> <button onclick="marquerConcretisee(${i}, this)" style="background:#16a34a;color:#fff;border:none;padding:2px 8px;border-radius:99px;font-size:.72rem;cursor:pointer;margin-left:4px">✅ Marquer</button>`;
       const eventBadge = p.eventLabel === 'Angers'
         ? `<span style="background:#fb0089;color:#fff;padding:1px 6px;border-radius:4px;font-size:.7rem">Angers</span>`
         : `<span style="background:#7c3aed;color:#fff;padding:1px 6px;border-radius:4px;font-size:.7rem">Joué</span>`;
@@ -1108,6 +1108,30 @@ async function chargerPromesses() {
         <tbody>${rows}</tbody>
       </table></div>`;
   } catch(e) { document.getElementById('promessesTable').innerHTML = `<div style="color:#f87171">❌ ${e.message}</div>`; }
+}
+
+async function marquerConcretisee(idx, btn) {
+  const montantDon = prompt('Montant du don concrétisé (€) — laisser vide si inconnu :');
+  if (montantDon === null) return; // annulé
+  btn.textContent = '⏳';
+  btn.disabled = true;
+  try {
+    const r = await apiFetch(`/api/promesses/${idx}/concretiser`, {
+      method: 'POST',
+      body: JSON.stringify({ montantDon: montantDon ? parseFloat(montantDon) : null })
+    });
+    const d = await r.json();
+    if (d.success) {
+      // Rafraîchir le tableau
+      await chargerPromesses();
+    } else {
+      btn.textContent = `❌ ${d.error}`;
+      btn.disabled = false;
+    }
+  } catch(e) {
+    btn.textContent = `❌ ${e.message}`;
+    btn.disabled = false;
+  }
 }
 
 async function relancerPromesse(idx, btn) {
