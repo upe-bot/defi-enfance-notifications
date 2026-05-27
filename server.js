@@ -5492,6 +5492,11 @@ async function chargerStructuresBulk() {
   let nbDetail = 0;
   for (const id of equipesDefi) {
     await sleep(OHME_DELAY_MS);
+    // Pause supplémentaire toutes les 10 équipes pour ménager Ohme
+    if (nbDetail > 0 && nbDetail % 10 === 0) {
+      addLog(`📋 Pause 5s — ${nbDetail}/${equipesDefi.length} équipes chargées…`, 'info');
+      await sleep(5000);
+    }
     const rd = await fetchOhmeWithRetry(`${CONFIG.ohmeBase}/api/v1/structures/${id}`, {
       headers: { 'Accept': 'application/json', 'client-name': CONFIG.ohmeClientName, 'client-secret': CONFIG.ohmeClientSecret }
     });
