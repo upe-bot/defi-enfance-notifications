@@ -320,6 +320,11 @@ const URL_INSTAGRAM= 'https://www.instagram.com/defienfance';
 
 // ── Cache contacts en mémoire (évite les appels répétés à Ohme)
 const contactsCache = new Map();
+const contactsParDossardJoue = new Map(); // dossard Joué → contact
+const supportersAngers     = new Map(); // contactId → contact (supporters Angers)
+const supportersJoue       = new Map(); // contactId → contact (supporters Joué)
+const donateursCache       = new Map(); // contactId → contact (donateurs)
+const promettantsCache     = new Map(); // contactId → contact (promettants)
 
 // ── Détection doublons paiements Ohme (même session)
 // Clé = contactId|amount|coureur_parraine|equipe_parraine|payment_type_id
@@ -5398,6 +5403,53 @@ async function chargerPromesses() {
   addLog(`✅ ${nb} promesse(s) chargée(s) — ${nbC} concrétisée(s)`, 'ok');
 }
 
+// ── Indexer supporters, donateurs et promettants depuis les paiements
+async function indexerProfilsDepuisPaiements() {
+  addLog('📋 Indexation supporters / donateurs / promettants...', 'info');
+  let cursor = null;
+  let nbSup = 0, nbDon = 0, nbProm = 0;
+  while (true) {
+    await sleep(OHME_DELAY_MS);
+    const url = cursor
+      ? `${CONFIG.ohmeBase}/api/v1/payments?limit=250&since_date=2025-01-01&cursor=${encodeURIComponent(cursor)}`
+      : `${CONFIG.ohmeBase}/api/v1/payments?limit=250&since_date=2025-01-01`;
+    const r = await fetchOhmeWithRetry(url, { headers: { 'Accept': 'application/json', 'client-name': CONFIG.ohmeClientName, 'client-secret': CONFIG.ohmeClientSecret } });
+    if (!r?.ok) break;
+    const j = await r.json();
+    const items = j.data || [];
+    for (const p of items) {
+      const cf = p.custom_fields || p;
+      const contactId = String(p.contact_id || '');
+      if (!contactId) continue;
+      const contact = contactsCache.get(contactId);
+      if (!contact) continue;
+      const eventNom = (p.nom_de_levent || cf.nom_de_levent || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+      const isAngers = eventNom.includes('angers');
+      const isJoue   = eventNom.includes('joue');
+      const montantKm = parseFloat(cf.montant_promesse_don_par_km || 0);
+      const typeP = parseInt(p.payment_type_id || 0);
+      const qualite = (cf.qualite_du_participant || '').toLowerCase();
+      if (typeP === 3 && qualite.includes('support')) {
+        if (isAngers) supportersAngers.set(contactId, contact);
+        if (isJoue)   supportersJoue.set(contactId, contact);
+        nbSup++;
+      }
+      if (typeP === 1 && !montantKm && parseFloat(p.amount || 0) > 0) {
+        donateursCache.set(contactId, contact);
+        nbDon++;
+      }
+      if (typeP === 1 && montantKm > 0) {
+        promettantsCache.set(contactId, contact);
+        nbProm++;
+      }
+    }
+    if (items.length < 250) break;
+    cursor = j.cursor || (items.length > 0 ? String(items[items.length - 1].id) : null);
+    if (!cursor) break;
+  }
+  addLog(`✅ Indexés — ${nbSup} supporters, ${nbDon} donateurs, ${nbProm} promettants`, 'ok');
+}
+
 // ── Cache bulk des structures par nom (chargé en une seule pagination)
 const structuresParNom = new Map(); // nomStructure → structure
 
@@ -5489,6 +5541,9 @@ async function chargerContactsBulk() {
         if (c.id) contactsCache.set(String(c.id), c);
         nbCoureurs++;
       }
+      // Indexer par dossard Joué
+      const dossardJoue = parseInt(cf.numero_de_dossard_joue2026 || c.numero_de_dossard_joue2026 || 0);
+      if (dossardJoue) contactsParDossardJoue.set(dossardJoue, c);
     }
     addLog(`📦 Bulk contacts : ${nbTotal} chargés (dont ${nbCoureurs} coureurs Angers indexés)…`, 'info');
     if (items.length < 250) break;
@@ -6441,9 +6496,13 @@ app.post('/api/cache/prechauffer', async (req, res) => {
     await chargerContactsBulk();
     await sleep(3000);
     await chargerStructuresBulk();
+    await sleep(2000);
+    // Indexer supporters, donateurs et promettants depuis les paiements
+    await indexerProfilsDepuisPaiements();
     state.prechauffage = false;
-    addLog(`✅ Cache préchauffé — ${contactsCache.size} contacts, ${structuresParNom.size} structures`, 'ok');
-    res.json({ success: true, message: `Cache préchauffé — ${contactsCache.size} contacts, ${structuresParNom.size} structures`, chaud: false });
+    const resume = `${contactsCache.size} contacts (${contactsParDossard.size} coureurs Angers, ${contactsParDossardJoue.size} coureurs Joué), ${structuresParNom.size / 3 | 0} structures, ${donateursCache.size} donateurs, ${promettantsCache.size} promettants`;
+    addLog(`✅ Cache préchauffé — ${resume}`, 'ok');
+    res.json({ success: true, message: `Cache préchauffé — ${resume}`, chaud: false });
   } catch(e) {
     state.prechauffage = false;
     res.json({ success: false, error: e.message });
@@ -6454,7 +6513,11 @@ app.post('/api/cache/prechauffer', async (req, res) => {
 app.get('/api/cache/status', (req, res) => {
   res.json({
     contacts: contactsCache.size,
-    structures: structuresParNom.size,
+    courseursAngers: contactsParDossard.size,
+    courseursJoue: contactsParDossardJoue.size,
+    structures: Math.round(structuresParNom.size / 3),
+    donateurs: donateursCache.size,
+    promettants: promettantsCache.size,
     chaud: contactsCache.size > 100 && structuresParNom.size > 10,
   });
 });
