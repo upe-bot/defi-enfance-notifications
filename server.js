@@ -6201,9 +6201,11 @@ app.post('/api/campagnes/doublons/annuler', (req, res) => {
 // ── GET /api/envoi-groupe/preview — comptage + aperçu 10 premiers
 app.post('/api/envoi-groupe/preview', async (req, res) => {
   if (envoiGroupe.running) return res.json({ error: 'Un envoi est déjà en cours' });
+  if (envoiGroupe.previewing) return res.json({ error: 'Un comptage est déjà en cours, veuillez patienter…' });
+  envoiGroupe.previewing = true;
   const { typeDestinataire, filtreEquipe, depuisFrance, nbJours, template, choixDoublons } = req.body;
-  if (!typeDestinataire) return res.json({ error: 'typeDestinataire requis' });
-  if (!template) return res.json({ error: 'template requis' });
+  if (!typeDestinataire) { envoiGroupe.previewing = false; return res.json({ error: 'typeDestinataire requis' }); }
+  if (!template) { envoiGroupe.previewing = false; return res.json({ error: 'template requis' }); }
 
   try {
     envoiGroupeLog(`🔍 Comptage : ${typeDestinataire}…`, 'info');
@@ -6277,11 +6279,12 @@ app.post('/api/envoi-groupe/preview', async (req, res) => {
       template,
     });
   } catch(e) {
+    envoiGroupe.previewing = false;
     res.json({ error: e.message });
+  } finally {
+    envoiGroupe.previewing = false;
   }
 });
-
-// ── POST /api/envoi-groupe/start — lancer l'envoi
 app.post('/api/envoi-groupe/start', async (req, res) => {
   if (envoiGroupe.running) return res.json({ error: 'Un envoi est déjà en cours' });
   const { typeDestinataire, filtreEquipe, depuisFrance, nbJours, template, contactIdsFinals } = req.body;
