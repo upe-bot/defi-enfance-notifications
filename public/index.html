@@ -232,6 +232,16 @@
     <div id="promessesTable"><div style="color:var(--text-muted);font-size:.82rem">Cliquez sur "Charger" pour afficher les promesses.</div></div>
   </div>
 
+  <!-- PRÉCHAUFFAGE CACHE -->
+  <div class="section-title" style="margin-top:8px">🔥 Cache Ohme</div>
+  <div class="card" style="margin-bottom:8px">
+    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+      <button class="btn btn-secondary" onclick="prechauffer()" id="btnPrechauffer">🔥 Préchauffer le cache</button>
+      <span id="cacheStatus" style="font-size:.8rem;color:var(--text-muted)">—</span>
+    </div>
+    <div style="font-size:.75rem;color:var(--text-muted);margin-top:8px">⚠️ À faire <strong>5 minutes avant</strong> un envoi groupé si le serveur vient de redémarrer. Le cache reste chaud toute la session.</div>
+  </div>
+
   <!-- ENVOIS GROUPÉS -->
   <div class="section-title" style="margin-top:8px">📢 Envois groupés</div>
   <div class="card">
@@ -1069,6 +1079,8 @@ async function egLancer() {
 function refresh() { fetchStatus(); fetchLogs(); fetchEvents(); fetchDonsAttente(); checkDoublons(); }
 refresh();
 setInterval(refresh, 30000);
+checkCacheStatus();
+setInterval(checkCacheStatus, 30000);
 loadCampagnes();
 
 // ── Suivi Promesses
@@ -1157,6 +1169,53 @@ async function relancerPromesse(idx, btn) {
     btn.textContent = `❌ ${e.message}`;
     btn.disabled = false;
   }
+}
+
+async function prechauffer() {
+  const btn = document.getElementById('btnPrechauffer');
+  const status = document.getElementById('cacheStatus');
+  btn.disabled = true;
+  btn.textContent = '⏳ Préchauffage…';
+  status.textContent = 'Chargement en cours…';
+  status.style.color = 'var(--text-muted)';
+  try {
+    const r = await apiFetch('/api/cache/prechauffer', { method: 'POST' });
+    const d = await r.json();
+    if (d.success) {
+      btn.textContent = '✅ Cache chaud';
+      btn.style.background = '#16a34a';
+      status.textContent = d.message;
+      status.style.color = '#16a34a';
+    } else {
+      btn.textContent = '❌ Erreur';
+      btn.disabled = false;
+      status.textContent = d.error;
+      status.style.color = '#f87171';
+    }
+  } catch(e) {
+    btn.textContent = '🔥 Réessayer';
+    btn.disabled = false;
+    status.textContent = e.message;
+    status.style.color = '#f87171';
+  }
+}
+
+async function checkCacheStatus() {
+  try {
+    const r = await apiFetch('/api/cache/status');
+    const d = await r.json();
+    const status = document.getElementById('cacheStatus');
+    const btn = document.getElementById('btnPrechauffer');
+    if (d.chaud) {
+      status.textContent = `✅ Cache chaud — ${d.contacts} contacts, ${d.structures} structures`;
+      status.style.color = '#16a34a';
+      btn.textContent = '✅ Cache chaud';
+      btn.style.background = '#16a34a';
+    } else {
+      status.textContent = `⚠️ Cache froid — ${d.contacts} contacts en mémoire`;
+      status.style.color = '#ef6135';
+    }
+  } catch(e) {}
 }
 
 async function rechargerPromesses() {
