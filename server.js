@@ -2758,8 +2758,6 @@ function tplGroupeJ1JoueCoureurs({ prenom, nbJours, numeroDossard, urlPageCoureu
   const blocDossard = numeroDossard
     ? `<table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:20px"><tr><td align="center" bgcolor="#fff0f8" style="background-color:#fff0f8;border:2px solid #fb0089;border-radius:14px;padding:16px 22px"><div style="font-size:.72rem;font-weight:700;color:#fb0089;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">Votre numéro de dossard</div><div style="font-family:Arial,sans-serif;font-size:48px;color:#fb0089;font-weight:700;line-height:1.2">\${numeroDossard}</div><div style="font-size:.75rem;color:#3d1830;margin-top:6px">À récupérer sur place dès 13h00</div><div style="margin-top:14px"><a href="\${URL_DOSSARD}" style="display:inline-block;background-color:#fb0089;color:#ffffff;text-decoration:none;padding:9px 20px;border-radius:99px;font-weight:700;font-size:.78rem;font-family:Arial,sans-serif">🎽 Je retrouve mon dossard</a></div></td></tr></table>`
     : `<table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:20px"><tr><td align="center" style="padding:8px 0"><a href="\${URL_DOSSARD}" style="display:inline-block;background-color:#fb0089;color:#ffffff;text-decoration:none;padding:11px 24px;border-radius:99px;font-weight:700;font-size:.84rem;font-family:Arial,sans-serif">🎽 Je retrouve mon dossard</a></td></tr></table>`
-    ? `<table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:20px"><tr><td align="center" bgcolor="#fff0f8" style="background-color:#fff0f8;border:2px solid #fb0089;border-radius:14px;padding:16px 22px"><div style="font-size:.72rem;font-weight:700;color:#fb0089;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">Votre numéro de dossard</div><div style="font-family:Arial,sans-serif;font-size:48px;color:#fb0089;font-weight:700;line-height:1.2">${numeroDossard}</div><div style="font-size:.75rem;color:#3d1830;margin-top:6px">À récupérer sur place dès 13h00</div><div style="margin-top:14px"><a href="${URL_DOSSARD}" style="display:inline-block;background-color:#fb0089;color:#ffffff;text-decoration:none;padding:9px 20px;border-radius:99px;font-weight:700;font-size:.78rem;font-family:Arial,sans-serif">Je retrouve mon dossard</a></div></td></tr></table>`
-    : `<table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:20px"><tr><td align="center" style="padding:8px 0"><a href="${URL_DOSSARD}" style="display:inline-block;background-color:#fb0089;color:#ffffff;text-decoration:none;padding:11px 24px;border-radius:99px;font-weight:700;font-size:.84rem;font-family:Arial,sans-serif">🎽 Je retrouve mon dossard</a></td></tr></table>`;
 
   return `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Antonio:wght@700&display=swap" rel="stylesheet"><style>${CSS_COMMUN}
     .checklist-item{display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid #f5dced;font-size:.84rem;color:#3d1830;text-align:left}
@@ -2778,13 +2776,13 @@ function tplGroupeJ1JoueCoureurs({ prenom, nbJours, numeroDossard, urlPageCoureu
 <div class="body">
 <div style="font-size:1rem;font-weight:600;color:#3d1830;margin-bottom:12px;text-align:left">Bonjour ${prenom} 👋</div>
 <div style="font-size:.85rem;color:#3d1830;line-height:1.7;margin-bottom:20px;text-align:left">Demain, c'est le grand jour ! <strong>On est fiers de vous avoir parmi nous.</strong> Et on a une bonne nouvelle : demain, vous allez courir — mais aussi <strong>jouer, rire et peut-être même gagner des km sans transpirer !</strong> 🌊 Voici tout ce qu'il faut savoir.</div>
-
+<div style="font-size:.85rem;color:#3d1830;line-height:1.7;margin-bottom:20px;text-align:left">J-${j} avant le grand jour — et quelle course en perspective ! <strong>On est fiers de vous avoir parmi nous.</strong> Vendredi, vous allez courir — mais aussi <strong>jouer, rire et peut-être même gagner des km sans transpirer !</strong> 🌊</div>
 ${blocDossard}
 
 <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:20px"><tr><td bgcolor="#e0f2fe" style="background-color:#e0f2fe;border:2px solid #0284c7;border-radius:14px;padding:18px 22px">
   <div style="font-size:.75rem;font-weight:700;color:#0284c7;text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px;text-align:left">🌡️ 35°C demain — on s'adapte !</div>
-  <div style="font-size:.85rem;color:#1e3a5f;line-height:1.7;margin-bottom:14px;text-align:left">Il va faire <strong>très chaud</strong> demain (35°C+). Pas question d'annuler — on a tout réorganisé pour que vous courriez <strong>frais, en sécurité et en s'amusant</strong> :</div>
-  <div style="font-size:.84rem;color:#1e3a5f;line-height:1.8;text-align:left">
+  <div style="font-size:.75rem;font-weight:700;color:#0284c7;text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px;text-align:left">🌡️ 35°C prévu vendredi — on s'adapte !</div>
+  <div style="font-size:.85rem;color:#1e3a5f;line-height:1.7;margin-bottom:14px;text-align:left">Il va faire <strong>très chaud vendredi</strong> (35°C+). Pas question d'annuler — on a tout réorganisé pour que vous courriez <strong>frais, en sécurité et en s'amusant</strong> :</div>
     🌳 <strong>100% sous les arbres</strong> — le village et le tracé ont été déplacés au cœur du Parc des Bretonnières, entièrement à l'ombre<br>
     ⏱️ <strong>1h30 de course</strong> au lieu de 2h — on préserve votre énergie<br>
     💦 <strong>Une tonne d'eau</strong> pour arroser les participants — vous serez trempés, rafraîchis, heureux<br>
@@ -2852,7 +2850,7 @@ ${blocDossard}
 
 ${BLOC_RECUS_FISCAUX}${BLOC_IFI}
 <div class="divider"></div>
-<div style="font-size:.86rem;color:#3d1830;text-align:center;font-style:italic;margin-bottom:8px">${j <= 1 ? "À demain" : "À très vite"} sous les arbres — et sous l'eau ! 💦🏃</div>
+<div style="font-size:.86rem;color:#3d1830;text-align:center;font-style:italic;margin-bottom:8px">À vendredi sous les arbres — et sous l'eau ! 💦🏃</div>
 <div style="font-size:.82rem;color:#fb0089;font-weight:600;text-align:center">— Team Défi Enfance</div>
 </div>
 <table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td bgcolor="#3d1830" style="background-color:#3d1830;padding:16px;text-align:center;border-radius:0 0 14px 14px"><div style="font-family:Arial,sans-serif;font-size:1.1rem;font-weight:700;color:#fb0089;letter-spacing:.08em;margin-bottom:6px">DÉFI ENFANCE</div><div style="font-size:.82rem;color:rgba(255,255,255,.5)">Générateur de victoires pour l'enfance · contact@defienfance.fr</div></td></tr></table>
