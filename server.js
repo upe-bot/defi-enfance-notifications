@@ -2775,12 +2775,10 @@ function tplGroupeJ1JoueCoureurs({ prenom, nbJours, numeroDossard, urlPageCoureu
 
 <div class="body">
 <div style="font-size:1rem;font-weight:600;color:#3d1830;margin-bottom:12px;text-align:left">Bonjour ${prenom} 👋</div>
-<div style="font-size:.85rem;color:#3d1830;line-height:1.7;margin-bottom:20px;text-align:left">Demain, c'est le grand jour ! <strong>On est fiers de vous avoir parmi nous.</strong> Et on a une bonne nouvelle : demain, vous allez courir — mais aussi <strong>jouer, rire et peut-être même gagner des km sans transpirer !</strong> 🌊 Voici tout ce qu'il faut savoir.</div>
-<div style="font-size:.85rem;color:#3d1830;line-height:1.7;margin-bottom:20px;text-align:left">J-${j} avant le grand jour — et quelle course en perspective ! <strong>On est fiers de vous avoir parmi nous.</strong> Vendredi, vous allez courir — mais aussi <strong>jouer, rire et peut-être même gagner des km sans transpirer !</strong> 🌊</div>
+<div style="font-size:.85rem;color:#3d1830;line-height:1.7;margin-bottom:20px;text-align:left">J-${j} avant le grand jour — avec les fortes chaleurs on vous a concocté une course gamifiée qui garde tout son piment mais qui va apporter beaucoup de fraîcheur ! <strong>On est fiers de vous avoir parmi nous.</strong> Vendredi, vous allez courir — mais aussi <strong>jouer, rire et peut-être même gagner des km sans transpirer !</strong> 🌊</div>
 ${blocDossard}
 
 <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:20px"><tr><td bgcolor="#e0f2fe" style="background-color:#e0f2fe;border:2px solid #0284c7;border-radius:14px;padding:18px 22px">
-  <div style="font-size:.75rem;font-weight:700;color:#0284c7;text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px;text-align:left">🌡️ 35°C demain — on s'adapte !</div>
   <div style="font-size:.75rem;font-weight:700;color:#0284c7;text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px;text-align:left">🌡️ 35°C prévu vendredi — on s'adapte !</div>
   <div style="font-size:.85rem;color:#1e3a5f;line-height:1.7;margin-bottom:14px;text-align:left">Il va faire <strong>très chaud vendredi</strong> (35°C+). Pas question d'annuler — on a tout réorganisé pour que vous courriez <strong>frais, en sécurité et en s'amusant</strong> :</div>
     🌳 <strong>100% sous les arbres</strong> — le village et le tracé ont été déplacés au cœur du Parc des Bretonnières, entièrement à l'ombre<br>
@@ -3285,39 +3283,37 @@ async function sendMerciDonateur({ email, prenom, montant, donateur, coureurPren
 // ══════════════════════════════════════════════════════
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 const OHME_DELAY_MS = 800;
-const ENVOI_GROUPE_DELAY_MS = 3000; // délai entre emails dans l'envoi groupé
-const OHME_CONTACT_DELAY_MS  = 1000; // délai entre appels contacts dans fetchDestinataires
+const ENVOI_GROUPE_DELAY_MS = 4000; // délai entre emails envoyés // délai entre emails dans l'envoi groupé
+const OHME_CONTACT_DELAY_MS  = 1500; // délai entre appels contacts dans fetchDestinataires
 
 // ── Fetch Ohme avec retry automatique (gère 429 et 5xx)
-async function fetchOhmeWithRetry(url, options = {}, maxRetries = 3) {
+async function fetchOhmeWithRetry(url, options = {}, maxRetries = 4) {
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
       const res = await fetch(url, options);
       if (res.status === 429) {
-        const waitMs = attempt * 2000;
+        const waitMs = attempt * 5000; // 5s, 10s, 15s, 20s
         addLog(`⏳ Ohme rate limit (429) — attente ${waitMs/1000}s (tentative ${attempt}/${maxRetries})`, 'warn');
         await sleep(waitMs);
         if (attempt === maxRetries) {
-          // Attente longue supplémentaire avant d'abandonner
-          addLog(`⏳ Ohme rate limit persistant — attente 10s supplémentaires…`, 'warn');
-          await sleep(10000);
+          addLog(`⏳ Ohme rate limit persistant — attente 30s supplémentaires…`, 'warn');
+          await sleep(30000);
           const retryFinal = await fetch(url, options);
           return retryFinal;
         }
         continue;
       }
       if (res.status >= 500 && attempt < maxRetries) {
-        addLog(`⏳ Ohme erreur ${res.status} — retry dans 2s (tentative ${attempt}/${maxRetries})`, 'warn');
-        await sleep(2000);
+        addLog(`⏳ Ohme erreur ${res.status} — retry dans 3s (tentative ${attempt}/${maxRetries})`, 'warn');
+        await sleep(3000);
         continue;
       }
       return res;
     } catch(e) {
-      if (attempt < maxRetries) { await sleep(1000); continue; }
+      if (attempt < maxRetries) { await sleep(2000); continue; }
       throw e;
     }
   }
-  // Ne devrait jamais arriver mais sécurité
   throw new Error('fetchOhmeWithRetry: toutes les tentatives ont échoué');
 }
 
@@ -4186,6 +4182,11 @@ async function processPaymentsForced(payments) { await processPayments(payments,
 //  POLLING
 // ══════════════════════════════════════════════════════
 async function poll() {
+  // Ne pas polluer Ohme pendant un envoi groupé
+  if (envoiGroupe.running) {
+    addLog('⏸️ Poll suspendu — envoi groupé en cours', 'info');
+    return;
+  }
   state.lastPoll = new Date().toISOString();
   state.nextPoll = new Date(Date.now() + CONFIG.pollInterval).toISOString();
   addLog(`🔄 Interrogation Ohme…`, 'info');
