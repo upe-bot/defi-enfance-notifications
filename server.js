@@ -72,7 +72,7 @@ const CONFIG = {
   brevoKey:         process.env.BREVO_API_KEY      || '',
   senderEmail:      process.env.SENDER_EMAIL       || 'contact@defienfance.fr',
   senderName:       process.env.SENDER_NAME        || 'Défi Enfance',
-  pollInterval:     parseInt(process.env.POLL_INTERVAL_MS || '600000'),
+  pollInterval:     parseInt(process.env.POLL_INTERVAL_MS || '900000'), // 15 min par défaut
   upstashUrl:       (process.env.UPSTASH_REDIS_REST_URL  || '').replace(/\/$/, ''),
   upstashToken:     process.env.UPSTASH_REDIS_REST_TOKEN || '',
 };
@@ -4875,10 +4875,18 @@ async function fetchDestinataires({ typeDestinataire, filtreEquipe, depuisFrance
     if (['angers_coureurs','joue_coureurs','joue_coureurs_equipe','global_coureurs',
          'angers_supporters','joue_supporters','global_supporters','dejeuner'].includes(typeDestinataire)) {
 
-      // Pré-charger contacts puis structures en bulk séquentiel (~6 appels, ménage Ohme)
+      // Pré-charger contacts puis structures — seulement si cache vide
       if (['angers_coureurs','angers_coureurs_referents','joue_coureurs','joue_coureurs_equipe'].includes(typeDestinataire)) {
-        await chargerContactsBulk();
-        await chargerStructuresBulk();
+        const cacheChaud = contactsCache.size > 100 && structuresParNom.size > 10;
+        if (!cacheChaud) {
+          addLog('📋 Cache froid — chargement bulk contacts + structures…', 'info');
+          await chargerContactsBulk();
+          await sleep(3000);
+          await chargerStructuresBulk();
+          await sleep(2000);
+        } else {
+          addLog(`✅ Cache chaud (${contactsCache.size} contacts, ${structuresParNom.size} structures) — pas de rechargement`, 'info');
+        }
       }
 
       const eventsAttendus = EVENTS_MAP[typeDestinataire] || [];
@@ -5442,7 +5450,7 @@ const contactsParDossard = new Map(); // dossard → contact
 const contactsParId      = new Map(); // contactId → contact
 
 async function chargerContactsBulk() {
-  if (contactsParDossard.size > 0) return; // déjà chargé
+  if (contactsCache.size > 100) return; // déjà chargé (>100 contacts en cache)
   addLog('📋 Chargement bulk tous les contacts Ohme…', 'info');
   let cursor = null;
   let nbTotal = 0;
@@ -5483,9 +5491,9 @@ async function fetchDestinatairesAvecDons(typeDestinataire) {
   const isAngers = typeDestinataire === 'donateurs_angers_global';
   const isJoue   = typeDestinataire === 'donateurs_joue';
 
-  // Charger le cache bulk contacts + structures pour les classements
-  await chargerContactsBulk();
-  await chargerStructuresBulk();
+  // Charger le cache bulk contacts + structures — seulement si nécessaire
+  if (contactsCache.size <= 100) await chargerContactsBulk();
+  if (structuresParNom.size <= 10) await chargerStructuresBulk();
 
   const donateursMap = new Map(); // email → { prenom, nom, email, contactId, dons[], totalDons }
   let cursor = null;
