@@ -317,7 +317,7 @@
     <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px">
       <button class="btn btn-secondary" onclick="egTester()">🧪 Tester sur Victor</button>
       <button class="btn btn-secondary" onclick="egCompter()">👁️ Compter + Aperçu</button>
-      <button class="btn btn-primary"   onclick="egLancer()">🚀 Lancer l'envoi</button>
+      <button class="btn btn-primary"   onclick="egCompter()">🚀 Compter + Lancer</button>
     </div>
 
     <!-- Aperçu 10 premiers -->
@@ -1072,7 +1072,8 @@ async function egEnvoyerTestContact() {
 }
 
 async function egLancer() {
-  await egCompter();
+  // Ne pas refaire un comptage — lancer directement l'envoi depuis egAfficherConfirmation
+  showToast('ℹ️', 'Utilisez le bouton "Compter + Aperçu" puis confirmez l\'envoi');
 }
 
 // ── REFRESH
