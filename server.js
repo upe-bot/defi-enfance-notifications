@@ -3283,7 +3283,7 @@ async function sendMerciDonateur({ email, prenom, montant, donateur, coureurPren
 // ══════════════════════════════════════════════════════
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 const OHME_DELAY_MS = 800;
-const ENVOI_GROUPE_DELAY_MS = 4000; // délai entre emails envoyés // délai entre emails dans l'envoi groupé
+const ENVOI_GROUPE_DELAY_MS = 500; // délai entre emails envoyés (Brevo n'a pas de rate limit strict)
 const OHME_CONTACT_DELAY_MS  = 1500; // délai entre appels contacts dans fetchDestinataires
 
 // ── Fetch Ohme avec retry automatique (gère 429 et 5xx)
@@ -4182,9 +4182,13 @@ async function processPaymentsForced(payments) { await processPayments(payments,
 //  POLLING
 // ══════════════════════════════════════════════════════
 async function poll() {
-  // Ne pas polluer Ohme pendant un envoi groupé
+  // Ne pas polluer Ohme pendant un envoi groupé ou un préchauffage
   if (envoiGroupe.running) {
     addLog('⏸️ Poll suspendu — envoi groupé en cours', 'info');
+    return;
+  }
+  if (state.prechauffage) {
+    addLog('⏸️ Poll suspendu — préchauffage cache en cours', 'info');
     return;
   }
   state.lastPoll = new Date().toISOString();
@@ -4195,6 +4199,7 @@ async function poll() {
   if (premierPoll) addLog('⚠️ Premier poll — paiements mis en attente de validation', 'warn');
   await processPayments(payments);
   if (premierPoll) { premierPoll = false; await saveProcessedIds(); addLog('✅ Mode validation manuelle terminé — surveillance automatique active', 'ok'); }
+  state.lastPollEndMs = Date.now(); // timestamp fin du poll
   // Mettre à jour l'index équipes toutes les 10 polls (~1h40)
   if (!state.pollCount) state.pollCount = 0;
   state.pollCount++;
@@ -4879,6 +4884,13 @@ async function fetchDestinataires({ typeDestinataire, filtreEquipe, depuisFrance
       if (['angers_coureurs','angers_coureurs_referents','joue_coureurs','joue_coureurs_equipe'].includes(typeDestinataire)) {
         const cacheChaud = contactsCache.size > 100 && structuresParNom.size > 10;
         if (!cacheChaud) {
+          // Attendre que Ohme récupère si le poll vient de tourner
+          const msSincePoll = Date.now() - (state.lastPollEndMs || 0);
+          if (msSincePoll < 60000) {
+            const attente = Math.ceil((60000 - msSincePoll) / 1000);
+            addLog(`⏳ Pause ${attente}s — poll récent, ménagement Ohme avant chargement bulk…`, 'info');
+            await sleep(60000 - msSincePoll);
+          }
           addLog('📋 Cache froid — chargement bulk contacts + structures…', 'info');
           await chargerContactsBulk();
           await sleep(3000);
@@ -6416,6 +6428,37 @@ app.post('/api/promesses/:idx/concretiser', async (req, res) => {
   res.json({ success: true });
 });
 
+// ── POST /api/cache/prechauffer — préchauffer le cache contacts + structures
+app.post('/api/cache/prechauffer', async (req, res) => {
+  try {
+    const deja = contactsCache.size > 100 && structuresParNom.size > 10;
+    if (deja) return res.json({ success: true, message: `Cache déjà chaud — ${contactsCache.size} contacts, ${structuresParNom.size} structures`, chaud: true });
+    // Forcer reset pour recharger même si partiellement chaud
+    contactsCache.clear();
+    structuresParNom.clear();
+    state.prechauffage = true; // suspend le poll
+    addLog('🔥 Préchauffage manuel du cache…', 'info');
+    await chargerContactsBulk();
+    await sleep(3000);
+    await chargerStructuresBulk();
+    state.prechauffage = false;
+    addLog(`✅ Cache préchauffé — ${contactsCache.size} contacts, ${structuresParNom.size} structures`, 'ok');
+    res.json({ success: true, message: `Cache préchauffé — ${contactsCache.size} contacts, ${structuresParNom.size} structures`, chaud: false });
+  } catch(e) {
+    state.prechauffage = false;
+    res.json({ success: false, error: e.message });
+  }
+});
+
+// ── GET /api/cache/status — état du cache
+app.get('/api/cache/status', (req, res) => {
+  res.json({
+    contacts: contactsCache.size,
+    structures: structuresParNom.size,
+    chaud: contactsCache.size > 100 && structuresParNom.size > 10,
+  });
+});
+
 // ── GET /api/promesses — liste des promesses avec statut
 app.get('/api/promesses', async (req, res) => {
   if (!promessesState.loaded) {
@@ -6670,11 +6713,11 @@ app.listen(PORT, () => {
 });
 
 initFromRedis();
-// Charger les promesses au démarrage (silencieux, après 10s pour laisser Redis se connecter)
+// Charger les promesses au démarrage (silencieux, après 10s)
+// Le bulk contacts/structures n'est PAS chargé auto — utiliser le bouton "Préchauffer le cache"
 setTimeout(async () => {
   try {
-    await chargerContactsBulk();
-    await chargerPromesses();
+    await chargerPromesses(); // charge seulement les promesses (léger)
   } catch(e) { addLog(`⚠️ Chargement promesses : ${e.message}`, 'warn'); }
 }, 10000);
 // Construire l'index équipes après init Redis (délai pour laisser Redis se connecter)
