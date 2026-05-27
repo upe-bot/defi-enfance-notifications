@@ -4910,12 +4910,10 @@ async function fetchDestinataires({ typeDestinataire, filtreEquipe, depuisFrance
       let cursor = null;
 
       while (true) {
-        await sleep(OHME_DELAY_MS);
-        const useTypeFilter = !['joue_coureurs','joue_coureurs_equipe'].includes(typeDestinataire);
-        const typeParam = useTypeFilter ? 'payment_type_id=3&' : '';
+        await sleep(2500); // délai plus long entre pages pour éviter 429
         const url = cursor
-          ? `${CONFIG.ohmeBase}/api/v1/payments?limit=250&${typeParam}since_date=2026-01-01&cursor=${encodeURIComponent(cursor)}`
-          : `${CONFIG.ohmeBase}/api/v1/payments?limit=250&${typeParam}since_date=2026-01-01`;
+          ? `${CONFIG.ohmeBase}/api/v1/payments?limit=250&payment_type_id=3&since_date=2026-01-01&cursor=${encodeURIComponent(cursor)}`
+          : `${CONFIG.ohmeBase}/api/v1/payments?limit=250&payment_type_id=3&since_date=2026-01-01`;
 
         const res = await fetchOhmeWithRetry(url, { headers: { 'Accept': 'application/json', 'client-name': CONFIG.ohmeClientName, 'client-secret': CONFIG.ohmeClientSecret } });
         if (!res.ok) { addLog(`⚠️ Ohme HTTP ${res.status} (fetchDestinataires billetterie)`, 'warn'); break; }
@@ -5406,13 +5404,15 @@ async function chargerPromesses() {
 // ── Indexer supporters, donateurs et promettants depuis les paiements
 async function indexerProfilsDepuisPaiements() {
   addLog('📋 Indexation supporters / donateurs / promettants...', 'info');
-  let cursor = null;
   let nbSup = 0, nbDon = 0, nbProm = 0;
+
+  // ── Supporters : paiements type 3 avec qualite_du_participant = supporter
+  let cursor = null;
   while (true) {
     await sleep(OHME_DELAY_MS);
     const url = cursor
-      ? `${CONFIG.ohmeBase}/api/v1/payments?limit=250&since_date=2025-01-01&cursor=${encodeURIComponent(cursor)}`
-      : `${CONFIG.ohmeBase}/api/v1/payments?limit=250&since_date=2025-01-01`;
+      ? `${CONFIG.ohmeBase}/api/v1/payments?payment_type_id=3&limit=250&since_date=2025-01-01&cursor=${encodeURIComponent(cursor)}`
+      : `${CONFIG.ohmeBase}/api/v1/payments?payment_type_id=3&limit=250&since_date=2025-01-01`;
     const r = await fetchOhmeWithRetry(url, { headers: { 'Accept': 'application/json', 'client-name': CONFIG.ohmeClientName, 'client-secret': CONFIG.ohmeClientSecret } });
     if (!r?.ok) break;
     const j = await r.json();
@@ -5423,30 +5423,48 @@ async function indexerProfilsDepuisPaiements() {
       if (!contactId) continue;
       const contact = contactsCache.get(contactId);
       if (!contact) continue;
-      const eventNom = (p.nom_de_levent || cf.nom_de_levent || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-      const isAngers = eventNom.includes('angers');
-      const isJoue   = eventNom.includes('joue');
-      const montantKm = parseFloat(cf.montant_promesse_don_par_km || 0);
-      const typeP = parseInt(p.payment_type_id || 0);
       const qualite = (cf.qualite_du_participant || '').toLowerCase();
-      if (typeP === 3 && qualite.includes('support')) {
-        if (isAngers) supportersAngers.set(contactId, contact);
-        if (isJoue)   supportersJoue.set(contactId, contact);
-        nbSup++;
-      }
-      if (typeP === 1 && !montantKm && parseFloat(p.amount || 0) > 0) {
-        donateursCache.set(contactId, contact);
-        nbDon++;
-      }
-      if (typeP === 1 && montantKm > 0) {
+      if (!qualite.includes('support')) continue;
+      const eventNom = (p.nom_de_levent || cf.nom_de_levent || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+      if (eventNom.includes('angers')) { supportersAngers.set(contactId, contact); nbSup++; }
+      if (eventNom.includes('joue'))   { supportersJoue.set(contactId, contact);   nbSup++; }
+    }
+    if (items.length < 250) break;
+    cursor = j.cursor || (items.length > 0 ? String(items[items.length - 1].id) : null);
+    if (!cursor) break;
+  }
+
+  // ── Dons et promesses : paiements type 1
+  cursor = null;
+  while (true) {
+    await sleep(OHME_DELAY_MS);
+    const url = cursor
+      ? `${CONFIG.ohmeBase}/api/v1/payments?payment_type_id=1&limit=250&since_date=2025-01-01&cursor=${encodeURIComponent(cursor)}`
+      : `${CONFIG.ohmeBase}/api/v1/payments?payment_type_id=1&limit=250&since_date=2025-01-01`;
+    const r = await fetchOhmeWithRetry(url, { headers: { 'Accept': 'application/json', 'client-name': CONFIG.ohmeClientName, 'client-secret': CONFIG.ohmeClientSecret } });
+    if (!r?.ok) break;
+    const j = await r.json();
+    const items = j.data || [];
+    for (const p of items) {
+      const cf = p.custom_fields || p;
+      const contactId = String(p.contact_id || '');
+      if (!contactId) continue;
+      const contact = contactsCache.get(contactId);
+      if (!contact) continue;
+      const montantKm = parseFloat(cf.montant_promesse_don_par_km || 0);
+      if (montantKm > 0) {
         promettantsCache.set(contactId, contact);
         nbProm++;
+      } else if (parseFloat(p.amount || 0) > 0) {
+        donateursCache.set(contactId, contact);
+        nbDon++;
       }
     }
     if (items.length < 250) break;
     cursor = j.cursor || (items.length > 0 ? String(items[items.length - 1].id) : null);
     if (!cursor) break;
   }
+
   addLog(`✅ Indexés — ${nbSup} supporters, ${nbDon} donateurs, ${nbProm} promettants`, 'ok');
 }
 
