@@ -1207,13 +1207,16 @@ async function checkCacheStatus() {
     const status = document.getElementById('cacheStatus');
     const btn = document.getElementById('btnPrechauffer');
     if (d.chaud) {
-      status.textContent = `✅ Cache chaud — ${d.contacts} contacts, ${d.structures} structures`;
+      status.textContent = `✅ Cache chaud — ${d.contacts} contacts (${d.courseursAngers} coureurs Angers, ${d.courseursJoue} coureurs Joué), ${d.structures} structures, ${d.donateurs} donateurs, ${d.promettants} promettants`;
       status.style.color = '#16a34a';
       btn.textContent = '✅ Cache chaud';
       btn.style.background = '#16a34a';
     } else {
       status.textContent = `⚠️ Cache froid — ${d.contacts} contacts en mémoire`;
       status.style.color = '#ef6135';
+      btn.textContent = '🔥 Préchauffer le cache';
+      btn.style.background = '';
+      btn.disabled = false;
     }
   } catch(e) {}
 }
