@@ -5547,6 +5547,8 @@ const TEMPLATES_SUJETS = {
   'groupe_j2_referents_joue':      null, // sujet dynamique
   'groupe_j1_joue_coureurs':         null, // sujet dynamique
   'groupe_j1_joue_referents':        null, // sujet dynamique
+  'groupe_j1_joue_donateurs':      '❤️ Vendredi, votre soutien court avec eux ! 🌊',
+  'groupe_j1_joue_supporters':     '🎉 Vendredi, votre présence fait toute la différence ! 🌊',
   'groupe_j1_angers_coureurs':    '🎽 Demain, c\'est le jour J ! 🎽',
   'groupe_j1_donateurs':          '❤️ Merci pour votre soutien — demain c\'est le grand jour !',
   'groupe_jourj_promesses':        '🏁 Vos promesses de don — le Défi Enfance a couru pour l\'enfance !',
@@ -5808,6 +5810,17 @@ async function fetchDestinataires({ typeDestinataire, filtreEquipe, depuisFrance
         if (!cursor) break;
         addLog(`📦 Pagination destinataires : ${destinataires.length} trouvés…`, 'info');
       }
+    }
+
+    // ── CAS 1b : Supporters (Angers ou Joué)
+    else if (['supporters_joue', 'supporters_angers'].includes(typeDestinataire)) {
+      const eventsAttendus = EVENTS_MAP[typeDestinataire] || [];
+      for (const nomEvent of eventsAttendus) {
+        const parts = await fetchParticipantsEvenement(nomEvent, ['supporter'], depuisFrance ? new Date('2026-01-01') : null);
+        destinataires.push(...parts);
+      }
+      addLog(`📦 Supporters ${typeDestinataire} : ${destinataires.length} trouvés`, 'info');
+      return destinataires;
     }
 
     // ── CAS 2 : Référents d'équipe (global, Angers, ou Joué)
