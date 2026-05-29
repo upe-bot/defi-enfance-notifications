@@ -3423,6 +3423,108 @@ ${BLOC_RECUS_FISCAUX}${BLOC_IFI}
 }
 
 
+// ── Template Jour J Joué — Coureurs
+function tplGroupeJourJJoueCoureurs({ prenom, numeroDossard, urlPageCoureur, urlPromesseCoureur }) {
+  const URL_DOSSARD = 'https://upe-bot.github.io/defi-enfance-dossard/index.html';
+  const urlDon  = urlPageCoureur     || 'https://defienfance.fr/faire-un-don/';
+  const urlProm = urlPromesseCoureur || 'https://defienfance.fr/suivre-la-collecte-defi-enfance/?de_promise=1';
+  const blocDossard = numeroDossard
+    ? `<table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:20px"><tr><td align="center" bgcolor="#fff0f8" style="background-color:#fff0f8;border:2px solid #fb0089;border-radius:14px;padding:16px 22px"><div style="font-size:.72rem;font-weight:700;color:#fb0089;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">Votre numéro de dossard</div><div style="font-family:Arial,sans-serif;font-size:56px;color:#fb0089;font-weight:700;line-height:1.1">${numeroDossard}</div><div style="font-size:.75rem;color:#3d1830;margin-top:6px">À récupérer sur place dès 13h00</div><div style="margin-top:14px"><a href="${URL_DOSSARD}" style="display:inline-block;background-color:#fb0089;color:#ffffff;text-decoration:none;padding:9px 20px;border-radius:99px;font-weight:700;font-size:.78rem;font-family:Arial,sans-serif">🎽 Je retrouve mon dossard</a></div></td></tr></table>`
+    : `<table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:20px"><tr><td align="center" style="padding:8px 0"><a href="${URL_DOSSARD}" style="display:inline-block;background-color:#fb0089;color:#ffffff;text-decoration:none;padding:11px 24px;border-radius:99px;font-weight:700;font-size:.84rem;font-family:Arial,sans-serif">🎽 Je retrouve mon dossard</a></td></tr></table>`;
+  return `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>${CSS_COMMUN}</style></head><body style="margin:0;padding:0;background:#f5f0f5">
+<table width="100%" cellpadding="0" cellspacing="0"><tr><td align="center" style="padding:20px 12px">
+<table width="100%" style="max-width:600px;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(61,24,48,.12)">
+
+<!-- HEADER -->
+<tr><td style="background:linear-gradient(135deg,#fb0089,#ef6135);padding:28px 32px;text-align:center">
+  <div style="font-size:.72rem;font-weight:700;color:rgba(255,255,255,.7);text-transform:uppercase;letter-spacing:.12em;margin-bottom:8px">🎽 Défi Enfance · Joué-lès-Tours · 29 mai 2026</div>
+  <h1 style="font-family:Arial,sans-serif;font-size:1.4rem;font-weight:700;color:#fff;margin:0 0 6px">🏁 C'est aujourd'hui !<br>On vous attend avec impatience !</h1>
+  <p style="font-size:.78rem;color:rgba(255,255,255,.8);margin:0">Parc des Bretonnières · Côté Espace Malraux · 13h00</p>
+</td></tr>
+
+<!-- BODY -->
+<tr><td style="background:#fff;padding:24px 28px">
+
+  <div style="font-size:.9rem;font-weight:600;color:#3d1830;margin-bottom:10px;text-align:left">Bonjour ${prenom} 👋</div>
+  <div style="font-size:.85rem;color:#3d1830;line-height:1.7;margin-bottom:20px;text-align:left"><strong>C'est le grand jour !</strong> Toute l'équipe du Défi Enfance vous attend avec beaucoup d'enthousiasme. Vous allez courir, jouer, rire — et faire quelque chose de grand pour l'enfance. 🌟</div>
+
+  ${blocDossard}
+
+  <!-- Chaleur -->
+  <div style="background:#e0f2fe;border:2px solid #0284c7;border-radius:14px;padding:18px 22px;margin-bottom:20px;text-align:left">
+    <div style="font-size:.72rem;font-weight:700;color:#0284c7;text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px">🌡️ 35°C aujourd'hui — on a tout prévu !</div>
+    <div style="font-size:.83rem;color:#1e3a5f;line-height:1.9">
+      🌳 <strong>100% sous les arbres</strong> — Parc des Bretonnières<br>
+      ⏱️ <strong>1h30 de course</strong> — départ 14h30<br>
+      💦 <strong>Une tonne d'eau</strong> pour vous arroser tout au long de la course<br>
+      🚑 <strong>Poste de secours</strong> Croix Blanche 37 sur place<br>
+      📍 <strong>RDV côté Espace Malraux</strong> dès 13h00
+    </div>
+  </div>
+
+  <!-- Gamification -->
+  <div style="background:#fff0f8;border:2px solid #fb0089;border-radius:14px;padding:18px 22px;margin-bottom:20px;text-align:left">
+    <div style="font-size:.72rem;font-weight:700;color:#fb0089;text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px">🎮 13 épreuves pour gagner des km autrement !</div>
+    <div style="font-size:.83rem;color:#3d1830;line-height:1.9">
+      🤜 <strong>Le Dos à Dos</strong> — 400m dos à dos → <strong style="color:#fb0089">+2,5 km 🥇</strong><br>
+      🧠 <strong>Le Tour Aveugle</strong> — yeux bandés, guidé → <strong style="color:#fb0089">+2 km</strong><br>
+      👣 <strong>Les Siamois des chevilles</strong> → <strong style="color:#fb0089">+1,5 km</strong><br>
+      🎯 <strong>Le Sniper du Radar</strong> → <strong style="color:#fb0089">+1 km</strong><br>
+      🦀 <strong>Le Tour du Crabe</strong> → <strong style="color:#fb0089">+1 km</strong><br>
+      🪣 <strong>Le Relais Éponge</strong> → <strong style="color:#fb0089">+0,75 km</strong> 💦<br>
+      🧊 <strong>Le Défi Glace</strong> → <strong style="color:#fb0089">+0,5 km</strong><br>
+      <span style="font-size:.78rem;color:#888;font-style:italic">...et 6 autres surprises sur place !</span>
+    </div>
+  </div>
+
+  <!-- Programme -->
+  <div style="background:linear-gradient(135deg,#fff0f8,#fff5ef);border:1.5px solid rgba(251,0,137,.2);border-radius:14px;padding:18px 22px;margin-bottom:20px;text-align:left">
+    <div style="font-size:.72rem;font-weight:700;color:#fb0089;text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px">📌 Programme du jour</div>
+    <div style="font-size:.83rem;color:#3d1830;line-height:2">
+      🕐 <strong>13h00</strong> — Ouverture du village &amp; récupération des dossards<br>
+      🎤 <strong>13h45</strong> — Discours officiels<br>
+      🏁 <strong>14h30</strong> — Départ de la course !<br>
+      🍰 <strong>16h00</strong> — Goûter offert à tous<br>
+      🏆 <strong>16h30</strong> — Remise des prix
+    </div>
+  </div>
+
+  <!-- Venez accompagnés -->
+  <div style="background:#f0fff5;border:1.5px solid rgba(22,163,74,.3);border-radius:14px;padding:16px 20px;margin-bottom:20px;text-align:left">
+    <div style="font-size:.72rem;font-weight:700;color:#16a34a;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">🎉 Venez accompagnés !</div>
+    <div style="font-size:.84rem;color:#3d1830;line-height:1.7">Amenez vos <strong>supporters, famille, collègues</strong> — plus on est nombreux sous les arbres, plus c'est festif ! Vos proches peuvent s'inscrire comme supporters sur place. Et s'ils veulent soutenir votre collecte :<br><br>
+    <a href="${urlDon}" style="display:inline-block;background-color:#fb0089;color:#fff;text-decoration:none;padding:8px 18px;border-radius:99px;font-weight:700;font-size:.78rem;font-family:Arial,sans-serif;margin-right:6px">❤️ Faire un don</a>
+    <a href="${urlProm}" style="display:inline-block;background-color:#7c3aed;color:#fff;text-decoration:none;padding:8px 18px;border-radius:99px;font-weight:700;font-size:.78rem;font-family:Arial,sans-serif">🏅 Promettre au km</a>
+    </div>
+  </div>
+
+  <!-- Checklist -->
+  <div style="background:#f9f7ff;border-radius:12px;padding:16px 20px;margin-bottom:20px;text-align:left">
+    <div style="font-size:.75rem;font-weight:700;color:#3d1830;text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">✅ Checklist du jour</div>
+    <div style="font-size:.83rem;color:#3d1830;line-height:1.9">
+      👕 Tenue légère + T-shirt de votre organisation<br>
+      🕶️ Lunettes de soleil &amp; casquette<br>
+      🧴 Crème solaire<br>
+      💧 Bouteille d'eau — et préparez-vous à être arrosés !<br>
+      📱 Téléphone chargé pour partager les moments<br>
+      🎉 Beaucoup d'énergie et le sourire !
+    </div>
+  </div>
+
+  <div style="border-top:1px solid #f5dced;margin:16px 0"></div>
+  <div style="font-size:.86rem;color:#3d1830;text-align:center;font-style:italic;margin-bottom:6px">À tout à l'heure sous les arbres — et sous l'eau ! 💦🏃🌳</div>
+  <div style="font-size:.8rem;color:#fb0089;font-weight:600;text-align:center">— Team Défi Enfance</div>
+
+</td></tr>
+<tr><td style="background:#3d1830;padding:14px;text-align:center;border-radius:0 0 16px 16px">
+  <div style="font-size:.8rem;font-weight:700;color:#fb0089">DÉFI ENFANCE</div>
+  <div style="font-size:.72rem;color:rgba(255,255,255,.5)">Générateur de victoires pour l'enfance · contact@defienfance.fr</div>
+</td></tr>
+</table></td></tr></table>
+</body></html>`;
+}
+
+
 function tplGroupeJ1JoueReferents({ prenom, nomEquipe, urlPromesseEquipe, urlPageEquipe }) {
   const urlProm = urlPromesseEquipe || 'https://defienfance.fr/suivre-la-collecte-defi-enfance/?de_promise=1';
   const urlPage = urlPageEquipe    || 'https://defienfance.fr/suivre-la-collecte-defi-enfance/?de_view=teams&de_event=all';
@@ -5547,6 +5649,7 @@ const TEMPLATES_SUJETS = {
   'groupe_j2_referents_joue':      null, // sujet dynamique
   'groupe_j1_joue_coureurs':         null, // sujet dynamique
   'groupe_j1_joue_referents':        null, // sujet dynamique
+  'groupe_jourj_joue_coureurs':   '🏁 C\'est aujourd\'hui — votre dossard + tout ce qu\'il faut savoir !',
   'groupe_j1_joue_donateurs':      '❤️ Vendredi, votre soutien court avec eux ! 🌊',
   'groupe_j1_joue_supporters':     '🎉 Vendredi, votre présence fait toute la différence ! 🌊',
   'groupe_j1_angers_coureurs':    '🎽 Demain, c\'est le jour J ! 🎽',
@@ -5572,6 +5675,7 @@ function getTemplateFunction(templateId) {
     'groupe_j2_referents_angers':  (prenom, nbJours, extra) => tplGroupeJ2Referents({ prenom, urlPromesseEquipe: extra?.urlPromesseEquipe, urlPageEquipe: extra?.urlPageEquipe }),
     'groupe_j2_referents_joue':     (prenom, nbJours, extra) => tplGroupeJ2ReferentsJoue({ prenom, nbJours, urlPromesseEquipe: extra?.urlPromesseEquipe || extra?.urlPromesseCoureur, urlPageEquipe: extra?.urlPageEquipe }),
     'groupe_j1_joue_coureurs':       (prenom, nbJours, extra) => tplGroupeJ1JoueCoureurs({ prenom, nbJours, numeroDossard: extra?.numeroDossard || '', urlPageCoureur: extra?.urlPageCoureur, urlPromesseCoureur: extra?.urlPromesseCoureur }),
+    'groupe_jourj_joue_coureurs':   (prenom, nbJours, extra) => tplGroupeJourJJoueCoureurs({ prenom, numeroDossard: extra?.numeroDossard || '', urlPageCoureur: extra?.urlPageCoureur, urlPromesseCoureur: extra?.urlPromesseCoureur }),
     'groupe_j1_joue_donateurs':      (prenom, nbJours, extra) => tplGroupeJ1JoueDonateurs({ prenom, urlDon: extra?.urlDon, urlProm: extra?.urlProm }),
     'groupe_j1_joue_supporters':    (prenom, nbJours, extra) => tplGroupeJ1JoueSupporters({ prenom, urlDon: extra?.urlDon, urlProm: extra?.urlProm }),
     'groupe_j1_joue_referents':      (prenom, nbJours, extra) => tplGroupeJ1JoueReferents({ prenom, nomEquipe: extra?.nomEquipe || '', urlPromesseEquipe: extra?.urlPromesseEquipe, urlPageEquipe: extra?.urlPageEquipe }),
