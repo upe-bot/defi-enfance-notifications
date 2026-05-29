@@ -7299,6 +7299,8 @@ app.post('/api/envoi-groupe/start', async (req, res) => {
             sujetFinal = `🏁 ${p.prenom || ''}, Angers a couru — Joué-lès-Tours entre en scène !`;
           } else if (template === 'groupe_j2_referents_joue') {
             sujetFinal = `🏃 ${p.prenom || ''} — Boost collecte Joué ! Dans ${nbJours || 7} jours, c'est votre tour !`;
+          } else if (template === 'groupe_jourj_joue_coureurs') {
+            sujetFinal = `🏁 ${p.prenom || 'Coureur'}, c'est aujourd'hui — votre dossard + tout ce qu'il faut savoir !`;
           } else {
             if (nbJours) sujetBase = sujetBase ? sujetBase.replace(/\$\{j\}/g, nbJours).replace(/\d+ jours?/gi, `${nbJours} jours`) : template;
             sujetFinal = sujetBase ? sujetBase.replace(/\$\{prenom\}/g, p.prenom || 'Participant') : template;
