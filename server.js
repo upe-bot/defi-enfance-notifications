@@ -3515,6 +3515,160 @@ ${BLOC_RECUS_FISCAUX}${BLOC_IFI}
 </div><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td bgcolor="#3d1830" style="background-color:#3d1830;padding:16px;text-align:center;border-radius:0 0 14px 14px"><div style="font-family:Arial,sans-serif;font-size:1.1rem;font-weight:700;color:#fb0089;letter-spacing:.08em;margin-bottom:6px">DÉFI ENFANCE</div><div style="font-size:.82rem;color:rgba(255,255,255,.5)">Générateur de victoires pour l'enfance<br>contact@defienfance.fr</div></td></tr></table></div></td></tr></table></body></html>`;
 }
 
+// ── Template Merci Promettants Joué 2026
+function tplGroupeMerciPromettantsJoue({ prenom, promesses }) {
+  // promesses = [{ type: 'coureur'|'equipe', nom, montantKm, kmParcourus, kmReel, clTotal, clReel, montantDu, urlDon }]
+  const totalDu = promesses.reduce((s, p) => s + (p.montantDu || 0), 0);
+
+  const IMG1 = 'https://raw.githubusercontent.com/upe-bot/defi-enfance-notifications/main/DSC07100.jpg';
+  const IMG2 = 'https://raw.githubusercontent.com/upe-bot/defi-enfance-notifications/main/DSC07318.jpg';
+  const IMG3 = 'https://raw.githubusercontent.com/upe-bot/defi-enfance-notifications/910b6a4cc1d78625a79201e5d4a46bc5c750adb6/enfanteau.jpg';
+  const URL_CLASSEMENT = 'https://upe-bot.github.io/defi-enfance-dossard/index.html';
+
+  let blocPromesses = '';
+  promesses.forEach(function(p) {
+    const isCoureur = p.type === 'coureur';
+    const label = isCoureur ? p.nom : ('l\'équipe ' + p.nom);
+    const emoji = isCoureur ? '🏃' : '🏆';
+    const typeLabel = isCoureur ? 'Coureur parrainé' : 'Équipe parrainée';
+
+    const montantAffiche = p.montantDu > 0
+      ? '<strong style="color:#fb0089;font-size:18px;font-family:Arial,sans-serif">' + p.montantDu.toFixed(2) + ' €</strong>'
+      : '<span style="color:#888;font-size:13px;font-family:Arial,sans-serif">km non encore saisis</span>';
+
+    const clBlock = (isCoureur && p.clTotal > 0)
+      ? '<table width="100%" cellpadding="0" cellspacing="0" style="margin:8px 0 10px"><tr>'
+        + '<td width="48%" style="text-align:center;background:#fff0f8;border-radius:8px;padding:8px 4px">'
+        + '<div style="font-size:22px;font-weight:700;color:#fb0089;font-family:Arial,sans-serif">#' + p.clTotal + '</div>'
+        + '<div style="font-size:10px;color:#fb0089;font-family:Arial,sans-serif">Classement km totaux</div>'
+        + '<div style="font-size:12px;font-weight:700;color:#3d1830;font-family:Arial,sans-serif">' + p.kmParcourus + ' km</div>'
+        + '</td><td width="4%"></td>'
+        + '<td width="48%" style="text-align:center;background:#f0fff8;border-radius:8px;padding:8px 4px">'
+        + '<div style="font-size:22px;font-weight:700;color:#0d9488;font-family:Arial,sans-serif">#' + p.clReel + '</div>'
+        + '<div style="font-size:10px;color:#0d9488;font-family:Arial,sans-serif">Classement km r&eacute;els</div>'
+        + '<div style="font-size:12px;font-weight:700;color:#3d1830;font-family:Arial,sans-serif">' + p.kmReel + ' km</div>'
+        + '</td></tr></table>'
+      : (p.kmParcourus > 0
+          ? '<div style="font-size:13px;color:#3d1830;margin:8px 0 10px;font-family:Arial,sans-serif">&#127939; <strong>' + p.kmParcourus + ' km</strong> parcourus</div>'
+          : '');
+
+    blocPromesses += '<table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:14px">'
+      + '<tr><td style="background:#ffffff;border:2px solid rgba(251,0,137,0.25);border-radius:12px;padding:16px 18px">'
+      + '<div style="font-size:10px;font-weight:700;color:#fb0089;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;font-family:Arial,sans-serif">' + emoji + ' ' + typeLabel + '</div>'
+      + '<div style="font-size:15px;font-weight:700;color:#3d1830;margin-bottom:4px;font-family:Arial,sans-serif">' + p.nom + '</div>'
+      + '<div style="font-size:13px;color:#3d1830;margin-bottom:2px;font-family:Arial,sans-serif">&#127881; <strong>' + p.montantKm + ' €/km</strong> promis</div>'
+      + clBlock
+      + '<div style="font-size:13px;color:#3d1830;margin-bottom:12px;font-family:Arial,sans-serif">&#128176; Don calcul&eacute; : ' + montantAffiche + '</div>'
+      + '<a href="' + p.urlDon + '" style="display:inline-block;background-color:#fb0089;color:#ffffff;text-decoration:none;padding:10px 22px;border-radius:99px;font-weight:700;font-size:13px;font-family:Arial,sans-serif">&#10084;&#65039; Je concr&eacute;tise ma promesse pour ' + label + '</a>'
+      + '</td></tr></table>';
+  });
+
+  const totalBlock = '<table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:20px">'
+    + '<tr><td align="center" bgcolor="#fff0f8" style="background-color:#fff0f8;border:2px solid #fb0089;border-radius:14px;padding:18px 22px">'
+    + '<div style="font-size:10px;font-weight:700;color:#fb0089;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;font-family:Arial,sans-serif">&#128176; Total de vos promesses</div>'
+    + '<div style="font-size:40px;font-weight:700;color:#fb0089;line-height:1.2;font-family:Arial,sans-serif">'
+    + (totalDu > 0 ? totalDu.toFixed(2) + ' &euro;' : '&Agrave; calculer')
+    + '</div>'
+    + '<div style="font-size:12px;color:#3d1830;margin-top:6px;font-family:Arial,sans-serif">Selon les km r&eacute;ellement parcourus</div>'
+    + '</td></tr></table>';
+
+  return '<!DOCTYPE html>'
+    + '<html lang="fr" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">'
+    + '<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
+    + '<meta http-equiv="X-UA-Compatible" content="IE=edge">'
+    + '<!--[if mso]><noscript><xml><o:OfficeDocumentSettings><o:PixelsPerInch>96</o:PixelsPerInch></o:OfficeDocumentSettings></xml></noscript><![endif]-->'
+    + '<style>body,table,td{font-family:Arial,sans-serif}a{color:#fb0089}</style>'
+    + '</head>'
+    + '<body style="margin:0;padding:0;background-color:#f5f0f5">'
+    + '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f5f0f5">'
+    + '<tr><td align="center" style="padding:20px 12px">'
+    + '<table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px">'
+
+    // HEADER
+    + '<tr><td align="center" valign="top" bgcolor="#fb0089" style="background-color:#fb0089;border-radius:16px 16px 0 0;padding:28px 32px">'
+    + '<div style="font-size:11px;font-weight:700;color:#ffd6ec;text-transform:uppercase;letter-spacing:2px;margin-bottom:10px;font-family:Arial,sans-serif">&#127881; D&eacute;fi Enfance &middot; Jou&eacute;-l&egrave;s-Tours 2026 &middot; 1ère &eacute;dition</div>'
+    + '<div style="font-size:22px;font-weight:700;color:#ffffff;line-height:1.3;margin-bottom:8px;font-family:Arial,sans-serif">&#127937; 3000 km pour l\'enfance &mdash;<br>concrétisez votre promesse !</div>'
+    + '<div style="font-size:13px;color:#ffd6ec;font-family:Arial,sans-serif">29 mai 2026 &middot; Parc des Bretonnières &middot; Joué-lès-Tours</div>'
+    + '</td></tr>'
+
+    // INTRO
+    + '<tr><td style="background-color:#ffffff;padding:24px 24px 8px">'
+    + '<p style="font-size:15px;font-weight:700;color:#3d1830;margin:0 0 6px;font-family:Arial,sans-serif">Bonjour ' + prenom + ',</p>'
+    + '<p style="font-size:14px;color:#3d1830;line-height:1.75;margin:0 0 16px;font-family:Arial,sans-serif">'
+    + 'La 1ère édition du Défi Enfance à Joué-lès-Tours est un <strong>succès</strong> — 3000 km parcourus pour l\'enfance, des dizaines d\'équipes, des pionniers qui ont osé ! '
+    + 'Vous avez promis un don au kilomètre pour soutenir nos coureurs. <strong>Il est temps de concrétiser cette belle promesse.</strong>'
+    + '</p></td></tr>'
+
+    // PHOTOS
+    + '<tr><td style="padding:0 24px 16px">'
+    + '<img src="' + IMG1 + '" alt="Défi Enfance Joué 2026" width="552" style="width:100%;max-width:552px;display:block;border-radius:12px 12px 0 0;border:0">'
+    + '<table width="100%" cellpadding="0" cellspacing="0"><tr>'
+    + '<td width="49%"><img src="' + IMG2 + '" alt="" width="272" style="width:100%;display:block;border-radius:0 0 0 12px;margin-top:4px;border:0"></td>'
+    + '<td width="2%"></td>'
+    + '<td width="49%"><img src="' + IMG3 + '" alt="" width="272" style="width:100%;display:block;border-radius:0 0 12px 0;margin-top:4px;border:0"></td>'
+    + '</tr></table></td></tr>'
+
+    // TOTAL
+    + '<tr><td style="padding:0 24px">' + totalBlock + '</td></tr>'
+
+    // PROMESSES
+    + '<tr><td style="padding:0 24px">'
+    + '<div style="font-size:14px;font-weight:700;color:#3d1830;margin-bottom:12px;font-family:Arial,sans-serif">&#127941; Vos promesses &mdash; concrétisez-les maintenant !</div>'
+    + blocPromesses
+    + '</td></tr>'
+
+    // CLASSEMENT
+    + '<tr><td style="padding:0 24px 16px"><table width="100%" cellpadding="0" cellspacing="0"><tr><td align="center">'
+    + '<a href="' + URL_CLASSEMENT + '" style="display:inline-block;background-color:#3d1830;color:#ffffff;text-decoration:none;padding:11px 24px;border-radius:99px;font-weight:700;font-size:13px;font-family:Arial,sans-serif">&#127942; Voir le classement général Joué &amp; Angers</a>'
+    + '</td></tr></table></td></tr>'
+
+    // COLLECTE
+    + '<tr><td style="padding:0 24px 16px">'
+    + '<table width="100%" cellpadding="0" cellspacing="0" style="border-radius:14px">'
+    + '<tr><td bgcolor="#f0fff8" style="background-color:#f0fff8;border:1px solid #bbf7d0;border-radius:12px;padding:16px 20px">'
+    + '<div style="font-size:10px;font-weight:700;color:#16a34a;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;font-family:Arial,sans-serif">&#128640; La collecte continue jusqu\'au 15 juin !</div>'
+    + '<p style="font-size:14px;color:#3d1830;line-height:1.75;margin:0 0 10px;font-family:Arial,sans-serif">'
+    + 'Votre don compte directement pour les enfants soutenus par <strong>les associations parrainées</strong> par nos coureurs. La collecte reste ouverte jusqu\'au 15 juin — vos proches et réseaux peuvent encore donner !'
+    + '</p>'
+    + '<a href="https://defienfance.fr/faire-un-don/" style="display:inline-block;background-color:#16a34a;color:#ffffff;text-decoration:none;padding:9px 20px;border-radius:99px;font-weight:700;font-size:13px;font-family:Arial,sans-serif">&#10084; Faire un don supplémentaire</a>'
+    + '</td></tr></table></td></tr>'
+
+    // DON SUPPLÉMENTAIRE
+    + '<tr><td style="padding:0 24px 16px">'
+    + '<table width="100%" cellpadding="0" cellspacing="0" style="border-radius:14px">'
+    + '<tr><td bgcolor="#fff5ef" style="background-color:#fff5ef;border:1px solid rgba(239,97,53,.3);border-radius:12px;padding:16px 20px">'
+    + '<div style="font-size:10px;font-weight:700;color:#ef6135;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;font-family:Arial,sans-serif">&#10024; Envie d\'aller encore plus loin ?</div>'
+    + '<p style="font-size:14px;color:#3d1830;line-height:1.75;margin:0 0 12px;font-family:Arial,sans-serif">'
+    + 'Si l\'énergie de cette journée vous a touché, vous pouvez donner <strong>au-delà de votre promesse</strong> directement pour le coureur ou l\'équipe que vous parrainez. Chaque euro supplémentaire fait une vraie différence pour les enfants.'
+    + '</p>'
+    + '<p style="font-size:14px;color:#3d1830;line-height:1.75;margin:0 0 14px;font-family:Arial,sans-serif">'
+    + 'Dans le module de don, sélectionnez :<br>'
+    + '<strong style="color:#ef6135">Défi Enfance Joué-lès-Tours</strong>'
+    + ' &rsaquo; <strong style="color:#ef6135">votre coureur ou équipe</strong>'
+    + ' &rsaquo; ajoutez si vous le souhaitez un <em>mot d\'encouragement</em>.'
+    + '</p>'
+    + '<a href="https://defienfance.fr/faire-un-don/" style="display:inline-block;background-color:#ef6135;color:#ffffff;text-decoration:none;padding:9px 20px;border-radius:99px;font-weight:700;font-size:13px;font-family:Arial,sans-serif">&#128150; Faire un don pour mon coureur / mon &eacute;quipe</a>'
+    + '</td></tr></table></td></tr>'
+
+    // MESSAGE FINAL
+    + '<tr><td style="padding:0 24px 20px">'
+    + '<p style="font-size:14px;color:#3d1830;line-height:1.75;margin:0 0 16px;font-family:Arial,sans-serif">'
+    + 'Un immense <strong>merci pour votre confiance et votre générosité</strong>. Votre promesse a donné de l\'élan à nos coureurs tout au long de la journée. Ensemble, nous posons les bases du Défi Enfance en Touraine. <strong>Tout commence !</strong>'
+    + '</p>'
+    + '<div style="border-top:1px solid #f5dced;margin:16px 0"></div>'
+    + '<p style="font-size:13px;color:#fb0089;font-weight:700;text-align:center;margin:0;font-family:Arial,sans-serif">&mdash; L\'équipe d\'organisation Défi Enfance</p>'
+    + '</td></tr>'
+
+    // FOOTER
+    + '<tr><td align="center" bgcolor="#3d1830" style="background-color:#3d1830;padding:14px;border-radius:0 0 16px 16px">'
+    + '<div style="font-size:13px;font-weight:700;color:#fb0089;font-family:Arial,sans-serif">DÉFI ENFANCE</div>'
+    + '<div style="font-size:11px;color:rgba(255,255,255,.5);font-family:Arial,sans-serif">Générateur de victoires pour l\'enfance &middot; contact@defienfance.fr</div>'
+    + '</td></tr>'
+
+    + '</table></td></tr></table></body></html>';
+}
+
+
 function tplGroupeJourJPromesses({ prenom, promesses }) {
   // promesses = [{ type: 'coureur'|'equipe', nom, montantKm, kmParcourus, montantDu, urlDon }]
   const totalDu = promesses.reduce((s, p) => s + (p.montantDu || 0), 0);
@@ -6276,6 +6430,7 @@ const TEMPLATES_SUJETS = {
   'groupe_j1_angers_coureurs':    '🎽 Demain, c\'est le jour J ! 🎽',
   'groupe_j1_donateurs':          '❤️ Merci pour votre soutien — demain c\'est le grand jour !',
   'groupe_jourj_promesses':        '🏁 Vos promesses de don — le Défi Enfance a couru pour l\'enfance !',
+  'groupe_merci_promettants_joue':  '💖 3000 km pour l\'enfance — concrétisez votre promesse de don !',
   'groupe_merci_donateurs_angers':  null, // sujet dynamique
   'groupe_merci_donateurs_joue':    null, // sujet dynamique
   'groupe_merci_coureurs_angers':   null, // sujet dynamique par coureur
@@ -6305,6 +6460,7 @@ function getTemplateFunction(templateId) {
     'groupe_j1_angers_coureurs':  (prenom, nbJours, extra) => tplGroupeJ1Angers({ prenom, numeroDossard: extra?.numeroDossard, urlPageCoureur: extra?.urlPageCoureur, urlPromesseCoureur: extra?.urlPromesseCoureur }),
     'groupe_j1_donateurs':        (prenom, nbJours, extra) => tplGroupeJ1Donateurs({ prenom, historiqueHtml: extra?.historiqueHtml || '', urlDon: extra?.urlDon, urlProm: extra?.urlProm }),
     'groupe_jourj_promesses':     (prenom, nbJours, extra) => tplGroupeJourJPromesses({ prenom, promesses: extra?.promesses || [] }),
+    'groupe_merci_promettants_joue': (prenom, nbJours, extra) => tplGroupeMerciPromettantsJoue({ prenom, promesses: extra?.promesses || [] }),
     'groupe_merci_donateurs_angers': (prenom, nbJours, extra) => tplGroupeMerciDonateurAngers({ prenom, historiqueHtml: extra?.historiqueHtml || '', totalDons: extra?.totalDons || 0, nbDons: extra?.nbDons || 0 }),
     'groupe_merci_donateurs_joue':   (prenom, nbJours, extra) => tplGroupeMerciDonateurJoue({ prenom, historiqueHtml: extra?.historiqueHtml || '', totalDons: extra?.totalDons || 0, nbDons: extra?.nbDons || 0 }),
     'groupe_merci_coureurs_angers': (prenom, nbJours, extra) => tplGroupeMerciCoureurAngers({ prenom, dossard: extra?.numeroDossard || 0, nomCoureur: extra?.nom || prenom, equipe: extra?.nomEquipe || '', kmsPerso: extra?.kmsPerso || 0, classementPerso: extra?.classementPerso || 0, kmsEquipe: extra?.kmsEquipe || 0, classementEquipe: extra?.classementEquipe || 0, estSolo: !extra?.nomEquipe || extra?.nomEquipe === (extra?.nom || prenom) }),
@@ -6327,6 +6483,7 @@ const EVENTS_MAP = {
   'angers_coureurs':             ['Défi Enfance #Course #Angers2026'],
   'angers_coureurs_referents':   ['Défi Enfance #Course #Angers2026'],
   'promettants_angers':         ['Défi Enfance #Course #Angers2026', 'Défi Enfance #Supporters #Angers2026'],
+  'promettants_joue':           ['Défi Enfance #Course #Joué-lès-Tours2026', 'Défi Enfance #Supporters #Joué-lès-Tours2026'],
   'donateurs_angers_global':    ['Défi Enfance #Course #Angers2026', 'Défi Enfance global'],
   'donateurs_joue':             ['Défi Enfance #Course #Joué-lès-Tours2026'],
   'supporters_joue':             ['Défi Enfance #Supporters #Joué-lès-Tours2026'],
@@ -7432,6 +7589,94 @@ async function fetchPromettantsAvecPromesses() {
   return [...promettantsMap.values()];
 }
 
+// ── Promettants Joué 2026 — enrichis avec classement CLASSEMENT_JOUE_2026
+async function fetchPromettantsJoueAvecPromesses() {
+  const promettantsMap = new Map(); // email → { prenom, nom, email, contactId, promesses[] }
+  let cursor = null;
+  while (true) {
+    await sleep(OHME_DELAY_MS);
+    const url = cursor
+      ? `${CONFIG.ohmeBase}/api/v1/payments?payment_type_id=1&limit=250&since_date=2025-01-01&cursor=${encodeURIComponent(cursor)}`
+      : `${CONFIG.ohmeBase}/api/v1/payments?payment_type_id=1&limit=250&since_date=2025-01-01`;
+    const r = await fetchOhmeWithRetry(url, { headers: { 'Accept': 'application/json', 'client-name': CONFIG.ohmeClientName, 'client-secret': CONFIG.ohmeClientSecret } });
+    if (!r || !r.ok) break;
+    const j = await r.json();
+    const items = j.data || [];
+    for (const p of items) {
+      const cf = p.custom_fields || p;
+      const montantKm = parseFloat(cf.montant_promesse_don_par_km || 0);
+      if (!montantKm || montantKm <= 0) continue;
+      const eventName = (p.nom_de_levent || cf.nom_de_levent || '').toUpperCase();
+      // Filtrer sur Joué
+      if (!eventName.includes('JOUE') && !eventName.includes('JOUÉ') && !eventName.includes('TOURS')) continue;
+      const coureurParraine = (cf.coureur_parraine || '').trim();
+      const equipeParraine  = (cf.equipe_parraine  || '').trim();
+      if (!coureurParraine && !equipeParraine) continue;
+      await sleep(OHME_CONTACT_DELAY_MS);
+      let contact = await fetchOhmeContactById(p.contact_id);
+      if (!contact?.email && p.structure_id) {
+        await sleep(OHME_CONTACT_DELAY_MS);
+        const rStr = await fetchOhmeWithRetry(`${CONFIG.ohmeBase}/api/v1/structures/${p.structure_id}`, {
+          headers: { 'Accept': 'application/json', 'client-name': CONFIG.ohmeClientName, 'client-secret': CONFIG.ohmeClientSecret }
+        });
+        if (rStr?.ok) {
+          const jStr = await rStr.json();
+          const structure = jStr.data || jStr;
+          const cfStr = structure.custom_fields || structure;
+          const emailRef = (cfStr.email_referent_defi_enfance || '').trim();
+          if (emailRef) {
+            contact = {
+              id: `struct_${p.structure_id}`,
+              email: emailRef,
+              firstname: cfStr.prenom_du_referent_defi_enfance || structure.name || '',
+              lastname:  cfStr.nom_du_referent_defi_enfance || '',
+            };
+          }
+        }
+      }
+      if (!contact?.email) continue;
+      const email  = contact.email.toLowerCase().trim();
+      const prenom = contact.firstname || contact.first_name || '';
+      const nom    = contact.lastname  || contact.last_name  || '';
+      if (!promettantsMap.has(email)) {
+        promettantsMap.set(email, { prenom, nom, email, contactId: contact.id, promesses: [] });
+      }
+      if (coureurParraine) {
+        // Chercher le dossard du coureur via DOSSARDS_JOUE_2026 (recherche par nom)
+        let clCoureur = null;
+        const nomNorm = coureurParraine.toLowerCase().trim();
+        for (const [dos, c] of Object.entries(DOSSARDS_JOUE_2026)) {
+          const nomComplet = ((c.prenom || '') + ' ' + (c.nom || '')).toLowerCase().trim();
+          const nomInverse = ((c.nom || '') + ' ' + (c.prenom || '')).toLowerCase().trim();
+          if (nomNorm === nomComplet || nomNorm === nomInverse || nomNorm === (c.nom || '').toLowerCase()) {
+            clCoureur = CLASSEMENT_JOUE_2026[parseInt(dos)];
+            break;
+          }
+        }
+        const kmParcourus = clCoureur?.km_total || 0;
+        const kmReel      = clCoureur?.km_reel  || 0;
+        const clTotal     = clCoureur?.cl_total || 0;
+        const clReel      = clCoureur?.cl_reel  || 0;
+        const montantDu   = kmParcourus > 0 ? Math.round(kmParcourus * montantKm * 100) / 100 : 0;
+        promettantsMap.get(email).promesses.push({ type: 'coureur', nom: coureurParraine, montantKm, kmParcourus, kmReel, clTotal, clReel, montantDu, urlDon: 'https://defienfance.fr/faire-un-don/' });
+      } else if (equipeParraine) {
+        const eqData = CLASSEMENT_EQUIPES_JOUE[equipeParraine] || {};
+        const kmParcourus = eqData.km_total || 0;
+        const kmReel      = eqData.km_reel  || 0;
+        const clTotal     = eqData.cl_total || 0;
+        const clReel      = eqData.cl_reel  || 0;
+        const montantDu   = kmParcourus > 0 ? Math.round(kmParcourus * montantKm * 100) / 100 : 0;
+        promettantsMap.get(email).promesses.push({ type: 'equipe', nom: equipeParraine, montantKm, kmParcourus, kmReel, clTotal, clReel, montantDu, urlDon: 'https://defienfance.fr/faire-un-don/' });
+      }
+    }
+    if (items.length < 250) break;
+    cursor = j.cursor || (items.length > 0 ? String(items[items.length - 1].id) : null);
+    if (!cursor) break;
+  }
+  addLog(`✅ ${promettantsMap.size} promettant(s) Joué trouvés`, 'ok');
+  return [...promettantsMap.values()];
+}
+
 
 // ══════════════════════════════════════════════════════
 //  GESTION DES DOUBLONS — ENVOIS GROUPÉS
@@ -7739,6 +7984,8 @@ app.post('/api/envoi-groupe/preview', async (req, res) => {
     envoiGroupeLog(`🔍 Comptage : ${typeDestinataire}…`, 'info');
     const tous = typeDestinataire === 'promettants_angers'
       ? (await fetchPromettantsAvecPromesses()).map(p => ({ prenom: p.prenom, nom: p.nom, email: p.email, contactId: p.contactId, extra_promesses: p.promesses }))
+      : typeDestinataire === 'promettants_joue'
+      ? (await fetchPromettantsJoueAvecPromesses()).map(p => ({ prenom: p.prenom, nom: p.nom, email: p.email, contactId: p.contactId, extra_promesses: p.promesses }))
       : ['donateurs_angers_global','donateurs_joue'].includes(typeDestinataire)
       ? (await fetchDestinatairesAvecDons(typeDestinataire)).map(p => ({ prenom: p.prenom, nom: p.nom, email: p.email, contactId: p.contactId, extra_historique: p.historiqueHtml, extra_total: p.totalDons, extra_nb: p.dons.length }))
       : await fetchDestinataires({ typeDestinataire, filtreEquipe, depuisFrance, nbJours });
@@ -7843,6 +8090,10 @@ app.post('/api/envoi-groupe/start', async (req, res) => {
       const fetchTousStart = async () => {
         if (typeDestinataire === 'promettants_angers') {
           const promettants = await fetchPromettantsAvecPromesses();
+          return promettants.map(p => ({ prenom: p.prenom, nom: p.nom, email: p.email, contactId: p.contactId, extra_promesses: p.promesses }));
+        }
+        if (typeDestinataire === 'promettants_joue') {
+          const promettants = await fetchPromettantsJoueAvecPromesses();
           return promettants.map(p => ({ prenom: p.prenom, nom: p.nom, email: p.email, contactId: p.contactId, extra_promesses: p.promesses }));
         }
         if (['donateurs_angers_global','donateurs_joue'].includes(typeDestinataire)) {
@@ -8242,6 +8493,9 @@ app.post('/api/envoi-groupe/test-contact', async (req, res) => {
     let tous;
     if (typeDestinataire === 'promettants_angers') {
       const promettants = await fetchPromettantsAvecPromesses();
+      tous = promettants.map(p => ({ prenom: p.prenom, nom: p.nom, email: p.email, contactId: p.contactId, extra_promesses: p.promesses }));
+    } else if (typeDestinataire === 'promettants_joue') {
+      const promettants = await fetchPromettantsJoueAvecPromesses();
       tous = promettants.map(p => ({ prenom: p.prenom, nom: p.nom, email: p.email, contactId: p.contactId, extra_promesses: p.promesses }));
     } else if (['donateurs_angers_global','donateurs_joue'].includes(typeDestinataire)) {
       const donateurs = await fetchDestinatairesAvecDons(typeDestinataire);
