@@ -3515,6 +3515,232 @@ ${BLOC_RECUS_FISCAUX}${BLOC_IFI}
 </div><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td bgcolor="#3d1830" style="background-color:#3d1830;padding:16px;text-align:center;border-radius:0 0 14px 14px"><div style="font-family:Arial,sans-serif;font-size:1.1rem;font-weight:700;color:#fb0089;letter-spacing:.08em;margin-bottom:6px">DÉFI ENFANCE</div><div style="font-size:.82rem;color:rgba(255,255,255,.5)">Générateur de victoires pour l'enfance<br>contact@defienfance.fr</div></td></tr></table></div></td></tr></table></body></html>`;
 }
 
+// ── Template Merci Donateurs Joué 2026 (post-course)
+function tplGroupeMerciDonateursJouePostCourse({ prenom, historiqueHtml, totalDons, nbDons }) {
+  const IMG1 = 'https://raw.githubusercontent.com/upe-bot/defi-enfance-notifications/main/DSC07100.jpg';
+  const IMG2 = 'https://raw.githubusercontent.com/upe-bot/defi-enfance-notifications/main/DSC07318.jpg';
+  const IMG3 = 'https://raw.githubusercontent.com/upe-bot/defi-enfance-notifications/910b6a4cc1d78625a79201e5d4a46bc5c750adb6/enfanteau.jpg';
+  const URL_CLASSEMENT = 'https://upe-bot.github.io/defi-enfance-dossard/index.html';
+  const URL_DON        = 'https://defienfance.fr/faire-un-don/';
+  const URL_IFI        = 'https://www.fondation-enfance.org/creer-ma-fondation/fondations-et-fonds-abrites/fondation-unis-pour-lenfance/';
+
+  const blocHistorique = historiqueHtml
+    ? '<table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:20px">'
+      + '<tr><td bgcolor="#fff0f8" style="background-color:#fff0f8;border:2px solid #fb0089;border-radius:14px;padding:18px 22px">'
+      + '<div style="font-size:10px;font-weight:700;color:#fb0089;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;font-family:Arial,sans-serif">&#10084;&#65039; Votre soutien au Défi Enfance de Joué</div>'
+      + historiqueHtml
+      + '<div style="font-size:14px;color:#3d1830;margin-top:12px;font-weight:600;font-family:Arial,sans-serif">Total : <span style="color:#fb0089">' + (totalDons > 0 ? totalDons.toFixed(2) + ' €' : 'voir ci-dessus') + '</span> — ' + nbDons + ' don(s)</div>'
+      + '</td></tr></table>'
+    : '';
+
+  const blocIFI = '<table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:20px">'
+    + '<tr><td style="background:linear-gradient(135deg,#f0f7ff,#f5f0ff);border:2px solid #1a56db;border-radius:14px;padding:18px 24px;text-align:center">'
+    + '<div style="font-size:10px;font-weight:700;color:#1a56db;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;font-family:Arial,sans-serif">&#127963;&#65039; Don IFI — soutenir le Défi Enfance avec votre IFI ?</div>'
+    + '<p style="font-size:14px;color:#1a0a12;line-height:1.7;margin:0 0 14px;font-family:Arial,sans-serif">C\'est possible via la <strong>Fondation Unis pour l\'Enfance</strong>, sous égide de la Fondation pour l\'Enfance reconnue d\'utilité publique. Trois leviers&nbsp;: le Défi Enfance &middot; les lieux de vie aimants &middot; l\'insertion des jeunes majeurs.</p>'
+    + '<a href="' + URL_IFI + '" style="display:inline-block;background:linear-gradient(135deg,#1a56db,#7c3aed);color:#ffffff;text-decoration:none;padding:10px 24px;border-radius:99px;font-weight:700;font-size:13px;font-family:Arial,sans-serif">&#127963;&#65039; Faire un don IFI</a>'
+    + '</td></tr></table>';
+
+  return '<!DOCTYPE html>'
+    + '<html lang="fr" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">'
+    + '<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
+    + '<meta http-equiv="X-UA-Compatible" content="IE=edge">'
+    + '<!--[if mso]><noscript><xml><o:OfficeDocumentSettings><o:PixelsPerInch>96</o:PixelsPerInch></o:OfficeDocumentSettings></xml></noscript><![endif]-->'
+    + '<style>body,table,td{font-family:Arial,sans-serif}a{color:#fb0089}</style>'
+    + '</head>'
+    + '<body style="margin:0;padding:0;background-color:#f5f0f5">'
+    + '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f5f0f5">'
+    + '<tr><td align="center" style="padding:20px 12px">'
+    + '<table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px">'
+
+    // HEADER
+    + '<tr><td align="center" valign="top" bgcolor="#fb0089" style="background-color:#fb0089;border-radius:16px 16px 0 0;padding:28px 32px">'
+    + '<div style="font-size:11px;font-weight:700;color:#ffd6ec;text-transform:uppercase;letter-spacing:2px;margin-bottom:10px;font-family:Arial,sans-serif">&#127881; Défi Enfance &middot; Joué-lès-Tours 2026 &middot; 1ère édition</div>'
+    + '<div style="font-size:22px;font-weight:700;color:#ffffff;line-height:1.3;margin-bottom:8px;font-family:Arial,sans-serif">&#10084;&#65039; Merci ' + prenom + ' —<br>vous avez rendu cela possible !</div>'
+    + '<div style="font-size:13px;color:#ffd6ec;font-family:Arial,sans-serif">29 mai 2026 &middot; Parc des Bretonnières &middot; Joué-lès-Tours</div>'
+    + '</td></tr>'
+
+    // INTRO
+    + '<tr><td style="background-color:#ffffff;padding:24px 24px 8px">'
+    + '<p style="font-size:15px;font-weight:700;color:#3d1830;margin:0 0 6px;font-family:Arial,sans-serif">Bonjour ' + prenom + ',</p>'
+    + '<p style="font-size:14px;color:#3d1830;line-height:1.75;margin:0 0 20px;font-family:Arial,sans-serif">'
+    + 'La 1ère édition du Défi Enfance à Joué-lès-Tours est un <strong>succès</strong>. 3000 km parcourus, des dizaines d\'équipes, des pionniers qui ont tout donné sous 35°C. '
+    + 'Et derrière chaque km couru, il y avait des personnes comme vous — <strong>artisans discrets mais essentiels de cette première en Touraine</strong>. Merci du fond du cœur.'
+    + '</p></td></tr>'
+
+    // PHOTOS
+    + '<tr><td style="padding:0 24px 16px">'
+    + '<img src="' + IMG1 + '" alt="Défi Enfance Joué 2026" width="552" style="width:100%;max-width:552px;display:block;border-radius:12px 12px 0 0;border:0">'
+    + '<table width="100%" cellpadding="0" cellspacing="0"><tr>'
+    + '<td width="49%"><img src="' + IMG2 + '" alt="" width="272" style="width:100%;display:block;border-radius:0 0 0 12px;margin-top:4px;border:0"></td>'
+    + '<td width="2%"></td>'
+    + '<td width="49%"><img src="' + IMG3 + '" alt="" width="272" style="width:100%;display:block;border-radius:0 0 12px 0;margin-top:4px;border:0"></td>'
+    + '</tr></table></td></tr>'
+
+    // CHIFFRES CLÉS
+    + '<tr><td style="padding:0 24px 16px">'
+    + '<table width="100%" cellpadding="0" cellspacing="0" style="border-radius:14px">'
+    + '<tr><td bgcolor="#3d1830" style="background-color:#3d1830;padding:18px 20px;border-radius:14px">'
+    + '<div style="font-size:10px;font-weight:700;color:#fb0089;text-transform:uppercase;letter-spacing:1px;margin-bottom:14px;text-align:center;font-family:Arial,sans-serif">&#127942; La 1ère édition en chiffres</div>'
+    + '<table width="100%" cellpadding="0" cellspacing="0"><tr>'
+    + '<td width="33%" style="text-align:center">'
+    + '<div style="font-size:30px;font-weight:700;color:#fb0089;font-family:Arial,sans-serif">3000</div>'
+    + '<div style="font-size:11px;color:#ffd6ec;font-family:Arial,sans-serif">km parcourus</div>'
+    + '</td>'
+    + '<td width="33%" style="text-align:center">'
+    + '<div style="font-size:30px;font-weight:700;color:#fb0089;font-family:Arial,sans-serif">430</div>'
+    + '<div style="font-size:11px;color:#ffd6ec;font-family:Arial,sans-serif">coureurs classés</div>'
+    + '</td>'
+    + '<td width="33%" style="text-align:center">'
+    + '<div style="font-size:30px;font-weight:700;color:#fb0089;font-family:Arial,sans-serif">25</div>'
+    + '<div style="font-size:11px;color:#ffd6ec;font-family:Arial,sans-serif">équipes au classement</div>'
+    + '</td>'
+    + '</tr></table>'
+    + '</td></tr></table></td></tr>'
+
+    // CLASSEMENT
+    + '<tr><td style="padding:0 24px 16px"><table width="100%" cellpadding="0" cellspacing="0"><tr><td align="center">'
+    + '<a href="' + URL_CLASSEMENT + '" style="display:inline-block;background-color:#3d1830;color:#ffffff;text-decoration:none;padding:11px 24px;border-radius:99px;font-weight:700;font-size:13px;font-family:Arial,sans-serif">&#127942; Voir le classement général Joué &amp; Angers</a>'
+    + '</td></tr></table></td></tr>'
+
+    // HISTORIQUE DONS
+    + (blocHistorique ? '<tr><td style="padding:0 24px">' + blocHistorique + '</td></tr>' : '')
+
+    // REDONNER
+    + '<tr><td style="padding:0 24px 16px">'
+    + '<table width="100%" cellpadding="0" cellspacing="0" style="border-radius:14px">'
+    + '<tr><td bgcolor="#f0fff8" style="background-color:#f0fff8;border:1px solid #bbf7d0;border-radius:12px;padding:16px 20px">'
+    + '<div style="font-size:10px;font-weight:700;color:#16a34a;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;font-family:Arial,sans-serif">&#128640; La collecte continue jusqu\'au 15 juin !</div>'
+    + '<p style="font-size:14px;color:#3d1830;line-height:1.75;margin:0 0 14px;font-family:Arial,sans-serif">'
+    + 'La course est terminée mais la collecte reste ouverte jusqu\'au <strong>15 juin</strong>. Si vous souhaitez redonner ou faire découvrir le Défi Enfance à vos proches, chaque don supplémentaire compte directement pour les enfants accompagnés par nos associations partenaires.'
+    + '</p>'
+    + '<a href="' + URL_DON + '" style="display:inline-block;background-color:#16a34a;color:#ffffff;text-decoration:none;padding:10px 22px;border-radius:99px;font-weight:700;font-size:13px;font-family:Arial,sans-serif">&#10084; Faire un don supplémentaire</a>'
+    + '</td></tr></table></td></tr>'
+
+    // IFI
+    + '<tr><td style="padding:0 24px">' + blocIFI + '</td></tr>'
+
+    // MESSAGE FINAL
+    + '<tr><td style="padding:0 24px 20px">'
+    + '<p style="font-size:14px;color:#3d1830;line-height:1.75;margin:0 0 16px;font-family:Arial,sans-serif">'
+    + 'Vous faites partie de ceux qui ont cru en ce projet avant tout le monde. Ensemble, nous avons posé les bases du Défi Enfance en Touraine au service de tout le secteur de l\'aide à l\'enfance. <strong>Tout commence !</strong> À très vite.'
+    + '</p>'
+    + '<div style="border-top:1px solid #f5dced;margin:16px 0"></div>'
+    + '<p style="font-size:13px;color:#fb0089;font-weight:700;text-align:center;margin:0;font-family:Arial,sans-serif">&mdash; L\'équipe d\'organisation Défi Enfance</p>'
+    + '</td></tr>'
+
+    // FOOTER
+    + '<tr><td align="center" bgcolor="#3d1830" style="background-color:#3d1830;padding:14px;border-radius:0 0 16px 16px">'
+    + '<div style="font-size:13px;font-weight:700;color:#fb0089;font-family:Arial,sans-serif">DÉFI ENFANCE</div>'
+    + '<div style="font-size:11px;color:rgba(255,255,255,.5);font-family:Arial,sans-serif">Générateur de victoires pour l\'enfance &middot; contact@defienfance.fr</div>'
+    + '</td></tr>'
+
+    + '</table></td></tr></table></body></html>';
+}
+
+
+// ── Template Merci Supporters Joué 2026 (post-course)
+function tplGroupeMerciSupportersJoue({ prenom }) {
+  const IMG1 = 'https://raw.githubusercontent.com/upe-bot/defi-enfance-notifications/main/DSC07100.jpg';
+  const IMG2 = 'https://raw.githubusercontent.com/upe-bot/defi-enfance-notifications/main/DSC07318.jpg';
+  const IMG3 = 'https://raw.githubusercontent.com/upe-bot/defi-enfance-notifications/910b6a4cc1d78625a79201e5d4a46bc5c750adb6/enfanteau.jpg';
+  const URL_CLASSEMENT = 'https://upe-bot.github.io/defi-enfance-dossard/index.html';
+  const URL_DON        = 'https://defienfance.fr/faire-un-don/';
+
+  return '<!DOCTYPE html>'
+    + '<html lang="fr" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">'
+    + '<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
+    + '<meta http-equiv="X-UA-Compatible" content="IE=edge">'
+    + '<!--[if mso]><noscript><xml><o:OfficeDocumentSettings><o:PixelsPerInch>96</o:PixelsPerInch></o:OfficeDocumentSettings></xml></noscript><![endif]-->'
+    + '<style>body,table,td{font-family:Arial,sans-serif}a{color:#fb0089}</style>'
+    + '</head>'
+    + '<body style="margin:0;padding:0;background-color:#f5f0f5">'
+    + '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f5f0f5">'
+    + '<tr><td align="center" style="padding:20px 12px">'
+    + '<table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px">'
+
+    // HEADER
+    + '<tr><td align="center" valign="top" bgcolor="#fb0089" style="background-color:#fb0089;border-radius:16px 16px 0 0;padding:28px 32px">'
+    + '<div style="font-size:11px;font-weight:700;color:#ffd6ec;text-transform:uppercase;letter-spacing:2px;margin-bottom:10px;font-family:Arial,sans-serif">&#127881; Défi Enfance &middot; Joué-lès-Tours 2026 &middot; 1ère édition</div>'
+    + '<div style="font-size:22px;font-weight:700;color:#ffffff;line-height:1.3;margin-bottom:8px;font-family:Arial,sans-serif">&#127881; ' + prenom + ', vous étiez là —<br>c\'est pour ça que ça marche !</div>'
+    + '<div style="font-size:13px;color:#ffd6ec;font-family:Arial,sans-serif">29 mai 2026 &middot; Parc des Bretonnières &middot; Joué-lès-Tours</div>'
+    + '</td></tr>'
+
+    // INTRO
+    + '<tr><td style="background-color:#ffffff;padding:24px 24px 8px">'
+    + '<p style="font-size:15px;font-weight:700;color:#3d1830;margin:0 0 6px;font-family:Arial,sans-serif">Bonjour ' + prenom + ',</p>'
+    + '<p style="font-size:14px;color:#3d1830;line-height:1.75;margin:0 0 20px;font-family:Arial,sans-serif">'
+    + 'Vous avez été là. Dans les tribunes, le long des pistes, à encourager, à applaudir, à vibrer. <strong>Votre présence a compté</strong> — pas juste symboliquement, vraiment. '
+    + 'Les coureurs vous ont vu, vous ont entendu. Cette 1ère édition du Défi Enfance à Joué-lès-Tours est un succès, et vous en êtes une pièce essentielle.'
+    + '</p></td></tr>'
+
+    // PHOTOS
+    + '<tr><td style="padding:0 24px 16px">'
+    + '<img src="' + IMG1 + '" alt="Défi Enfance Joué 2026" width="552" style="width:100%;max-width:552px;display:block;border-radius:12px 12px 0 0;border:0">'
+    + '<table width="100%" cellpadding="0" cellspacing="0"><tr>'
+    + '<td width="49%"><img src="' + IMG2 + '" alt="" width="272" style="width:100%;display:block;border-radius:0 0 0 12px;margin-top:4px;border:0"></td>'
+    + '<td width="2%"></td>'
+    + '<td width="49%"><img src="' + IMG3 + '" alt="" width="272" style="width:100%;display:block;border-radius:0 0 12px 0;margin-top:4px;border:0"></td>'
+    + '</tr></table></td></tr>'
+
+    // CE QU'ON A FAIT ENSEMBLE
+    + '<tr><td style="padding:0 24px 16px">'
+    + '<table width="100%" cellpadding="0" cellspacing="0" style="border-radius:14px">'
+    + '<tr><td bgcolor="#3d1830" style="background-color:#3d1830;padding:18px 20px;border-radius:14px">'
+    + '<div style="font-size:10px;font-weight:700;color:#fb0089;text-transform:uppercase;letter-spacing:1px;margin-bottom:14px;text-align:center;font-family:Arial,sans-serif">&#127942; Ce qu\'on a accompli ensemble</div>'
+    + '<table width="100%" cellpadding="0" cellspacing="0"><tr>'
+    + '<td width="33%" style="text-align:center">'
+    + '<div style="font-size:30px;font-weight:700;color:#fb0089;font-family:Arial,sans-serif">3000</div>'
+    + '<div style="font-size:11px;color:#ffd6ec;font-family:Arial,sans-serif">km pour l\'enfance</div>'
+    + '</td>'
+    + '<td width="33%" style="text-align:center">'
+    + '<div style="font-size:30px;font-weight:700;color:#fb0089;font-family:Arial,sans-serif">25</div>'
+    + '<div style="font-size:11px;color:#ffd6ec;font-family:Arial,sans-serif">équipes en course</div>'
+    + '</td>'
+    + '<td width="33%" style="text-align:center">'
+    + '<div style="font-size:30px;font-weight:700;color:#fb0089;font-family:Arial,sans-serif">1ère</div>'
+    + '<div style="font-size:11px;color:#ffd6ec;font-family:Arial,sans-serif">édition en Touraine</div>'
+    + '</td>'
+    + '</tr></table>'
+    + '</td></tr></table></td></tr>'
+
+    // CLASSEMENT
+    + '<tr><td style="padding:0 24px 16px"><table width="100%" cellpadding="0" cellspacing="0"><tr><td align="center">'
+    + '<a href="' + URL_CLASSEMENT + '" style="display:inline-block;background-color:#3d1830;color:#ffffff;text-decoration:none;padding:11px 24px;border-radius:99px;font-weight:700;font-size:13px;font-family:Arial,sans-serif">&#127942; Voir le classement général Joué &amp; Angers</a>'
+    + '</td></tr></table></td></tr>'
+
+    // INVITER À DONNER
+    + '<tr><td style="padding:0 24px 16px">'
+    + '<table width="100%" cellpadding="0" cellspacing="0" style="border-radius:14px">'
+    + '<tr><td bgcolor="#fff0f8" style="background-color:#fff0f8;border:2px solid #fb0089;border-radius:14px;padding:18px 20px">'
+    + '<div style="font-size:10px;font-weight:700;color:#fb0089;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;font-family:Arial,sans-serif">&#10084;&#65039; Transformez votre présence en soutien concret</div>'
+    + '<p style="font-size:14px;color:#3d1830;line-height:1.75;margin:0 0 8px;font-family:Arial,sans-serif">'
+    + 'Vous avez soutenu les coureurs de vive voix. Vous pouvez maintenant <strong>prolonger ce soutien par un don</strong> — direct, en ligne, en quelques clics. '
+    + 'La collecte est ouverte jusqu\'au <strong>15 juin</strong> et chaque euro compte pour les enfants accompagnés par nos associations partenaires.'
+    + '</p>'
+    + '<p style="font-size:13px;color:#888;margin:0 0 14px;font-family:Arial,sans-serif">Dans le module de don : <strong style="color:#fb0089">Défi Enfance Joué-lès-Tours</strong> &rsaquo; choisissez un coureur ou une équipe &rsaquo; ajoutez un mot si vous le souhaitez.</p>'
+    + '<a href="' + URL_DON + '" style="display:inline-block;background-color:#fb0089;color:#ffffff;text-decoration:none;padding:11px 26px;border-radius:99px;font-weight:700;font-size:13px;font-family:Arial,sans-serif">&#10084; Faire un don pour l\'enfance</a>'
+    + '</td></tr></table></td></tr>'
+
+    // MESSAGE FINAL
+    + '<tr><td style="padding:0 24px 20px">'
+    + '<p style="font-size:14px;color:#3d1830;line-height:1.75;margin:0 0 16px;font-family:Arial,sans-serif">'
+    + 'Avec Baptiste Bech, le responsable des bénévoles, et toute l\'équipe d\'organisation, nous vous remercions chaleureusement de votre présence et de votre enthousiasme. '
+    + 'Ensemble, nous avons posé les bases du Défi Enfance en Touraine. <strong>Tout commence !</strong> À très vite.'
+    + '</p>'
+    + '<div style="border-top:1px solid #f5dced;margin:16px 0"></div>'
+    + '<p style="font-size:13px;color:#fb0089;font-weight:700;text-align:center;margin:0;font-family:Arial,sans-serif">&mdash; L\'équipe d\'organisation Défi Enfance</p>'
+    + '</td></tr>'
+
+    // FOOTER
+    + '<tr><td align="center" bgcolor="#3d1830" style="background-color:#3d1830;padding:14px;border-radius:0 0 16px 16px">'
+    + '<div style="font-size:13px;font-weight:700;color:#fb0089;font-family:Arial,sans-serif">DÉFI ENFANCE</div>'
+    + '<div style="font-size:11px;color:rgba(255,255,255,.5);font-family:Arial,sans-serif">Générateur de victoires pour l\'enfance &middot; contact@defienfance.fr</div>'
+    + '</td></tr>'
+
+    + '</table></td></tr></table></body></html>';
+}
+
+
 // ── Template Merci Promettants Joué 2026
 function tplGroupeMerciPromettantsJoue({ prenom, promesses }) {
   // promesses = [{ type: 'coureur'|'equipe', nom, montantKm, kmParcourus, kmReel, clTotal, clReel, montantDu, urlDon }]
@@ -6430,6 +6656,8 @@ const TEMPLATES_SUJETS = {
   'groupe_j1_angers_coureurs':    '🎽 Demain, c\'est le jour J ! 🎽',
   'groupe_j1_donateurs':          '❤️ Merci pour votre soutien — demain c\'est le grand jour !',
   'groupe_jourj_promesses':        '🏁 Vos promesses de don — le Défi Enfance a couru pour l\'enfance !',
+  'groupe_merci_donateurs_joue_post':  '💖 3000 km pour l\'enfance — merci d\'avoir rendu cela possible !',
+  'groupe_merci_supporters_joue':       '🎉 Vous étiez là — merci pour votre présence au Défi Enfance !',
   'groupe_merci_promettants_joue':  '💖 3000 km pour l\'enfance — concrétisez votre promesse de don !',
   'groupe_merci_donateurs_angers':  null, // sujet dynamique
   'groupe_merci_donateurs_joue':    null, // sujet dynamique
@@ -6460,6 +6688,8 @@ function getTemplateFunction(templateId) {
     'groupe_j1_angers_coureurs':  (prenom, nbJours, extra) => tplGroupeJ1Angers({ prenom, numeroDossard: extra?.numeroDossard, urlPageCoureur: extra?.urlPageCoureur, urlPromesseCoureur: extra?.urlPromesseCoureur }),
     'groupe_j1_donateurs':        (prenom, nbJours, extra) => tplGroupeJ1Donateurs({ prenom, historiqueHtml: extra?.historiqueHtml || '', urlDon: extra?.urlDon, urlProm: extra?.urlProm }),
     'groupe_jourj_promesses':     (prenom, nbJours, extra) => tplGroupeJourJPromesses({ prenom, promesses: extra?.promesses || [] }),
+    'groupe_merci_donateurs_joue_post': (prenom, nbJours, extra) => tplGroupeMerciDonateursJouePostCourse({ prenom, historiqueHtml: extra?.historiqueHtml || '', totalDons: extra?.totalDons || 0, nbDons: extra?.nbDons || 0 }),
+    'groupe_merci_supporters_joue':      (prenom, nbJours, extra) => tplGroupeMerciSupportersJoue({ prenom }),
     'groupe_merci_promettants_joue': (prenom, nbJours, extra) => tplGroupeMerciPromettantsJoue({ prenom, promesses: extra?.promesses || [] }),
     'groupe_merci_donateurs_angers': (prenom, nbJours, extra) => tplGroupeMerciDonateurAngers({ prenom, historiqueHtml: extra?.historiqueHtml || '', totalDons: extra?.totalDons || 0, nbDons: extra?.nbDons || 0 }),
     'groupe_merci_donateurs_joue':   (prenom, nbJours, extra) => tplGroupeMerciDonateurJoue({ prenom, historiqueHtml: extra?.historiqueHtml || '', totalDons: extra?.totalDons || 0, nbDons: extra?.nbDons || 0 }),
