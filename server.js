@@ -4023,10 +4023,10 @@ function tplGroupeMerciCoureurJoue({ prenom, nomComplet, nomEquipe, numeroDossar
 
   <!-- Photos -->
   <div style="margin-bottom:20px;border-radius:12px;overflow:hidden">
-    <img src="https://raw.githubusercontent.com/upe-bot/defi-enfance-notifications/aa0acab63d64c36bf95ac1511c093fa06a3536a6/DSC07100.jpg" alt="Défi Enfance Joué 2026" style="width:100%;display:block;border-radius:12px 12px 0 0" onerror="this.style.display='none'">
+    <img src="https://raw.githubusercontent.com/upe-bot/defi-enfance-notifications/main/DSC07100.jpg" alt="Défi Enfance Joué 2026" style="width:100%;display:block;border-radius:12px 12px 0 0" onerror="this.style.display='none'">
     <div style="display:flex;gap:4px;margin-top:4px">
-      <img src="https://raw.githubusercontent.com/upe-bot/defi-enfance-notifications/aa0acab63d64c36bf95ac1511c093fa06a3536a6/DSC07318.jpg" alt="Défi Enfance Joué 2026" style="width:50%;border-radius:0 0 0 12px" onerror="this.style.display='none'">
-      <img src="https://raw.githubusercontent.com/upe-bot/defi-enfance-notifications/aa0acab63d64c36bf95ac1511c093fa06a3536a6/DSC07438.jpg" alt="Défi Enfance Joué 2026" style="width:50%;border-radius:0 0 12px 0" onerror="this.style.display='none'">
+      <img src="https://raw.githubusercontent.com/upe-bot/defi-enfance-notifications/main/DSC07318.jpg" alt="Défi Enfance Joué 2026" style="width:50%;border-radius:0 0 0 12px" onerror="this.style.display='none'">
+      <img src="https://raw.githubusercontent.com/upe-bot/defi-enfance-notifications/910b6a4cc1d78625a79201e5d4a46bc5c750adb6/enfanteau.jpg" alt="Défi Enfance Joué 2026" style="width:50%;border-radius:0 0 12px 0" onerror="this.style.display='none'">
     </div>
   </div>
 
@@ -6337,8 +6337,8 @@ async function fetchDestinataires({ typeDestinataire, filtreEquipe, depuisFrance
           const runner  = coureur.runner || dossard;
           const urlPageCoureur     = runner ? `https://defienfance.fr/suivre-la-collecte-defi-enfance/?de_view=runners&de_event=${EVENT_ID_JOUE}&de_runner=${runner}` : '';
           const urlPromesseCoureur = runner ? `https://defienfance.fr/suivre-la-collecte-defi-enfance/?de_view=runners&de_event=${EVENT_ID_JOUE}&de_runner=${runner}&de_promise=1` : '';
-          // Enrichissement classement
-          const cl = CLASSEMENT_JOUE_2026[dossard] || {};
+          // Enrichissement classement — clé string dans l'objet JS
+          const cl = CLASSEMENT_JOUE_2026[dossard] || CLASSEMENT_JOUE_2026[String(dossard)] || {};
           const eqData = equipe && CLASSEMENT_EQUIPES_JOUE[equipe] ? CLASSEMENT_EQUIPES_JOUE[equipe] : {};
           destinataires.push({
             prenom, nom, email, contactId: coureur.id, nomEquipe: equipe, nomAsso: asso, numeroDossard: dossard,
@@ -6349,9 +6349,7 @@ async function fetchDestinataires({ typeDestinataire, filtreEquipe, depuisFrance
           });
         }
         if (typeDestinataire === 'merci_coureurs_joue') {
-          const avant = destinataires.length;
-          destinataires.splice(0, destinataires.length, ...destinataires.filter(d => d.kmTotal > 0));
-          addLog(`📦 Merci coureurs Joué : ${destinataires.length} coureurs avec kms (${avant - destinataires.length} sans résultat exclus)`, 'info');
+          addLog(`📦 Merci coureurs Joué : ${destinataires.length} coureurs (dont ${destinataires.filter(d => d.kmTotal > 0).length} avec kms classés)`, 'info');
         } else {
           addLog(`📦 Coureurs Joué depuis index : ${destinataires.length} trouvés`, 'info');
         }
@@ -7870,8 +7868,7 @@ app.post('/api/envoi-groupe/start', async (req, res) => {
           } else if (template === 'groupe_jourj_joue_coureurs') {
             sujetFinal = `🏁 ${p.prenom || 'Coureur'}, c'est aujourd'hui — votre dossard + tout ce qu'il faut savoir !`;
           } else if (template === 'groupe_merci_coureurs_joue') {
-            const kmt = p.kmTotal || 0;
-            sujetFinal = `🎉 ${p.prenom || 'Coureur'}, merci — ${kmt > 0 ? `vous avez parcouru ${kmt} km pour l'enfance !` : 'vous avez couru pour l\'enfance !'}`;
+            sujetFinal = `💖 3000 km pour cette première édition à Joué !`;
           } else {
             if (nbJours) sujetBase = sujetBase ? sujetBase.replace(/\$\{j\}/g, nbJours).replace(/\d+ jours?/gi, `${nbJours} jours`) : template;
             sujetFinal = sujetBase ? sujetBase.replace(/\$\{prenom\}/g, p.prenom || 'Participant') : template;
