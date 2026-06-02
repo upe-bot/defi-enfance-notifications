@@ -3979,102 +3979,146 @@ function tplGroupeJourJJoueCoureurs({ prenom, numeroDossard, urlPageCoureur, url
 function tplGroupeMerciCoureurJoue({ prenom, nomComplet, nomEquipe, numeroDossard, clTotal, clReel, kmTotal, kmReel, kmBonus, clEquipeTotal, clEquipeReel, kmEquipeTotal, urlPageCoureur, urlDon }) {
   urlPageCoureur = urlPageCoureur || 'https://defienfance.fr/suivre-la-collecte-defi-enfance/';
   urlDon = urlDon || 'https://defienfance.fr/faire-un-don/';
+  const urlClassement = 'https://defienfance.fr/suivre-la-collecte-defi-enfance/';
   const hasBonus = kmBonus > 0;
   const hasEquipe = nomEquipe && nomEquipe !== 'je cours solo' && clEquipeTotal;
-
-  // Médaille selon classement total
+  const hasCl = clTotal > 0;
   const medal = clTotal === 1 ? '🥇' : clTotal === 2 ? '🥈' : clTotal === 3 ? '🥉' : clTotal <= 10 ? '🏅' : '🎽';
 
-  const blocEquipe = hasEquipe ? `
-    <div style="background:#f0fff5;border:1.5px solid rgba(22,163,74,.3);border-radius:12px;padding:14px 18px;margin-bottom:16px;text-align:left">
-      <div style="font-size:.72rem;font-weight:700;color:#16a34a;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">🏳️ Classement équipe — ${nomEquipe}</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
-        <div style="text-align:center;background:#fff;border-radius:8px;padding:8px">
-          <div style="font-size:1.6rem;font-weight:700;color:#16a34a">#${clEquipeTotal}</div>
-          <div style="font-size:.68rem;color:#666">Classement avec bonus</div>
-          <div style="font-size:.75rem;font-weight:600;color:#16a34a">${kmEquipeTotal} km</div>
-        </div>
-        <div style="text-align:center;background:#fff;border-radius:8px;padding:8px">
-          <div style="font-size:1.6rem;font-weight:700;color:#0d9488">#${clEquipeReel}</div>
-          <div style="font-size:.68rem;color:#666">Classement réel</div>
-        </div>
-      </div>
-    </div>` : '';
+  let blocEquipe = '';
+  if (hasEquipe) {
+    blocEquipe = '<tr><td style="padding:0 24px 16px">'
+      + '<table width="100%" cellpadding="0" cellspacing="0" style="background:#f0fff5;border:1px solid #bbf7d0;border-radius:12px">'
+      + '<tr><td style="padding:14px 18px">'
+      + '<div style="font-size:11px;font-weight:700;color:#16a34a;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;font-family:Arial,sans-serif">🏳️ Classement équipe &mdash; ' + nomEquipe + '</div>'
+      + '<table width="100%" cellpadding="0" cellspacing="0"><tr>'
+      + '<td width="50%" style="text-align:center;background:#ffffff;border-radius:8px;padding:10px 6px">'
+      + '<div style="font-size:28px;font-weight:700;color:#16a34a;font-family:Arial,sans-serif">#' + clEquipeTotal + '</div>'
+      + '<div style="font-size:11px;color:#16a34a;font-weight:600;font-family:Arial,sans-serif">avec bonus</div>'
+      + '<div style="font-size:13px;font-weight:700;color:#1a3a1a;margin-top:4px;font-family:Arial,sans-serif">' + kmEquipeTotal + ' km</div>'
+      + '</td><td width="4"></td>'
+      + '<td width="50%" style="text-align:center;background:#ffffff;border-radius:8px;padding:10px 6px">'
+      + '<div style="font-size:28px;font-weight:700;color:#0d9488;font-family:Arial,sans-serif">#' + clEquipeReel + '</div>'
+      + '<div style="font-size:11px;color:#0d9488;font-weight:600;font-family:Arial,sans-serif">classement r&eacute;el</div>'
+      + '</td></tr></table>'
+      + '</td></tr></table></td></tr>';
+  }
 
-  return `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>${CSS_COMMUN}</style></head><body style="margin:0;padding:0;background:#f5f0f5">
-<table width="100%" cellpadding="0" cellspacing="0"><tr><td align="center" style="padding:20px 12px">
-<table width="100%" style="max-width:600px;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(61,24,48,.12)">
+  let blocBonus = '';
+  if (hasBonus) {
+    blocBonus = '<table width="100%" cellpadding="0" cellspacing="0" style="margin-top:10px"><tr>'
+      + '<td style="background:#fff5ef;border-radius:8px;padding:8px 12px;text-align:center;font-size:12px;color:#3d1830;font-family:Arial,sans-serif">'
+      + '&#127918; &Eacute;preuves gamifi&eacute;es : <strong style="color:#ef6135">+' + kmBonus + ' km bonus</strong> gagnés !</td></tr></table>';
+  }
 
-<!-- HEADER -->
-<tr><td style="background:linear-gradient(135deg,#fb0089,#ef6135);padding:28px 32px;text-align:center">
-  <div style="font-size:.72rem;font-weight:700;color:rgba(255,255,255,.7);text-transform:uppercase;letter-spacing:.12em;margin-bottom:8px">🎉 Défi Enfance · Joué-lès-Tours 2026 · 1ère édition</div>
-  <h1 style="font-family:Arial,sans-serif;font-size:1.35rem;font-weight:700;color:#fff;margin:0 0 6px">${medal} Merci ${prenom} —<br>vous avez été incroyable !</h1>
-  <p style="font-size:.78rem;color:rgba(255,255,255,.85);margin:0">29 mai 2026 · Parc des Bretonnières · Joué-lès-Tours</p>
-</td></tr>
+  let bonusDetail = '';
+  if (hasBonus) {
+    bonusDetail = '<div style="font-size:11px;color:#888;font-family:Arial,sans-serif">' + kmReel + ' r&eacute;els + ' + kmBonus + ' bonus &#127918;</div>';
+  }
 
-<!-- BODY -->
-<tr><td style="background:#fff;padding:24px 28px">
+  let blocClassement = '';
+  if (hasCl) {
+    blocClassement = '<tr><td style="padding:0 24px 16px">'
+      + '<table width="100%" cellpadding="0" cellspacing="0" style="background:#fff0f8;border:2px solid #fb0089;border-radius:14px">'
+      + '<tr><td style="padding:18px 20px">'
+      + '<div style="font-size:11px;font-weight:700;color:#fb0089;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;font-family:Arial,sans-serif">🏅 Votre classement individuel &mdash; Dossard ' + numeroDossard + '</div>'
+      + '<table width="100%" cellpadding="0" cellspacing="0"><tr>'
+      + '<td width="50%" style="text-align:center;background:#ffffff;border-radius:10px;padding:12px 6px">'
+      + '<div style="font-size:36px;font-weight:700;color:#fb0089;font-family:Arial,sans-serif">#' + clTotal + '</div>'
+      + '<div style="font-size:11px;color:#fb0089;font-weight:600;font-family:Arial,sans-serif">classement avec bonus</div>'
+      + '<div style="font-size:14px;font-weight:700;color:#3d1830;margin-top:4px;font-family:Arial,sans-serif">' + kmTotal + ' km</div>'
+      + bonusDetail
+      + '</td><td width="4"></td>'
+      + '<td width="50%" style="text-align:center;background:#ffffff;border-radius:10px;padding:12px 6px">'
+      + '<div style="font-size:36px;font-weight:700;color:#0d9488;font-family:Arial,sans-serif">#' + clReel + '</div>'
+      + '<div style="font-size:11px;color:#0d9488;font-weight:600;font-family:Arial,sans-serif">classement r&eacute;el</div>'
+      + '<div style="font-size:14px;font-weight:700;color:#3d1830;margin-top:4px;font-family:Arial,sans-serif">' + kmReel + ' km</div>'
+      + '<div style="font-size:11px;color:#888;font-family:Arial,sans-serif">km sur le terrain</div>'
+      + '</td></tr></table>'
+      + blocBonus
+      + '<table width="100%" cellpadding="0" cellspacing="0" style="margin-top:12px"><tr><td align="center">'
+      + '<a href="' + urlClassement + '" style="display:inline-block;background-color:#fb0089;color:#ffffff;text-decoration:none;padding:9px 20px;border-radius:99px;font-weight:700;font-size:12px;font-family:Arial,sans-serif">&#127942; Voir le classement général en ligne</a>'
+      + '</td></tr></table>'
+      + '</td></tr></table></td></tr>';
+  }
 
-  <!-- Intro pionniers -->
-  <div style="font-size:.85rem;color:#3d1830;line-height:1.75;margin-bottom:20px;text-align:left">
-    <strong>Bonjour ${prenom},</strong><br><br>
-    La 1ère édition du Défi Enfance à Joué-lès-Tours est un <strong>succès</strong> — et vous en êtes l'un des artisans. En choisissant de courir aujourd'hui, vous avez rejoint les <strong>pionniers du Défi Enfance</strong> à Tours. Merci du fond du cœur.
-  </div>
+  const html = '<!DOCTYPE html>'
+    + '<html lang="fr" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">'
+    + '<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
+    + '<meta http-equiv="X-UA-Compatible" content="IE=edge">'
+    + '<!--[if mso]><noscript><xml><o:OfficeDocumentSettings><o:PixelsPerInch>96</o:PixelsPerInch></o:OfficeDocumentSettings></xml></noscript><![endif]-->'
+    + '<style>body,table,td{font-family:Arial,sans-serif}a{color:#fb0089}</style>'
+    + '</head>'
+    + '<body style="margin:0;padding:0;background-color:#f5f0f5">'
+    + '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f5f0f5">'
+    + '<tr><td align="center" style="padding:20px 12px">'
+    + '<table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px">'
 
-  <!-- Photos -->
-  <div style="margin-bottom:20px;border-radius:12px;overflow:hidden">
-    <img src="https://raw.githubusercontent.com/upe-bot/defi-enfance-notifications/main/DSC07100.jpg" alt="Défi Enfance Joué 2026" style="width:100%;display:block;border-radius:12px 12px 0 0" onerror="this.style.display='none'">
-    <div style="display:flex;gap:4px;margin-top:4px">
-      <img src="https://raw.githubusercontent.com/upe-bot/defi-enfance-notifications/main/DSC07318.jpg" alt="Défi Enfance Joué 2026" style="width:50%;border-radius:0 0 0 12px" onerror="this.style.display='none'">
-      <img src="https://raw.githubusercontent.com/upe-bot/defi-enfance-notifications/910b6a4cc1d78625a79201e5d4a46bc5c750adb6/enfanteau.jpg" alt="Défi Enfance Joué 2026" style="width:50%;border-radius:0 0 12px 0" onerror="this.style.display='none'">
-    </div>
-  </div>
+    // HEADER - fond solide pour Outlook
+    + '<tr><td align="center" valign="top" bgcolor="#fb0089" style="background-color:#fb0089;border-radius:16px 16px 0 0;padding:28px 32px">'
+    + '<div style="font-size:11px;font-weight:700;color:#ffd6ec;text-transform:uppercase;letter-spacing:2px;margin-bottom:10px;font-family:Arial,sans-serif">&#127881; D&eacute;fi Enfance &middot; Joué-lès-Tours 2026 &middot; 1ère édition</div>'
+    + '<div style="font-size:22px;font-weight:700;color:#ffffff;line-height:1.3;margin-bottom:8px;font-family:Arial,sans-serif">' + medal + ' Merci ' + prenom + ' &mdash;<br>vous avez &eacute;t&eacute; incroyable !</div>'
+    + '<div style="font-size:13px;color:#ffd6ec;font-family:Arial,sans-serif">29 mai 2026 &middot; Parc des Bretonnières &middot; Joué-lès-Tours</div>'
+    + '</td></tr>'
 
-  <!-- Classement individuel -->
-  <div style="background:#fff0f8;border:2px solid #fb0089;border-radius:14px;padding:18px 22px;margin-bottom:20px;text-align:left">
-    <div style="font-size:.72rem;font-weight:700;color:#fb0089;text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px">🏅 Votre classement individuel — Dossard ${numeroDossard}</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
-      <div style="text-align:center;background:#fff;border-radius:10px;padding:12px 8px">
-        <div style="font-size:2rem;font-weight:700;color:#fb0089">#${clTotal}</div>
-        <div style="font-size:.72rem;color:#fb0089;font-weight:600">Classement avec bonus</div>
-        <div style="font-size:.82rem;font-weight:700;color:#3d1830;margin-top:4px">${kmTotal} km</div>
-        ${hasBonus ? `<div style="font-size:.68rem;color:#888">${kmReel} km réels + ${kmBonus} km bonus 🎮</div>` : ''}
-      </div>
-      <div style="text-align:center;background:#fff;border-radius:10px;padding:12px 8px">
-        <div style="font-size:2rem;font-weight:700;color:#0d9488">#${clReel}</div>
-        <div style="font-size:.72rem;color:#0d9488;font-weight:600">Classement réel</div>
-        <div style="font-size:.82rem;font-weight:700;color:#3d1830;margin-top:4px">${kmReel} km</div>
-        <div style="font-size:.68rem;color:#888">km parcourus sur le terrain</div>
-      </div>
-    </div>
-    ${hasBonus ? `<div style="font-size:.78rem;color:#3d1830;background:#fff5ef;border-radius:8px;padding:8px 12px;text-align:center">🎮 Grâce aux épreuves gamifiées, vous avez gagné <strong style="color:#ef6135">${kmBonus} km bonus</strong> !</div>` : ''}
-  </div>
+    // INTRO
+    + '<tr><td style="background-color:#ffffff;padding:24px 24px 8px">'
+    + '<p style="font-size:15px;font-weight:700;color:#3d1830;margin:0 0 6px;font-family:Arial,sans-serif">Bonjour ' + prenom + ',</p>'
+    + '<p style="font-size:14px;color:#3d1830;line-height:1.75;margin:0 0 20px;font-family:Arial,sans-serif">'
+    + 'La 1ère édition du Défi Enfance à Joué-lès-Tours est un <strong>succès</strong> — et vous en êtes l\'un des artisans. En choisissant de courir, vous avez rejoint les <strong>pionniers du Défi Enfance à Joué-lès-Tours</strong>. Merci du fond du cœur.'
+    + '</p></td></tr>'
 
-  ${blocEquipe}
+    // PHOTOS
+    + '<tr><td style="padding:0 24px 16px">'
+    + '<img src="https://raw.githubusercontent.com/upe-bot/defi-enfance-notifications/main/DSC07100.jpg" alt="Défi Enfance Joué 2026" width="552" style="width:100%;max-width:552px;display:block;border-radius:12px 12px 0 0;border:0">'
+    + '<table width="100%" cellpadding="0" cellspacing="0"><tr>'
+    + '<td width="49%"><img src="https://raw.githubusercontent.com/upe-bot/defi-enfance-notifications/main/DSC07318.jpg" alt="" width="272" style="width:100%;display:block;border-radius:0 0 0 12px;margin-top:4px;border:0"></td>'
+    + '<td width="2%"></td>'
+    + '<td width="49%"><img src="https://raw.githubusercontent.com/upe-bot/defi-enfance-notifications/910b6a4cc1d78625a79201e5d4a46bc5c750adb6/enfanteau.jpg" alt="" width="272" style="width:100%;display:block;border-radius:0 0 12px 0;margin-top:4px;border:0"></td>'
+    + '</tr></table></td></tr>'
 
-  <!-- Collecte -->
-  <div style="background:linear-gradient(135deg,#3d1830,#1a0a12);border-radius:14px;padding:18px 22px;margin-bottom:20px;text-align:left">
-    <div style="font-size:.72rem;font-weight:700;color:#fb0089;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">❤️ La collecte continue jusqu'au 15 juin !</div>
-    <div style="font-size:.84rem;color:#fff;line-height:1.75;margin-bottom:14px">La course est terminée mais <strong style="color:#fb0089">la collecte de dons est toujours ouverte jusqu'au 15 juin</strong>. Chaque km que vous avez couru peut encore générer des dons — partagez votre page de collecte autour de vous !</div>
-    <a href="${urlPageCoureur}" style="display:inline-block;background-color:#fb0089;color:#fff;text-decoration:none;padding:10px 22px;border-radius:99px;font-weight:700;font-size:.8rem;font-family:Arial,sans-serif">🏃 Voir ma page de collecte</a>
-  </div>
+    // CLASSEMENT INDIVIDUEL
+    + blocClassement
 
-  <!-- Message -->
-  <div style="font-size:.84rem;color:#3d1830;line-height:1.75;margin-bottom:16px;text-align:left">
-    Vous faites partie de ceux qui ont osé courir pour l'enfance, sous 35°C, avec la bonne humeur que vous avez montrée. Les équipes de l'Union pour l'Enfance et les enfants que nous accompagnons vous remercient infiniment. <strong>Vous avez fait quelque chose de grand.</strong>
-  </div>
+    // CLASSEMENT EQUIPE
+    + blocEquipe
 
-  <div style="border-top:1px solid #f5dced;margin:16px 0"></div>
-  <div style="font-size:.84rem;color:#3d1830;text-align:center;font-style:italic;margin-bottom:6px">À l'année prochaine — encore plus fort ! 💪</div>
-  <div style="font-size:.78rem;color:#fb0089;font-weight:600;text-align:center">— Team Défi Enfance</div>
+    // COLLECTE
+    + '<tr><td style="padding:0 24px 16px">'
+    + '<table width="100%" cellpadding="0" cellspacing="0" style="border-radius:14px">'
+    + '<tr><td bgcolor="#3d1830" style="background-color:#3d1830;padding:18px 20px;border-radius:14px">'
+    + '<div style="font-size:11px;font-weight:700;color:#fb0089;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;font-family:Arial,sans-serif">&#10084;&#65039; La collecte de dons continue jusqu\'au 15 juin !</div>'
+    + '<p style="font-size:14px;color:#ffffff;line-height:1.75;margin:0 0 6px;font-family:Arial,sans-serif">'
+    + 'La course est terminée mais <strong style="color:#fb0089">la collecte est ouverte jusqu\'au 15 juin</strong>. C\'est uniquement grâce aux dons de vos proches et de vos réseaux professionnels que vous pouvez soutenir concrètement <strong style="color:#ffd6ec">l\'association que vous avez choisie de parrainer</strong> lors de votre inscription.'
+    + '</p>'
+    + '<p style="font-size:14px;color:#ffffff;line-height:1.75;margin:0 0 14px;font-family:Arial,sans-serif">'
+    + 'Partagez votre page de collecte, relancez vos contacts — chaque don compte directement pour votre asso !'
+    + '</p>'
+    + '<table cellpadding="0" cellspacing="0"><tr>'
+    + '<td style="padding-right:8px"><a href="' + urlPageCoureur + '" style="display:inline-block;background-color:#fb0089;color:#ffffff;text-decoration:none;padding:10px 20px;border-radius:99px;font-weight:700;font-size:13px;font-family:Arial,sans-serif">&#127939; Ma page de collecte</a></td>'
+    + '<td><a href="' + urlDon + '" style="display:inline-block;background-color:#ffffff;color:#3d1830;text-decoration:none;padding:10px 20px;border-radius:99px;font-weight:700;font-size:13px;font-family:Arial,sans-serif">&#10084; Faire un don</a></td>'
+    + '</tr></table>'
+    + '</td></tr></table></td></tr>'
 
-</td></tr>
-<tr><td style="background:#3d1830;padding:14px;text-align:center;border-radius:0 0 16px 16px">
-  <div style="font-size:.8rem;font-weight:700;color:#fb0089">DÉFI ENFANCE</div>
-  <div style="font-size:.72rem;color:rgba(255,255,255,.5)">Générateur de victoires pour l'enfance · contact@defienfance.fr</div>
-</td></tr>
-</table></td></tr></table>
-</body></html>`;
+    // MESSAGE FINAL
+    + '<tr><td style="padding:0 24px 20px">'
+    + '<p style="font-size:14px;color:#3d1830;line-height:1.75;margin:0 0 16px;font-family:Arial,sans-serif">'
+    + 'Vous faites partie de ceux qui ont osé courir pour l\'enfance avec tant d\'enthousiasme. Les équipes de l\'Union pour l\'Enfance et les enfants que nous accompagnons vous remercient infiniment. <strong>Vous avez fait quelque chose de grand.</strong>'
+    + '</p>'
+    + '<div style="border-top:1px solid #f5dced;margin:16px 0"></div>'
+    + '<p style="font-size:14px;color:#3d1830;text-align:center;font-style:italic;margin:0 0 6px;font-family:Arial,sans-serif">À l\'année prochaine — encore plus fort ! &#128170;</p>'
+    + '<p style="font-size:13px;color:#fb0089;font-weight:700;text-align:center;margin:0;font-family:Arial,sans-serif">&mdash; L\'équipe d\'organisation Défi Enfance</p>'
+    + '</td></tr>'
+
+    // FOOTER
+    + '<tr><td align="center" bgcolor="#3d1830" style="background-color:#3d1830;padding:14px;border-radius:0 0 16px 16px">'
+    + '<div style="font-size:13px;font-weight:700;color:#fb0089;font-family:Arial,sans-serif">DÉFI ENFANCE</div>'
+    + '<div style="font-size:11px;color:rgba(255,255,255,.5);font-family:Arial,sans-serif">Générateur de victoires pour l\'enfance &middot; contact@defienfance.fr</div>'
+    + '</td></tr>'
+
+    + '</table></td></tr></table></body></html>';
+
+  return html;
 }
 
 
