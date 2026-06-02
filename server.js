@@ -952,6 +952,456 @@ const DOSSARDS_JOUE_2026 = {
   179: { id: 851, equipe: 'Eclats d\'Union', asso: 'Eclats d\'Union', prenom: 'Cameron', nom: 'REKIAN', email: 'cameronrekian9@gmail.com', runner: null },
 };
 
+// ── Classement individuel Joué 2026 (indexé par dossard)
+const CLASSEMENT_JOUE_2026 = {
+  1: { cl_total: 191, cl_reel: 83, km_total: 7.5, km_reel: 7.5, km_bonus: 0 },
+  2: { cl_total: 148, cl_reel: 46, km_total: 9, km_reel: 9, km_bonus: 0 },
+  3: { cl_total: 61, cl_reel: 12, km_total: 12.75, km_reel: 12.75, km_bonus: 0 },
+  4: { cl_total: 48, cl_reel: 109, km_total: 13.5, km_reel: 6.75, km_bonus: 6.75 },
+  5: { cl_total: 62, cl_reel: 13, km_total: 12.75, km_reel: 12.75, km_bonus: 0 },
+  6: { cl_total: 125, cl_reel: 190, km_total: 9.75, km_reel: 4.5, km_bonus: 5.25 },
+  7: { cl_total: 41, cl_reel: 60, km_total: 13.5, km_reel: 8.25, km_bonus: 5.25 },
+  8: { cl_total: 144, cl_reel: 47, km_total: 9, km_reel: 9, km_bonus: 0 },
+  9: { cl_total: 240, cl_reel: 157, km_total: 6.0, km_reel: 5.25, km_bonus: 0.75 },
+  11: { cl_total: 325, cl_reel: 284, km_total: 3.0, km_reel: 3.0, km_bonus: 0.0 },
+  12: { cl_total: 32, cl_reel: 84, km_total: 15, km_reel: 7.5, km_bonus: 7.5 },
+  13: { cl_total: 13, cl_reel: 48, km_total: 16.5, km_reel: 9, km_bonus: 7.5 },
+  14: { cl_total: 182, cl_reel: 85, km_total: 7.5, km_reel: 7.5, km_bonus: 0 },
+  15: { cl_total: 423, cl_reel: 385, km_total: 0.75, km_reel: 0.75, km_bonus: 0.0 },
+  17: { cl_total: 390, cl_reel: 351, km_total: 1.5, km_reel: 1.5, km_bonus: 0.0 },
+  18: { cl_total: 298, cl_reel: 285, km_total: 3.75, km_reel: 3.0, km_bonus: 0.75 },
+  19: { cl_total: 208, cl_reel: 158, km_total: 6.75, km_reel: 5.25, km_bonus: 1.5 },
+  20: { cl_total: 53, cl_reel: 26, km_total: 12.75, km_reel: 11.25, km_bonus: 1.5 },
+  21: { cl_total: 50, cl_reel: 159, km_total: 12.75, km_reel: 5.25, km_bonus: 7.5 },
+  22: { cl_total: 372, cl_reel: 352, km_total: 1.5, km_reel: 1.5, km_bonus: 0.0 },
+  23: { cl_total: 18, cl_reel: 61, km_total: 15.75, km_reel: 8.25, km_bonus: 7.5 },
+  24: { cl_total: 408, cl_reel: 386, km_total: 0.75, km_reel: 0.75, km_bonus: 0.0 },
+  25: { cl_total: 324, cl_reel: 286, km_total: 3.0, km_reel: 3.0, km_bonus: 0.0 },
+  26: { cl_total: 316, cl_reel: 239, km_total: 3.75, km_reel: 3.75, km_bonus: 0.0 },
+  27: { cl_total: 179, cl_reel: 110, km_total: 7.5, km_reel: 6.75, km_bonus: 0.75 },
+  28: { cl_total: 31, cl_reel: 4, km_total: 15, km_reel: 15, km_bonus: 0 },
+  29: { cl_total: 99, cl_reel: 86, km_total: 10.5, km_reel: 7.5, km_bonus: 3 },
+  30: { cl_total: 60, cl_reel: 14, km_total: 12.75, km_reel: 12.75, km_bonus: 0 },
+  31: { cl_total: 14, cl_reel: 15, km_total: 16.5, km_reel: 12.75, km_bonus: 3.75 },
+  32: { cl_total: 2, cl_reel: 3, km_total: 19.5, km_reel: 15.75, km_bonus: 3.75 },
+  33: { cl_total: 12, cl_reel: 2, km_total: 16.5, km_reel: 16.5, km_bonus: 0 },
+  37: { cl_total: 93, cl_reel: 27, km_total: 11.25, km_reel: 11.25, km_bonus: 0 },
+  38: { cl_total: 38, cl_reel: 18, km_total: 14.25, km_reel: 12, km_bonus: 2.25 },
+  39: { cl_total: 101, cl_reel: 32, km_total: 10.5, km_reel: 10.5, km_bonus: 0 },
+  42: { cl_total: 143, cl_reel: 353, km_total: 9.0, km_reel: 1.5, km_bonus: 7.5 },
+  43: { cl_total: 7, cl_reel: 191, km_total: 17.25, km_reel: 4.5, km_bonus: 12.75 },
+  44: { cl_total: 19, cl_reel: 240, km_total: 15.75, km_reel: 3.75, km_bonus: 12.0 },
+  45: { cl_total: 63, cl_reel: 49, km_total: 12.75, km_reel: 9, km_bonus: 3.75 },
+  46: { cl_total: 165, cl_reel: 192, km_total: 8.25, km_reel: 4.5, km_bonus: 3.75 },
+  48: { cl_total: 121, cl_reel: 160, km_total: 9.75, km_reel: 5.25, km_bonus: 4.5 },
+  49: { cl_total: 23, cl_reel: 111, km_total: 15.75, km_reel: 6.75, km_bonus: 9.0 },
+  51: { cl_total: 69, cl_reel: 40, km_total: 12, km_reel: 9.75, km_bonus: 2.25 },
+  52: { cl_total: 163, cl_reel: 161, km_total: 8.25, km_reel: 5.25, km_bonus: 3.0 },
+  53: { cl_total: 120, cl_reel: 162, km_total: 9.75, km_reel: 5.25, km_bonus: 4.5 },
+  54: { cl_total: 76, cl_reel: 87, km_total: 12, km_reel: 7.5, km_bonus: 4.5 },
+  55: { cl_total: 40, cl_reel: 112, km_total: 13.5, km_reel: 6.75, km_bonus: 6.75 },
+  57: { cl_total: 189, cl_reel: 241, km_total: 7.5, km_reel: 3.75, km_bonus: 3.75 },
+  58: { cl_total: 46, cl_reel: 7, km_total: 13.5, km_reel: 13.5, km_bonus: 0 },
+  59: { cl_total: 151, cl_reel: 113, km_total: 8.25, km_reel: 6.75, km_bonus: 1.5 },
+  60: { cl_total: 34, cl_reel: 41, km_total: 15, km_reel: 9.75, km_bonus: 5.25 },
+  61: { cl_total: 55, cl_reel: 62, km_total: 12.75, km_reel: 8.25, km_bonus: 4.5 },
+  62: { cl_total: 73, cl_reel: 63, km_total: 12, km_reel: 8.25, km_bonus: 3.75 },
+  63: { cl_total: 36, cl_reel: 114, km_total: 15.0, km_reel: 6.75, km_bonus: 8.25 },
+  64: { cl_total: 9, cl_reel: 8, km_total: 17.25, km_reel: 13.5, km_bonus: 3.75 },
+  65: { cl_total: 103, cl_reel: 88, km_total: 10.5, km_reel: 7.5, km_bonus: 3 },
+  67: { cl_total: 11, cl_reel: 115, km_total: 17.25, km_reel: 6.75, km_bonus: 10.5 },
+  68: { cl_total: 1, cl_reel: 9, km_total: 21.75, km_reel: 13.5, km_bonus: 8.25 },
+  69: { cl_total: 29, cl_reel: 5, km_total: 15, km_reel: 15, km_bonus: 0 },
+  70: { cl_total: 115, cl_reel: 133, km_total: 9.75, km_reel: 6.0, km_bonus: 3.75 },
+  71: { cl_total: 149, cl_reel: 50, km_total: 9, km_reel: 9, km_bonus: 0 },
+  72: { cl_total: 92, cl_reel: 42, km_total: 11.25, km_reel: 9.75, km_bonus: 1.5 },
+  73: { cl_total: 26, cl_reel: 64, km_total: 15.75, km_reel: 8.25, km_bonus: 7.5 },
+  74: { cl_total: 27, cl_reel: 89, km_total: 15.75, km_reel: 7.5, km_bonus: 8.25 },
+  75: { cl_total: 15, cl_reel: 65, km_total: 16.5, km_reel: 8.25, km_bonus: 8.25 },
+  76: { cl_total: 146, cl_reel: 116, km_total: 9.0, km_reel: 6.75, km_bonus: 2.25 },
+  77: { cl_total: 117, cl_reel: 43, km_total: 9.75, km_reel: 9.75, km_bonus: 0 },
+  78: { cl_total: 37, cl_reel: 19, km_total: 14.25, km_reel: 12, km_bonus: 2.25 },
+  79: { cl_total: 106, cl_reel: 33, km_total: 10.5, km_reel: 10.5, km_bonus: 0 },
+  80: { cl_total: 319, cl_reel: 287, km_total: 3.75, km_reel: 3.0, km_bonus: 0.75 },
+  82: { cl_total: 54, cl_reel: 134, km_total: 12.75, km_reel: 6.0, km_bonus: 6.75 },
+  83: { cl_total: 237, cl_reel: 135, km_total: 6.0, km_reel: 6.0, km_bonus: 0.0 },
+  84: { cl_total: 291, cl_reel: 288, km_total: 4.5, km_reel: 3.0, km_bonus: 1.5 },
+  85: { cl_total: 124, cl_reel: 66, km_total: 9.75, km_reel: 8.25, km_bonus: 1.5 },
+  86: { cl_total: 231, cl_reel: 426, km_total: 6.0, km_reel: 0.0, km_bonus: 6.0 },
+  87: { cl_total: 153, cl_reel: 193, km_total: 8.25, km_reel: 4.5, km_bonus: 3.75 },
+  89: { cl_total: 391, cl_reel: 354, km_total: 1.5, km_reel: 1.5, km_bonus: 0.0 },
+  90: { cl_total: 129, cl_reel: 163, km_total: 9.75, km_reel: 5.25, km_bonus: 4.5 },
+  92: { cl_total: 100, cl_reel: 164, km_total: 10.5, km_reel: 5.25, km_bonus: 5.25 },
+  93: { cl_total: 302, cl_reel: 242, km_total: 3.75, km_reel: 3.75, km_bonus: 0.0 },
+  95: { cl_total: 326, cl_reel: 321, km_total: 3.0, km_reel: 2.25, km_bonus: 0.75 },
+  96: { cl_total: 248, cl_reel: 165, km_total: 5.25, km_reel: 5.25, km_bonus: 0.0 },
+  97: { cl_total: 293, cl_reel: 421, km_total: 3.75, km_reel: 0.0, km_bonus: 6.75 },
+  98: { cl_total: 388, cl_reel: 355, km_total: 1.5, km_reel: 1.5, km_bonus: 0.0 },
+  99: { cl_total: 184, cl_reel: 90, km_total: 7.5, km_reel: 7.5, km_bonus: 0 },
+  100: { cl_total: 426, cl_reel: 387, km_total: 0.75, km_reel: 0.75, km_bonus: 0.0 },
+  102: { cl_total: 229, cl_reel: 194, km_total: 6.0, km_reel: 4.5, km_bonus: 1.5 },
+  103: { cl_total: 270, cl_reel: 195, km_total: 4.5, km_reel: 4.5, km_bonus: 0.0 },
+  105: { cl_total: 239, cl_reel: 196, km_total: 6.0, km_reel: 4.5, km_bonus: 1.5 },
+  107: { cl_total: 282, cl_reel: 243, km_total: 4.5, km_reel: 3.75, km_bonus: 0.75 },
+  108: { cl_total: 235, cl_reel: 136, km_total: 6.0, km_reel: 6.0, km_bonus: 0.0 },
+  110: { cl_total: 387, cl_reel: 356, km_total: 1.5, km_reel: 1.5, km_bonus: 0.0 },
+  111: { cl_total: 226, cl_reel: 289, km_total: 6.0, km_reel: 3.0, km_bonus: 3.0 },
+  112: { cl_total: 152, cl_reel: 166, km_total: 8.25, km_reel: 5.25, km_bonus: 3.0 },
+  113: { cl_total: 214, cl_reel: 167, km_total: 6.75, km_reel: 5.25, km_bonus: 1.5 },
+  114: { cl_total: 130, cl_reel: 290, km_total: 9.0, km_reel: 3.0, km_bonus: 6.0 },
+  116: { cl_total: 234, cl_reel: 137, km_total: 6.0, km_reel: 6.0, km_bonus: 0.0 },
+  117: { cl_total: 308, cl_reel: 388, km_total: 3.75, km_reel: 0.75, km_bonus: 3.0 },
+  118: { cl_total: 185, cl_reel: 117, km_total: 7.5, km_reel: 6.75, km_bonus: 0.75 },
+  119: { cl_total: 172, cl_reel: 322, km_total: 7.5, km_reel: 2.25, km_bonus: 5.25 },
+  120: { cl_total: 110, cl_reel: 197, km_total: 9.75, km_reel: 4.5, km_bonus: 5.25 },
+  121: { cl_total: 276, cl_reel: 198, km_total: 4.5, km_reel: 4.5, km_bonus: 0.0 },
+  122: { cl_total: 359, cl_reel: 323, km_total: 2.25, km_reel: 2.25, km_bonus: 0.0 },
+  123: { cl_total: 109, cl_reel: 199, km_total: 9.75, km_reel: 4.5, km_bonus: 5.25 },
+  124: { cl_total: 205, cl_reel: 244, km_total: 6.75, km_reel: 3.75, km_bonus: 3.0 },
+  125: { cl_total: 262, cl_reel: 168, km_total: 5.25, km_reel: 5.25, km_bonus: 0.0 },
+  126: { cl_total: 285, cl_reel: 291, km_total: 4.5, km_reel: 3.0, km_bonus: 1.5 },
+  128: { cl_total: 398, cl_reel: 389, km_total: 1.5, km_reel: 0.75, km_bonus: 0.75 },
+  130: { cl_total: 72, cl_reel: 20, km_total: 12, km_reel: 12, km_bonus: 0 },
+  131: { cl_total: 386, cl_reel: 357, km_total: 1.5, km_reel: 1.5, km_bonus: 0.0 },
+  132: { cl_total: 183, cl_reel: 245, km_total: 7.5, km_reel: 3.75, km_bonus: 3.75 },
+  133: { cl_total: 134, cl_reel: 246, km_total: 9.0, km_reel: 3.75, km_bonus: 5.25 },
+  134: { cl_total: 274, cl_reel: 200, km_total: 4.5, km_reel: 4.5, km_bonus: 0.0 },
+  135: { cl_total: 194, cl_reel: 324, km_total: 6.75, km_reel: 2.25, km_bonus: 4.5 },
+  136: { cl_total: 136, cl_reel: 247, km_total: 9.0, km_reel: 3.75, km_bonus: 5.25 },
+  137: { cl_total: 6, cl_reel: 138, km_total: 17.25, km_reel: 6.0, km_bonus: 11.25 },
+  138: { cl_total: 82, cl_reel: 292, km_total: 11.25, km_reel: 3.0, km_bonus: 8.25 },
+  139: { cl_total: 107, cl_reel: 201, km_total: 10.5, km_reel: 4.5, km_bonus: 6.0 },
+  141: { cl_total: 4, cl_reel: 51, km_total: 18.75, km_reel: 9, km_bonus: 9.75 },
+  143: { cl_total: 188, cl_reel: 202, km_total: 7.5, km_reel: 4.5, km_bonus: 3.0 },
+  146: { cl_total: 51, cl_reel: 16, km_total: 12.75, km_reel: 12.75, km_bonus: 0 },
+  147: { cl_total: 22, cl_reel: 203, km_total: 15.75, km_reel: 4.5, km_bonus: 11.25 },
+  148: { cl_total: 140, cl_reel: 52, km_total: 9, km_reel: 9, km_bonus: 0 },
+  149: { cl_total: 24, cl_reel: 139, km_total: 15.75, km_reel: 6.0, km_bonus: 9.75 },
+  150: { cl_total: 197, cl_reel: 248, km_total: 6.75, km_reel: 3.75, km_bonus: 3.0 },
+  152: { cl_total: 128, cl_reel: 140, km_total: 9.75, km_reel: 6.0, km_bonus: 3.75 },
+  153: { cl_total: 17, cl_reel: 34, km_total: 16.5, km_reel: 10.5, km_bonus: 6 },
+  154: { cl_total: 3, cl_reel: 91, km_total: 19.5, km_reel: 7.5, km_bonus: 12 },
+  155: { cl_total: 58, cl_reel: 17, km_total: 12.75, km_reel: 12.75, km_bonus: 0 },
+  156: { cl_total: 5, cl_reel: 35, km_total: 18, km_reel: 10.5, km_bonus: 7.5 },
+  157: { cl_total: 222, cl_reel: 169, km_total: 6.0, km_reel: 5.25, km_bonus: 0.75 },
+  158: { cl_total: 85, cl_reel: 141, km_total: 11.25, km_reel: 6.0, km_bonus: 5.25 },
+  159: { cl_total: 123, cl_reel: 44, km_total: 9.75, km_reel: 9.75, km_bonus: 0 },
+  161: { cl_total: 16, cl_reel: 53, km_total: 16.5, km_reel: 9, km_bonus: 7.5 },
+  163: { cl_total: 21, cl_reel: 204, km_total: 15.75, km_reel: 4.5, km_bonus: 11.25 },
+  164: { cl_total: 169, cl_reel: 205, km_total: 8.25, km_reel: 4.5, km_bonus: 3.75 },
+  165: { cl_total: 43, cl_reel: 92, km_total: 13.5, km_reel: 7.5, km_bonus: 6 },
+  166: { cl_total: 243, cl_reel: 249, km_total: 5.25, km_reel: 3.75, km_bonus: 1.5 },
+  167: { cl_total: 84, cl_reel: 93, km_total: 11.25, km_reel: 7.5, km_bonus: 3.75 },
+  168: { cl_total: 39, cl_reel: 21, km_total: 13.5, km_reel: 12, km_bonus: 1.5 },
+  169: { cl_total: 20, cl_reel: 206, km_total: 15.75, km_reel: 4.5, km_bonus: 11.25 },
+  170: { cl_total: 132, cl_reel: 170, km_total: 9.0, km_reel: 5.25, km_bonus: 3.75 },
+  171: { cl_total: 89, cl_reel: 28, km_total: 11.25, km_reel: 11.25, km_bonus: 0 },
+  175: { cl_total: 56, cl_reel: 67, km_total: 12.75, km_reel: 8.25, km_bonus: 4.5 },
+  178: { cl_total: 374, cl_reel: 358, km_total: 1.5, km_reel: 1.5, km_bonus: 0.0 },
+  179: { cl_total: 198, cl_reel: 118, km_total: 6.75, km_reel: 6.75, km_bonus: 0.0 },
+  181: { cl_total: 230, cl_reel: 359, km_total: 6.0, km_reel: 1.5, km_bonus: 4.5 },
+  183: { cl_total: 322, cl_reel: 390, km_total: 3.0, km_reel: 0.75, km_bonus: 2.25 },
+  193: { cl_total: 375, cl_reel: 360, km_total: 1.5, km_reel: 1.5, km_bonus: 0.0 },
+  200: { cl_total: 300, cl_reel: 423, km_total: 3.75, km_reel: 0.0, km_bonus: 5.25 },
+  202: { cl_total: 81, cl_reel: 29, km_total: 11.25, km_reel: 11.25, km_bonus: 0 },
+  203: { cl_total: 401, cl_reel: 361, km_total: 1.5, km_reel: 1.5, km_bonus: 0.0 },
+  205: { cl_total: 299, cl_reel: 250, km_total: 3.75, km_reel: 3.75, km_bonus: 0.0 },
+  206: { cl_total: 354, cl_reel: 325, km_total: 2.25, km_reel: 2.25, km_bonus: 0.0 },
+  207: { cl_total: 133, cl_reel: 171, km_total: 9.0, km_reel: 5.25, km_bonus: 3.75 },
+  208: { cl_total: 362, cl_reel: 326, km_total: 2.25, km_reel: 2.25, km_bonus: 0.0 },
+  209: { cl_total: 251, cl_reel: 293, km_total: 5.25, km_reel: 3.0, km_bonus: 2.25 },
+  211: { cl_total: 301, cl_reel: 327, km_total: 3.75, km_reel: 2.25, km_bonus: 1.5 },
+  212: { cl_total: 309, cl_reel: 251, km_total: 3.75, km_reel: 3.75, km_bonus: 0.0 },
+  213: { cl_total: 389, cl_reel: 362, km_total: 1.5, km_reel: 1.5, km_bonus: 0.0 },
+  214: { cl_total: 404, cl_reel: 391, km_total: 0.75, km_reel: 0.75, km_bonus: 0.0 },
+  215: { cl_total: 150, cl_reel: 207, km_total: 8.25, km_reel: 4.5, km_bonus: 3.75 },
+  216: { cl_total: 395, cl_reel: 363, km_total: 1.5, km_reel: 1.5, km_bonus: 0.0 },
+  217: { cl_total: 394, cl_reel: 364, km_total: 1.5, km_reel: 1.5, km_bonus: 0.0 },
+  218: { cl_total: 97, cl_reel: 36, km_total: 10.5, km_reel: 10.5, km_bonus: 0 },
+  219: { cl_total: 176, cl_reel: 142, km_total: 7.5, km_reel: 6.0, km_bonus: 1.5 },
+  220: { cl_total: 178, cl_reel: 94, km_total: 7.5, km_reel: 7.5, km_bonus: 0 },
+  222: { cl_total: 265, cl_reel: 208, km_total: 4.5, km_reel: 4.5, km_bonus: 0.0 },
+  223: { cl_total: 364, cl_reel: 328, km_total: 2.25, km_reel: 2.25, km_bonus: 0.0 },
+  226: { cl_total: 366, cl_reel: 329, km_total: 2.25, km_reel: 2.25, km_bonus: 0.0 },
+  229: { cl_total: 154, cl_reel: 172, km_total: 8.25, km_reel: 5.25, km_bonus: 3.0 },
+  230: { cl_total: 405, cl_reel: 392, km_total: 0.75, km_reel: 0.75, km_bonus: 0.0 },
+  231: { cl_total: 358, cl_reel: 330, km_total: 2.25, km_reel: 2.25, km_bonus: 0.0 },
+  232: { cl_total: 407, cl_reel: 393, km_total: 0.75, km_reel: 0.75, km_bonus: 0.0 },
+  233: { cl_total: 400, cl_reel: 365, km_total: 1.5, km_reel: 1.5, km_bonus: 0.0 },
+  235: { cl_total: 409, cl_reel: 394, km_total: 0.75, km_reel: 0.75, km_bonus: 0.0 },
+  236: { cl_total: 96, cl_reel: 209, km_total: 10.5, km_reel: 4.5, km_bonus: 6.0 },
+  237: { cl_total: 421, cl_reel: 395, km_total: 0.75, km_reel: 0.75, km_bonus: 0.0 },
+  238: { cl_total: 339, cl_reel: 294, km_total: 3.0, km_reel: 3.0, km_bonus: 0.0 },
+  239: { cl_total: 417, cl_reel: 396, km_total: 0.75, km_reel: 0.75, km_bonus: 0.0 },
+  241: { cl_total: 206, cl_reel: 295, km_total: 6.75, km_reel: 3.0, km_bonus: 3.75 },
+  242: { cl_total: 91, cl_reel: 30, km_total: 11.25, km_reel: 11.25, km_bonus: 0 },
+  243: { cl_total: 383, cl_reel: 366, km_total: 1.5, km_reel: 1.5, km_bonus: 0.0 },
+  244: { cl_total: 195, cl_reel: 252, km_total: 6.75, km_reel: 3.75, km_bonus: 3.0 },
+  245: { cl_total: 420, cl_reel: 397, km_total: 0.75, km_reel: 0.75, km_bonus: 0.0 },
+  246: { cl_total: 313, cl_reel: 253, km_total: 3.75, km_reel: 3.75, km_bonus: 0.0 },
+  247: { cl_total: 200, cl_reel: 296, km_total: 6.75, km_reel: 3.0, km_bonus: 3.75 },
+  248: { cl_total: 157, cl_reel: 297, km_total: 8.25, km_reel: 3.0, km_bonus: 5.25 },
+  250: { cl_total: 317, cl_reel: 254, km_total: 3.75, km_reel: 3.75, km_bonus: 0.0 },
+  252: { cl_total: 427, cl_reel: 398, km_total: 0.75, km_reel: 0.75, km_bonus: 0.0 },
+  253: { cl_total: 233, cl_reel: 255, km_total: 6.0, km_reel: 3.75, km_bonus: 2.25 },
+  254: { cl_total: 181, cl_reel: 95, km_total: 7.5, km_reel: 7.5, km_bonus: 0 },
+  255: { cl_total: 410, cl_reel: 399, km_total: 0.75, km_reel: 0.75, km_bonus: 0.0 },
+  256: { cl_total: 254, cl_reel: 331, km_total: 5.25, km_reel: 2.25, km_bonus: 3.0 },
+  257: { cl_total: 418, cl_reel: 400, km_total: 0.75, km_reel: 0.75, km_bonus: 0.0 },
+  258: { cl_total: 343, cl_reel: 298, km_total: 3.0, km_reel: 3.0, km_bonus: 0.0 },
+  259: { cl_total: 350, cl_reel: 332, km_total: 2.25, km_reel: 2.25, km_bonus: 0.0 },
+  260: { cl_total: 342, cl_reel: 299, km_total: 3.0, km_reel: 3.0, km_bonus: 0.0 },
+  261: { cl_total: 344, cl_reel: 333, km_total: 3.0, km_reel: 2.25, km_bonus: 0.75 },
+  262: { cl_total: 307, cl_reel: 256, km_total: 3.75, km_reel: 3.75, km_bonus: 0.0 },
+  263: { cl_total: 268, cl_reel: 300, km_total: 4.5, km_reel: 3.0, km_bonus: 1.5 },
+  264: { cl_total: 341, cl_reel: 424, km_total: 3.0, km_reel: 0.0, km_bonus: 3.75 },
+  265: { cl_total: 365, cl_reel: 427, km_total: 2.25, km_reel: 0.0, km_bonus: 2.25 },
+  266: { cl_total: 156, cl_reel: 367, km_total: 8.25, km_reel: 1.5, km_bonus: 6.75 },
+  267: { cl_total: 415, cl_reel: 401, km_total: 0.75, km_reel: 0.75, km_bonus: 0.0 },
+  268: { cl_total: 79, cl_reel: 173, km_total: 11.25, km_reel: 5.25, km_bonus: 6.0 },
+  269: { cl_total: 95, cl_reel: 68, km_total: 10.5, km_reel: 8.25, km_bonus: 2.25 },
+  270: { cl_total: 137, cl_reel: 174, km_total: 9.0, km_reel: 5.25, km_bonus: 3.75 },
+  271: { cl_total: 334, cl_reel: 301, km_total: 3.0, km_reel: 3.0, km_bonus: 0.0 },
+  272: { cl_total: 399, cl_reel: 368, km_total: 1.5, km_reel: 1.5, km_bonus: 0.0 },
+  273: { cl_total: 416, cl_reel: 402, km_total: 0.75, km_reel: 0.75, km_bonus: 0.0 },
+  274: { cl_total: 419, cl_reel: 403, km_total: 0.75, km_reel: 0.75, km_bonus: 0.0 },
+  275: { cl_total: 277, cl_reel: 210, km_total: 4.5, km_reel: 4.5, km_bonus: 0.0 },
+  276: { cl_total: 167, cl_reel: 69, km_total: 8.25, km_reel: 8.25, km_bonus: 0 },
+  277: { cl_total: 312, cl_reel: 257, km_total: 3.75, km_reel: 3.75, km_bonus: 0.0 },
+  279: { cl_total: 377, cl_reel: 369, km_total: 1.5, km_reel: 1.5, km_bonus: 0.0 },
+  280: { cl_total: 335, cl_reel: 302, km_total: 3.0, km_reel: 3.0, km_bonus: 0.0 },
+  281: { cl_total: 385, cl_reel: 370, km_total: 1.5, km_reel: 1.5, km_bonus: 0.0 },
+  282: { cl_total: 227, cl_reel: 371, km_total: 6.0, km_reel: 1.5, km_bonus: 4.5 },
+  283: { cl_total: 367, cl_reel: 334, km_total: 2.25, km_reel: 2.25, km_bonus: 0.0 },
+  284: { cl_total: 283, cl_reel: 211, km_total: 4.5, km_reel: 4.5, km_bonus: 0.0 },
+  286: { cl_total: 337, cl_reel: 303, km_total: 3.0, km_reel: 3.0, km_bonus: 0.0 },
+  288: { cl_total: 318, cl_reel: 258, km_total: 3.75, km_reel: 3.75, km_bonus: 0.0 },
+  289: { cl_total: 253, cl_reel: 212, km_total: 5.25, km_reel: 4.5, km_bonus: 0.75 },
+  290: { cl_total: 190, cl_reel: 96, km_total: 7.5, km_reel: 7.5, km_bonus: 0 },
+  291: { cl_total: 348, cl_reel: 425, km_total: 2.25, km_reel: 0.0, km_bonus: 3.0 },
+  292: { cl_total: 171, cl_reel: 119, km_total: 8.25, km_reel: 6.75, km_bonus: 1.5 },
+  293: { cl_total: 321, cl_reel: 404, km_total: 3.0, km_reel: 0.75, km_bonus: 2.25 },
+  294: { cl_total: 280, cl_reel: 213, km_total: 4.5, km_reel: 4.5, km_bonus: 0.0 },
+  295: { cl_total: 159, cl_reel: 372, km_total: 8.25, km_reel: 1.5, km_bonus: 6.75 },
+  296: { cl_total: 246, cl_reel: 304, km_total: 5.25, km_reel: 3.0, km_bonus: 2.25 },
+  297: { cl_total: 207, cl_reel: 120, km_total: 6.75, km_reel: 6.75, km_bonus: 0.0 },
+  298: { cl_total: 315, cl_reel: 259, km_total: 3.75, km_reel: 3.75, km_bonus: 0.0 },
+  299: { cl_total: 158, cl_reel: 260, km_total: 8.25, km_reel: 3.75, km_bonus: 4.5 },
+  300: { cl_total: 139, cl_reel: 335, km_total: 9.0, km_reel: 2.25, km_bonus: 6.75 },
+  301: { cl_total: 331, cl_reel: 336, km_total: 3.0, km_reel: 2.25, km_bonus: 0.75 },
+  302: { cl_total: 314, cl_reel: 261, km_total: 3.75, km_reel: 3.75, km_bonus: 0.0 },
+  303: { cl_total: 266, cl_reel: 214, km_total: 4.5, km_reel: 4.5, km_bonus: 0.0 },
+  304: { cl_total: 247, cl_reel: 215, km_total: 5.25, km_reel: 4.5, km_bonus: 0.75 },
+  305: { cl_total: 281, cl_reel: 262, km_total: 4.5, km_reel: 3.75, km_bonus: 0.75 },
+  306: { cl_total: 232, cl_reel: 175, km_total: 6.0, km_reel: 5.25, km_bonus: 0.75 },
+  308: { cl_total: 180, cl_reel: 97, km_total: 7.5, km_reel: 7.5, km_bonus: 0 },
+  309: { cl_total: 258, cl_reel: 176, km_total: 5.25, km_reel: 5.25, km_bonus: 0.0 },
+  310: { cl_total: 287, cl_reel: 216, km_total: 4.5, km_reel: 4.5, km_bonus: 0.0 },
+  311: { cl_total: 333, cl_reel: 305, km_total: 3.0, km_reel: 3.0, km_bonus: 0.0 },
+  312: { cl_total: 131, cl_reel: 121, km_total: 9.0, km_reel: 6.75, km_bonus: 2.25 },
+  313: { cl_total: 241, cl_reel: 177, km_total: 5.25, km_reel: 5.25, km_bonus: 0.0 },
+  314: { cl_total: 320, cl_reel: 405, km_total: 3.0, km_reel: 0.75, km_bonus: 2.25 },
+  315: { cl_total: 224, cl_reel: 217, km_total: 6.0, km_reel: 4.5, km_bonus: 1.5 },
+  316: { cl_total: 211, cl_reel: 122, km_total: 6.75, km_reel: 6.75, km_bonus: 0.0 },
+  317: { cl_total: 65, cl_reel: 70, km_total: 12, km_reel: 8.25, km_bonus: 3.75 },
+  318: { cl_total: 332, cl_reel: 306, km_total: 3.0, km_reel: 3.0, km_bonus: 0.0 },
+  322: { cl_total: 10, cl_reel: 71, km_total: 17.25, km_reel: 8.25, km_bonus: 9 },
+  323: { cl_total: 86, cl_reel: 263, km_total: 11.25, km_reel: 3.75, km_bonus: 7.5 },
+  324: { cl_total: 213, cl_reel: 264, km_total: 6.75, km_reel: 3.75, km_bonus: 3.0 },
+  325: { cl_total: 105, cl_reel: 37, km_total: 10.5, km_reel: 10.5, km_bonus: 0 },
+  328: { cl_total: 174, cl_reel: 98, km_total: 7.5, km_reel: 7.5, km_bonus: 0 },
+  331: { cl_total: 170, cl_reel: 143, km_total: 8.25, km_reel: 6.0, km_bonus: 2.25 },
+  332: { cl_total: 340, cl_reel: 307, km_total: 3.0, km_reel: 3.0, km_bonus: 0.0 },
+  334: { cl_total: 345, cl_reel: 308, km_total: 3.0, km_reel: 3.0, km_bonus: 0.0 },
+  336: { cl_total: 25, cl_reel: 72, km_total: 15.75, km_reel: 8.25, km_bonus: 7.5 },
+  337: { cl_total: 196, cl_reel: 265, km_total: 6.75, km_reel: 3.75, km_bonus: 3.0 },
+  338: { cl_total: 102, cl_reel: 73, km_total: 10.5, km_reel: 8.25, km_bonus: 2.25 },
+  339: { cl_total: 263, cl_reel: 178, km_total: 5.25, km_reel: 5.25, km_bonus: 0.0 },
+  340: { cl_total: 329, cl_reel: 309, km_total: 3.0, km_reel: 3.0, km_bonus: 0.0 },
+  341: { cl_total: 393, cl_reel: 373, km_total: 1.5, km_reel: 1.5, km_bonus: 0.0 },
+  342: { cl_total: 59, cl_reel: 179, km_total: 12.75, km_reel: 5.25, km_bonus: 7.5 },
+  343: { cl_total: 30, cl_reel: 22, km_total: 15, km_reel: 12, km_bonus: 3 },
+  344: { cl_total: 71, cl_reel: 23, km_total: 12, km_reel: 12, km_bonus: 0 },
+  346: { cl_total: 173, cl_reel: 99, km_total: 7.5, km_reel: 7.5, km_bonus: 0 },
+  349: { cl_total: 168, cl_reel: 74, km_total: 8.25, km_reel: 8.25, km_bonus: 0 },
+  355: { cl_total: 259, cl_reel: 180, km_total: 5.25, km_reel: 5.25, km_bonus: 0.0 },
+  356: { cl_total: 303, cl_reel: 266, km_total: 3.75, km_reel: 3.75, km_bonus: 0.0 },
+  358: { cl_total: 33, cl_reel: 100, km_total: 15, km_reel: 7.5, km_bonus: 7.5 },
+  359: { cl_total: 430, cl_reel: 406, km_total: 0.75, km_reel: 0.75, km_bonus: 0.0 },
+  360: { cl_total: 64, cl_reel: 181, km_total: 12.0, km_reel: 5.25, km_bonus: 6.75 },
+  361: { cl_total: 218, cl_reel: 123, km_total: 6.75, km_reel: 6.75, km_bonus: 0.0 },
+  365: { cl_total: 80, cl_reel: 31, km_total: 11.25, km_reel: 11.25, km_bonus: 0 },
+  366: { cl_total: 98, cl_reel: 38, km_total: 10.5, km_reel: 10.5, km_bonus: 0 },
+  367: { cl_total: 255, cl_reel: 267, km_total: 5.25, km_reel: 3.75, km_bonus: 1.5 },
+  368: { cl_total: 242, cl_reel: 310, km_total: 5.25, km_reel: 3.0, km_bonus: 2.25 },
+  369: { cl_total: 351, cl_reel: 337, km_total: 2.25, km_reel: 2.25, km_bonus: 0.0 },
+  370: { cl_total: 269, cl_reel: 218, km_total: 4.5, km_reel: 4.5, km_bonus: 0.0 },
+  371: { cl_total: 126, cl_reel: 219, km_total: 9.75, km_reel: 4.5, km_bonus: 5.25 },
+  373: { cl_total: 422, cl_reel: 407, km_total: 0.75, km_reel: 0.75, km_bonus: 0.0 },
+  374: { cl_total: 429, cl_reel: 408, km_total: 0.75, km_reel: 0.75, km_bonus: 0.0 },
+  375: { cl_total: 67, cl_reel: 24, km_total: 12, km_reel: 12, km_bonus: 0 },
+  376: { cl_total: 425, cl_reel: 409, km_total: 0.75, km_reel: 0.75, km_bonus: 0.0 },
+  377: { cl_total: 327, cl_reel: 311, km_total: 3.0, km_reel: 3.0, km_bonus: 0.0 },
+  378: { cl_total: 186, cl_reel: 144, km_total: 7.5, km_reel: 6.0, km_bonus: 1.5 },
+  379: { cl_total: 94, cl_reel: 54, km_total: 11.25, km_reel: 9, km_bonus: 2.25 },
+  382: { cl_total: 160, cl_reel: 75, km_total: 8.25, km_reel: 8.25, km_bonus: 0 },
+  383: { cl_total: 90, cl_reel: 45, km_total: 11.25, km_reel: 9.75, km_bonus: 1.5 },
+  385: { cl_total: 352, cl_reel: 338, km_total: 2.25, km_reel: 2.25, km_bonus: 0.0 },
+  386: { cl_total: 267, cl_reel: 312, km_total: 4.5, km_reel: 3.0, km_bonus: 1.5 },
+  388: { cl_total: 289, cl_reel: 220, km_total: 4.5, km_reel: 4.5, km_bonus: 0.0 },
+  389: { cl_total: 223, cl_reel: 221, km_total: 6.0, km_reel: 4.5, km_bonus: 1.5 },
+  390: { cl_total: 323, cl_reel: 410, km_total: 3.0, km_reel: 0.75, km_bonus: 2.25 },
+  391: { cl_total: 328, cl_reel: 313, km_total: 3.0, km_reel: 3.0, km_bonus: 0.0 },
+  394: { cl_total: 275, cl_reel: 314, km_total: 4.5, km_reel: 3.0, km_bonus: 1.5 },
+  395: { cl_total: 406, cl_reel: 411, km_total: 0.75, km_reel: 0.75, km_bonus: 0.0 },
+  397: { cl_total: 193, cl_reel: 222, km_total: 7.5, km_reel: 4.5, km_bonus: 3.0 },
+  398: { cl_total: 217, cl_reel: 223, km_total: 6.75, km_reel: 4.5, km_bonus: 2.25 },
+  399: { cl_total: 360, cl_reel: 339, km_total: 2.25, km_reel: 2.25, km_bonus: 0.0 },
+  400: { cl_total: 311, cl_reel: 268, km_total: 3.75, km_reel: 3.75, km_bonus: 0.0 },
+  402: { cl_total: 424, cl_reel: 412, km_total: 0.75, km_reel: 0.75, km_bonus: 0.0 },
+  403: { cl_total: 384, cl_reel: 374, km_total: 1.5, km_reel: 1.5, km_bonus: 0.0 },
+  406: { cl_total: 210, cl_reel: 269, km_total: 6.75, km_reel: 3.75, km_bonus: 3.0 },
+  408: { cl_total: 368, cl_reel: 340, km_total: 2.25, km_reel: 2.25, km_bonus: 0.0 },
+  409: { cl_total: 294, cl_reel: 270, km_total: 3.75, km_reel: 3.75, km_bonus: 0.0 },
+  410: { cl_total: 310, cl_reel: 341, km_total: 3.75, km_reel: 2.25, km_bonus: 1.5 },
+  413: { cl_total: 78, cl_reel: 182, km_total: 11.25, km_reel: 5.25, km_bonus: 6.0 },
+  415: { cl_total: 114, cl_reel: 124, km_total: 9.75, km_reel: 6.75, km_bonus: 3.0 },
+  416: { cl_total: 295, cl_reel: 271, km_total: 3.75, km_reel: 3.75, km_bonus: 0.0 },
+  418: { cl_total: 380, cl_reel: 375, km_total: 1.5, km_reel: 1.5, km_bonus: 0.0 },
+  421: { cl_total: 373, cl_reel: 376, km_total: 1.5, km_reel: 1.5, km_bonus: 0.0 },
+  422: { cl_total: 412, cl_reel: 413, km_total: 0.75, km_reel: 0.75, km_bonus: 0.0 },
+  423: { cl_total: 381, cl_reel: 377, km_total: 1.5, km_reel: 1.5, km_bonus: 0.0 },
+  424: { cl_total: 411, cl_reel: 414, km_total: 0.75, km_reel: 0.75, km_bonus: 0.0 },
+  425: { cl_total: 199, cl_reel: 125, km_total: 6.75, km_reel: 6.75, km_bonus: 0.0 },
+  426: { cl_total: 403, cl_reel: 415, km_total: 0.75, km_reel: 0.75, km_bonus: 0.0 },
+  429: { cl_total: 376, cl_reel: 378, km_total: 1.5, km_reel: 1.5, km_bonus: 0.0 },
+  434: { cl_total: 371, cl_reel: 379, km_total: 1.5, km_reel: 1.5, km_bonus: 0.0 },
+  435: { cl_total: 57, cl_reel: 101, km_total: 12.75, km_reel: 7.5, km_bonus: 5.25 },
+  438: { cl_total: 228, cl_reel: 145, km_total: 6.0, km_reel: 6.0, km_bonus: 0.0 },
+  440: { cl_total: 236, cl_reel: 183, km_total: 6.0, km_reel: 5.25, km_bonus: 0.75 },
+  441: { cl_total: 201, cl_reel: 224, km_total: 6.75, km_reel: 4.5, km_bonus: 2.25 },
+  445: { cl_total: 44, cl_reel: 55, km_total: 13.5, km_reel: 9, km_bonus: 4.5 },
+  447: { cl_total: 35, cl_reel: 6, km_total: 15, km_reel: 15, km_bonus: 0 },
+  448: { cl_total: 414, cl_reel: 416, km_total: 0.75, km_reel: 0.75, km_bonus: 0.0 },
+  449: { cl_total: 346, cl_reel: 315, km_total: 3.0, km_reel: 3.0, km_bonus: 0.0 },
+  451: { cl_total: 245, cl_reel: 225, km_total: 5.25, km_reel: 4.5, km_bonus: 0.75 },
+  453: { cl_total: 250, cl_reel: 226, km_total: 5.25, km_reel: 4.5, km_bonus: 0.75 },
+  454: { cl_total: 127, cl_reel: 102, km_total: 9.75, km_reel: 7.5, km_bonus: 2.25 },
+  455: { cl_total: 238, cl_reel: 227, km_total: 6.0, km_reel: 4.5, km_bonus: 1.5 },
+  456: { cl_total: 175, cl_reel: 316, km_total: 7.5, km_reel: 3.0, km_bonus: 4.5 },
+  459: { cl_total: 402, cl_reel: 428, km_total: 1.5, km_reel: 0.0, km_bonus: 1.5 },
+  465: { cl_total: 104, cl_reel: 228, km_total: 10.5, km_reel: 4.5, km_bonus: 6.0 },
+  472: { cl_total: 264, cl_reel: 229, km_total: 5.25, km_reel: 4.5, km_bonus: 0.75 },
+  474: { cl_total: 392, cl_reel: 380, km_total: 1.5, km_reel: 1.5, km_bonus: 0.0 },
+  479: { cl_total: 212, cl_reel: 126, km_total: 6.75, km_reel: 6.75, km_bonus: 0.0 },
+  480: { cl_total: 220, cl_reel: 146, km_total: 6.75, km_reel: 6.0, km_bonus: 0.75 },
+  481: { cl_total: 378, cl_reel: 381, km_total: 1.5, km_reel: 1.5, km_bonus: 0.0 },
+  483: { cl_total: 147, cl_reel: 56, km_total: 9, km_reel: 9, km_bonus: 0 },
+  484: { cl_total: 379, cl_reel: 422, km_total: 1.5, km_reel: 0.0, km_bonus: 4.5 },
+  487: { cl_total: 297, cl_reel: 272, km_total: 3.75, km_reel: 3.75, km_bonus: 0.0 },
+  489: { cl_total: 304, cl_reel: 273, km_total: 3.75, km_reel: 3.75, km_bonus: 0.0 },
+  492: { cl_total: 261, cl_reel: 184, km_total: 5.25, km_reel: 5.25, km_bonus: 0.0 },
+  494: { cl_total: 260, cl_reel: 185, km_total: 5.25, km_reel: 5.25, km_bonus: 0.0 },
+  496: { cl_total: 370, cl_reel: 342, km_total: 2.25, km_reel: 2.25, km_bonus: 0.0 },
+  497: { cl_total: 273, cl_reel: 274, km_total: 4.5, km_reel: 3.75, km_bonus: 0.75 },
+  498: { cl_total: 256, cl_reel: 186, km_total: 5.25, km_reel: 5.25, km_bonus: 0.0 },
+  499: { cl_total: 286, cl_reel: 275, km_total: 4.5, km_reel: 3.75, km_bonus: 0.75 },
+  500: { cl_total: 349, cl_reel: 382, km_total: 2.25, km_reel: 1.5, km_bonus: 0.75 },
+  501: { cl_total: 244, cl_reel: 276, km_total: 5.25, km_reel: 3.75, km_bonus: 1.5 },
+  502: { cl_total: 279, cl_reel: 230, km_total: 4.5, km_reel: 4.5, km_bonus: 0.0 },
+  503: { cl_total: 221, cl_reel: 317, km_total: 6.0, km_reel: 3.0, km_bonus: 3.0 },
+  504: { cl_total: 278, cl_reel: 231, km_total: 4.5, km_reel: 4.5, km_bonus: 0.0 },
+  506: { cl_total: 306, cl_reel: 277, km_total: 3.75, km_reel: 3.75, km_bonus: 0.0 },
+  507: { cl_total: 272, cl_reel: 232, km_total: 4.5, km_reel: 4.5, km_bonus: 0.0 },
+  508: { cl_total: 177, cl_reel: 278, km_total: 7.5, km_reel: 3.75, km_bonus: 3.75 },
+  509: { cl_total: 347, cl_reel: 318, km_total: 3.0, km_reel: 3.0, km_bonus: 0.0 },
+  510: { cl_total: 336, cl_reel: 343, km_total: 3.0, km_reel: 2.25, km_bonus: 0.75 },
+  511: { cl_total: 52, cl_reel: 233, km_total: 12.75, km_reel: 4.5, km_bonus: 8.25 },
+  512: { cl_total: 209, cl_reel: 147, km_total: 6.75, km_reel: 6.0, km_bonus: 0.75 },
+  513: { cl_total: 355, cl_reel: 344, km_total: 2.25, km_reel: 2.25, km_bonus: 0.0 },
+  514: { cl_total: 116, cl_reel: 148, km_total: 9.75, km_reel: 6.0, km_bonus: 3.75 },
+  519: { cl_total: 292, cl_reel: 417, km_total: 3.75, km_reel: 0.75, km_bonus: 3.0 },
+  520: { cl_total: 284, cl_reel: 279, km_total: 4.5, km_reel: 3.75, km_bonus: 0.75 },
+  521: { cl_total: 353, cl_reel: 418, km_total: 2.25, km_reel: 0.75, km_bonus: 1.5 },
+  523: { cl_total: 138, cl_reel: 103, km_total: 9.0, km_reel: 7.5, km_bonus: 1.5 },
+  526: { cl_total: 428, cl_reel: 429, km_total: 0.75, km_reel: 0.0, km_bonus: 0.75 },
+  528: { cl_total: 397, cl_reel: 383, km_total: 1.5, km_reel: 1.5, km_bonus: 0.0 },
+  529: { cl_total: 356, cl_reel: 345, km_total: 2.25, km_reel: 2.25, km_bonus: 0.0 },
+  530: { cl_total: 338, cl_reel: 346, km_total: 3.0, km_reel: 2.25, km_bonus: 0.75 },
+  532: { cl_total: 357, cl_reel: 347, km_total: 2.25, km_reel: 2.25, km_bonus: 0.0 },
+  533: { cl_total: 142, cl_reel: 234, km_total: 9.0, km_reel: 4.5, km_bonus: 4.5 },
+  535: { cl_total: 74, cl_reel: 76, km_total: 12, km_reel: 8.25, km_bonus: 3.75 },
+  536: { cl_total: 141, cl_reel: 149, km_total: 9.0, km_reel: 6.0, km_bonus: 3.0 },
+  538: { cl_total: 305, cl_reel: 280, km_total: 3.75, km_reel: 3.75, km_bonus: 0.0 },
+  540: { cl_total: 216, cl_reel: 150, km_total: 6.75, km_reel: 6.0, km_bonus: 0.75 },
+  541: { cl_total: 83, cl_reel: 77, km_total: 11.25, km_reel: 8.25, km_bonus: 3 },
+  542: { cl_total: 257, cl_reel: 187, km_total: 5.25, km_reel: 5.25, km_bonus: 0.0 },
+  543: { cl_total: 155, cl_reel: 151, km_total: 8.25, km_reel: 6.0, km_bonus: 2.25 },
+  544: { cl_total: 119, cl_reel: 127, km_total: 9.75, km_reel: 6.75, km_bonus: 3.0 },
+  545: { cl_total: 118, cl_reel: 128, km_total: 9.75, km_reel: 6.75, km_bonus: 3.0 },
+  546: { cl_total: 113, cl_reel: 152, km_total: 9.75, km_reel: 6.0, km_bonus: 3.75 },
+  547: { cl_total: 204, cl_reel: 129, km_total: 6.75, km_reel: 6.75, km_bonus: 0.0 },
+  548: { cl_total: 112, cl_reel: 104, km_total: 9.75, km_reel: 7.5, km_bonus: 2.25 },
+  549: { cl_total: 161, cl_reel: 78, km_total: 8.25, km_reel: 8.25, km_bonus: 0 },
+  550: { cl_total: 111, cl_reel: 79, km_total: 9.75, km_reel: 8.25, km_bonus: 1.5 },
+  551: { cl_total: 88, cl_reel: 80, km_total: 11.25, km_reel: 8.25, km_bonus: 3 },
+  552: { cl_total: 68, cl_reel: 39, km_total: 12, km_reel: 10.5, km_bonus: 1.5 },
+  553: { cl_total: 145, cl_reel: 57, km_total: 9, km_reel: 9, km_bonus: 0 },
+  554: { cl_total: 164, cl_reel: 81, km_total: 8.25, km_reel: 8.25, km_bonus: 0 },
+  555: { cl_total: 162, cl_reel: 130, km_total: 8.25, km_reel: 6.75, km_bonus: 1.5 },
+  556: { cl_total: 8, cl_reel: 1, km_total: 17.25, km_reel: 17.25, km_bonus: 0 },
+  557: { cl_total: 45, cl_reel: 10, km_total: 13.5, km_reel: 13.5, km_bonus: 0 },
+  558: { cl_total: 203, cl_reel: 235, km_total: 6.75, km_reel: 4.5, km_bonus: 2.25 },
+  559: { cl_total: 215, cl_reel: 188, km_total: 6.75, km_reel: 5.25, km_bonus: 1.5 },
+  560: { cl_total: 166, cl_reel: 189, km_total: 8.25, km_reel: 5.25, km_bonus: 3.0 },
+  561: { cl_total: 202, cl_reel: 281, km_total: 6.75, km_reel: 3.75, km_bonus: 3.0 },
+  562: { cl_total: 288, cl_reel: 236, km_total: 4.5, km_reel: 4.5, km_bonus: 0.0 },
+  563: { cl_total: 192, cl_reel: 105, km_total: 7.5, km_reel: 7.5, km_bonus: 0.0 },
+  564: { cl_total: 87, cl_reel: 131, km_total: 11.25, km_reel: 6.75, km_bonus: 4.5 },
+  565: { cl_total: 70, cl_reel: 153, km_total: 12.0, km_reel: 6.0, km_bonus: 6.0 },
+  566: { cl_total: 75, cl_reel: 154, km_total: 12.0, km_reel: 6.0, km_bonus: 6.0 },
+  567: { cl_total: 42, cl_reel: 82, km_total: 13.5, km_reel: 8.25, km_bonus: 5.25 },
+  568: { cl_total: 77, cl_reel: 155, km_total: 12.0, km_reel: 6.0, km_bonus: 6.0 },
+  569: { cl_total: 290, cl_reel: 319, km_total: 4.5, km_reel: 3.0, km_bonus: 1.5 },
+  570: { cl_total: 413, cl_reel: 419, km_total: 0.75, km_reel: 0.75, km_bonus: 0.0 },
+  572: { cl_total: 296, cl_reel: 282, km_total: 3.75, km_reel: 3.75, km_bonus: 0.0 },
+  574: { cl_total: 271, cl_reel: 237, km_total: 4.5, km_reel: 4.5, km_bonus: 0.0 },
+  575: { cl_total: 49, cl_reel: 58, km_total: 13.5, km_reel: 9, km_bonus: 4.5 },
+  577: { cl_total: 225, cl_reel: 283, km_total: 6.0, km_reel: 3.75, km_bonus: 2.25 },
+  578: { cl_total: 66, cl_reel: 25, km_total: 12, km_reel: 12, km_bonus: 0 },
+  579: { cl_total: 28, cl_reel: 106, km_total: 15.75, km_reel: 7.5, km_bonus: 8.25 },
+  581: { cl_total: 47, cl_reel: 11, km_total: 13.5, km_reel: 13.5, km_bonus: 0 },
+};
+
+// ── Classement équipes Joué 2026
+const CLASSEMENT_EQUIPES_JOUE = {
+  'Touraine le Département': { cl_total: 1, cl_reel: 2, km_total: 358.5, km_reel: 207.0, km_bonus: 151.5 },
+  'Union pour l\'Enfance 37 - UPE': { cl_total: 2, cl_reel: 1, km_total: 320.3, km_reel: 243.8, km_bonus: 76.5 },
+  'SAF Normandie - UPE': { cl_total: 3, cl_reel: 3, km_total: 294.8, km_reel: 193.55, km_bonus: 101.25 },
+  'La Montgolfière - UPE': { cl_total: 4, cl_reel: 5, km_total: 201.0, km_reel: 139.5, km_bonus: 61.5 },
+  'Institut départemental de l\'Enfance et de la Famille (IDEF 37)': { cl_total: 5, cl_reel: 6, km_total: 186.0, km_reel: 117.75, km_bonus: 68.25 },
+  'Maisons Hugues Renaudin - UPE': { cl_total: 6, cl_reel: 4, km_total: 171.8, km_reel: 141.05, km_bonus: 30.75 },
+  'Maison Paul Valéry - UPE': { cl_total: 7, cl_reel: 7, km_total: 157.5, km_reel: 112.5, km_bonus: 45.0 },
+  'Agapè Anjou': { cl_total: 8, cl_reel: 8, km_total: 150.8, km_reel: 105.05, km_bonus: 45.75 },
+  'AG2R LA MONDIALE': { cl_total: 9, cl_reel: 9, km_total: 120.8, km_reel: 99.05, km_bonus: 21.75 },
+  'ACTION ENFANCE': { cl_total: 10, cl_reel: 11, km_total: 96.0, km_reel: 79.5, km_bonus: 16.5 },
+  'CGI France': { cl_total: 11, cl_reel: 10, km_total: 90.8, km_reel: 80.3, km_bonus: 10.5 },
+  'Les Cahutes de Louise': { cl_total: 12, cl_reel: 12, km_total: 86.3, km_reel: 58.55, km_bonus: 27.75 },
+  'Les Crins Verts - Enfants du Compas': { cl_total: 13, cl_reel: 14, km_total: 68.3, km_reel: 45.05, km_bonus: 23.25 },
+  'LVA Canihuel - Enfants du Compas': { cl_total: 14, cl_reel: 13, km_total: 65.3, km_reel: 55.55, km_bonus: 9.75 },
+  'La Chacunière - UPE': { cl_total: 15, cl_reel: 15, km_total: 57.0, km_reel: 40.5, km_bonus: 16.5 },
+  'SAF Île-de-France - UPE': { cl_total: 16, cl_reel: 16, km_total: 54.0, km_reel: 39.75, km_bonus: 14.25 },
+  'Maison Pauline Kergomard - UPE': { cl_total: 17, cl_reel: 18, km_total: 51.8, km_reel: 37.55, km_bonus: 14.25 },
+  'Twinon': { cl_total: 18, cl_reel: 22, km_total: 49.5, km_reel: 26.25, km_bonus: 23.25 },
+  'Réseau Entreprendre Loire Vallée': { cl_total: 19, cl_reel: 17, km_total: 43.5, km_reel: 39.0, km_bonus: 4.5 },
+  'La Morinière - Enfants du Compas': { cl_total: 20, cl_reel: 20, km_total: 42.0, km_reel: 34.5, km_bonus: 7.5 },
+  'La Maison commune - UPE': { cl_total: 21, cl_reel: 19, km_total: 37.5, km_reel: 36.0, km_bonus: 1.5 },
+  'EGERIA - SAINT-CRICQ et Associés': { cl_total: 22, cl_reel: 21, km_total: 36.0, km_reel: 33.75, km_bonus: 2.25 },
+  'Inserm 1253 iBraiN': { cl_total: 23, cl_reel: 36, km_total: 33.0, km_reel: 8.25, km_bonus: 24.75 },
+  'Eclats d\'Union': { cl_total: 24, cl_reel: 24, km_total: 31.5, km_reel: 20.25, km_bonus: 11.25 },
+  'Fondation Rabelais': { cl_total: 25, cl_reel: 35, km_total: 20.3, km_reel: 8.3, km_bonus: 12.0 },
+};
+
 // ── IDs événements Défi Enfance
 const EVENT_ID_ANGERS = '36946';
 const EVENT_ID_JOUE   = '36956';
@@ -3525,6 +3975,109 @@ function tplGroupeJourJJoueCoureurs({ prenom, numeroDossard, urlPageCoureur, url
 }
 
 
+// ── Template Merci Coureurs Joué 2026
+function tplGroupeMerciCoureurJoue({ prenom, nomComplet, nomEquipe, numeroDossard, clTotal, clReel, kmTotal, kmReel, kmBonus, clEquipeTotal, clEquipeReel, kmEquipeTotal, urlPageCoureur, urlDon }) {
+  urlPageCoureur = urlPageCoureur || 'https://defienfance.fr/suivre-la-collecte-defi-enfance/';
+  urlDon = urlDon || 'https://defienfance.fr/faire-un-don/';
+  const hasBonus = kmBonus > 0;
+  const hasEquipe = nomEquipe && nomEquipe !== 'je cours solo' && clEquipeTotal;
+
+  // Médaille selon classement total
+  const medal = clTotal === 1 ? '🥇' : clTotal === 2 ? '🥈' : clTotal === 3 ? '🥉' : clTotal <= 10 ? '🏅' : '🎽';
+
+  const blocEquipe = hasEquipe ? `
+    <div style="background:#f0fff5;border:1.5px solid rgba(22,163,74,.3);border-radius:12px;padding:14px 18px;margin-bottom:16px;text-align:left">
+      <div style="font-size:.72rem;font-weight:700;color:#16a34a;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">🏳️ Classement équipe — ${nomEquipe}</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+        <div style="text-align:center;background:#fff;border-radius:8px;padding:8px">
+          <div style="font-size:1.6rem;font-weight:700;color:#16a34a">#${clEquipeTotal}</div>
+          <div style="font-size:.68rem;color:#666">Classement avec bonus</div>
+          <div style="font-size:.75rem;font-weight:600;color:#16a34a">${kmEquipeTotal} km</div>
+        </div>
+        <div style="text-align:center;background:#fff;border-radius:8px;padding:8px">
+          <div style="font-size:1.6rem;font-weight:700;color:#0d9488">#${clEquipeReel}</div>
+          <div style="font-size:.68rem;color:#666">Classement réel</div>
+        </div>
+      </div>
+    </div>` : '';
+
+  return `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>${CSS_COMMUN}</style></head><body style="margin:0;padding:0;background:#f5f0f5">
+<table width="100%" cellpadding="0" cellspacing="0"><tr><td align="center" style="padding:20px 12px">
+<table width="100%" style="max-width:600px;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(61,24,48,.12)">
+
+<!-- HEADER -->
+<tr><td style="background:linear-gradient(135deg,#fb0089,#ef6135);padding:28px 32px;text-align:center">
+  <div style="font-size:.72rem;font-weight:700;color:rgba(255,255,255,.7);text-transform:uppercase;letter-spacing:.12em;margin-bottom:8px">🎉 Défi Enfance · Joué-lès-Tours 2026 · 1ère édition</div>
+  <h1 style="font-family:Arial,sans-serif;font-size:1.35rem;font-weight:700;color:#fff;margin:0 0 6px">${medal} Merci ${prenom} —<br>vous avez été incroyable !</h1>
+  <p style="font-size:.78rem;color:rgba(255,255,255,.85);margin:0">29 mai 2026 · Parc des Bretonnières · Joué-lès-Tours</p>
+</td></tr>
+
+<!-- BODY -->
+<tr><td style="background:#fff;padding:24px 28px">
+
+  <!-- Intro pionniers -->
+  <div style="font-size:.85rem;color:#3d1830;line-height:1.75;margin-bottom:20px;text-align:left">
+    <strong>Bonjour ${prenom},</strong><br><br>
+    La 1ère édition du Défi Enfance à Joué-lès-Tours est un <strong>succès</strong> — et vous en êtes l'un des artisans. En choisissant de courir aujourd'hui, vous avez rejoint les <strong>pionniers du Défi Enfance</strong> à Tours. Merci du fond du cœur.
+  </div>
+
+  <!-- Photos -->
+  <div style="margin-bottom:20px;border-radius:12px;overflow:hidden">
+    <img src="https://raw.githubusercontent.com/upe-bot/defi-enfance-notifications/aa0acab63d64c36bf95ac1511c093fa06a3536a6/DSC07100.jpg" alt="Défi Enfance Joué 2026" style="width:100%;display:block;border-radius:12px 12px 0 0" onerror="this.style.display='none'">
+    <div style="display:flex;gap:4px;margin-top:4px">
+      <img src="https://raw.githubusercontent.com/upe-bot/defi-enfance-notifications/aa0acab63d64c36bf95ac1511c093fa06a3536a6/DSC07318.jpg" alt="Défi Enfance Joué 2026" style="width:50%;border-radius:0 0 0 12px" onerror="this.style.display='none'">
+      <img src="https://raw.githubusercontent.com/upe-bot/defi-enfance-notifications/aa0acab63d64c36bf95ac1511c093fa06a3536a6/DSC07438.jpg" alt="Défi Enfance Joué 2026" style="width:50%;border-radius:0 0 12px 0" onerror="this.style.display='none'">
+    </div>
+  </div>
+
+  <!-- Classement individuel -->
+  <div style="background:#fff0f8;border:2px solid #fb0089;border-radius:14px;padding:18px 22px;margin-bottom:20px;text-align:left">
+    <div style="font-size:.72rem;font-weight:700;color:#fb0089;text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px">🏅 Votre classement individuel — Dossard ${numeroDossard}</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+      <div style="text-align:center;background:#fff;border-radius:10px;padding:12px 8px">
+        <div style="font-size:2rem;font-weight:700;color:#fb0089">#${clTotal}</div>
+        <div style="font-size:.72rem;color:#fb0089;font-weight:600">Classement avec bonus</div>
+        <div style="font-size:.82rem;font-weight:700;color:#3d1830;margin-top:4px">${kmTotal} km</div>
+        ${hasBonus ? `<div style="font-size:.68rem;color:#888">${kmReel} km réels + ${kmBonus} km bonus 🎮</div>` : ''}
+      </div>
+      <div style="text-align:center;background:#fff;border-radius:10px;padding:12px 8px">
+        <div style="font-size:2rem;font-weight:700;color:#0d9488">#${clReel}</div>
+        <div style="font-size:.72rem;color:#0d9488;font-weight:600">Classement réel</div>
+        <div style="font-size:.82rem;font-weight:700;color:#3d1830;margin-top:4px">${kmReel} km</div>
+        <div style="font-size:.68rem;color:#888">km parcourus sur le terrain</div>
+      </div>
+    </div>
+    ${hasBonus ? `<div style="font-size:.78rem;color:#3d1830;background:#fff5ef;border-radius:8px;padding:8px 12px;text-align:center">🎮 Grâce aux épreuves gamifiées, vous avez gagné <strong style="color:#ef6135">${kmBonus} km bonus</strong> !</div>` : ''}
+  </div>
+
+  ${blocEquipe}
+
+  <!-- Collecte -->
+  <div style="background:linear-gradient(135deg,#3d1830,#1a0a12);border-radius:14px;padding:18px 22px;margin-bottom:20px;text-align:left">
+    <div style="font-size:.72rem;font-weight:700;color:#fb0089;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">❤️ La collecte continue jusqu'au 15 juin !</div>
+    <div style="font-size:.84rem;color:#fff;line-height:1.75;margin-bottom:14px">La course est terminée mais <strong style="color:#fb0089">la collecte de dons est toujours ouverte jusqu'au 15 juin</strong>. Chaque km que vous avez couru peut encore générer des dons — partagez votre page de collecte autour de vous !</div>
+    <a href="${urlPageCoureur}" style="display:inline-block;background-color:#fb0089;color:#fff;text-decoration:none;padding:10px 22px;border-radius:99px;font-weight:700;font-size:.8rem;font-family:Arial,sans-serif">🏃 Voir ma page de collecte</a>
+  </div>
+
+  <!-- Message -->
+  <div style="font-size:.84rem;color:#3d1830;line-height:1.75;margin-bottom:16px;text-align:left">
+    Vous faites partie de ceux qui ont osé courir pour l'enfance, sous 35°C, avec la bonne humeur que vous avez montrée. Les équipes de l'Union pour l'Enfance et les enfants que nous accompagnons vous remercient infiniment. <strong>Vous avez fait quelque chose de grand.</strong>
+  </div>
+
+  <div style="border-top:1px solid #f5dced;margin:16px 0"></div>
+  <div style="font-size:.84rem;color:#3d1830;text-align:center;font-style:italic;margin-bottom:6px">À l'année prochaine — encore plus fort ! 💪</div>
+  <div style="font-size:.78rem;color:#fb0089;font-weight:600;text-align:center">— Team Défi Enfance</div>
+
+</td></tr>
+<tr><td style="background:#3d1830;padding:14px;text-align:center;border-radius:0 0 16px 16px">
+  <div style="font-size:.8rem;font-weight:700;color:#fb0089">DÉFI ENFANCE</div>
+  <div style="font-size:.72rem;color:rgba(255,255,255,.5)">Générateur de victoires pour l'enfance · contact@defienfance.fr</div>
+</td></tr>
+</table></td></tr></table>
+</body></html>`;
+}
+
+
 function tplGroupeJ1JoueReferents({ prenom, nomEquipe, urlPromesseEquipe, urlPageEquipe }) {
   const urlProm = urlPromesseEquipe || 'https://defienfance.fr/suivre-la-collecte-defi-enfance/?de_promise=1';
   const urlPage = urlPageEquipe    || 'https://defienfance.fr/suivre-la-collecte-defi-enfance/?de_view=teams&de_event=all';
@@ -5650,6 +6203,7 @@ const TEMPLATES_SUJETS = {
   'groupe_j1_joue_coureurs':         null, // sujet dynamique
   'groupe_j1_joue_referents':        null, // sujet dynamique
   'groupe_jourj_joue_coureurs':   '🏁 C\'est aujourd\'hui — votre dossard + tout ce qu\'il faut savoir !',
+  'groupe_merci_coureurs_joue':   null, // sujet dynamique avec prénom + kms
   'groupe_j1_joue_donateurs':      '❤️ Vendredi, votre soutien court avec eux ! 🌊',
   'groupe_j1_joue_supporters':     '🎉 Vendredi, votre présence fait toute la différence ! 🌊',
   'groupe_j1_angers_coureurs':    '🎽 Demain, c\'est le jour J ! 🎽',
@@ -5676,6 +6230,7 @@ function getTemplateFunction(templateId) {
     'groupe_j2_referents_joue':     (prenom, nbJours, extra) => tplGroupeJ2ReferentsJoue({ prenom, nbJours, urlPromesseEquipe: extra?.urlPromesseEquipe || extra?.urlPromesseCoureur, urlPageEquipe: extra?.urlPageEquipe }),
     'groupe_j1_joue_coureurs':       (prenom, nbJours, extra) => tplGroupeJ1JoueCoureurs({ prenom, nbJours, numeroDossard: extra?.numeroDossard || '', urlPageCoureur: extra?.urlPageCoureur, urlPromesseCoureur: extra?.urlPromesseCoureur }),
     'groupe_jourj_joue_coureurs':   (prenom, nbJours, extra) => tplGroupeJourJJoueCoureurs({ prenom, numeroDossard: extra?.numeroDossard || '', urlPageCoureur: extra?.urlPageCoureur, urlPromesseCoureur: extra?.urlPromesseCoureur }),
+    'groupe_merci_coureurs_joue':   (prenom, nbJours, extra) => tplGroupeMerciCoureurJoue({ prenom, nomComplet: extra?.nomComplet || prenom, nomEquipe: extra?.nomEquipe || '', numeroDossard: extra?.numeroDossard || '', clTotal: extra?.clTotal || 0, clReel: extra?.clReel || 0, kmTotal: extra?.kmTotal || 0, kmReel: extra?.kmReel || 0, kmBonus: extra?.kmBonus || 0, clEquipeTotal: extra?.clEquipeTotal || 0, clEquipeReel: extra?.clEquipeReel || 0, kmEquipeTotal: extra?.kmEquipeTotal || 0, urlPageCoureur: extra?.urlPageCoureur, urlDon: extra?.urlDon }),
     'groupe_j1_joue_donateurs':      (prenom, nbJours, extra) => tplGroupeJ1JoueDonateurs({ prenom, urlDon: extra?.urlDon, urlProm: extra?.urlProm }),
     'groupe_j1_joue_supporters':    (prenom, nbJours, extra) => tplGroupeJ1JoueSupporters({ prenom, urlDon: extra?.urlDon, urlProm: extra?.urlProm }),
     'groupe_j1_joue_referents':      (prenom, nbJours, extra) => tplGroupeJ1JoueReferents({ prenom, nomEquipe: extra?.nomEquipe || '', urlPromesseEquipe: extra?.urlPromesseEquipe, urlPageEquipe: extra?.urlPageEquipe }),
@@ -5767,7 +6322,7 @@ async function fetchDestinataires({ typeDestinataire, filtreEquipe, depuisFrance
       }
 
       // ── Coureurs Joué : lecture directe depuis l'index codé en dur (0 appel Ohme)
-      if (['joue_coureurs', 'joue_coureurs_equipe'].includes(typeDestinataire)) {
+      if (['joue_coureurs', 'joue_coureurs_equipe', 'merci_coureurs_joue'].includes(typeDestinataire)) {
         for (const [dossardStr, coureur] of Object.entries(DOSSARDS_JOUE_2026)) {
           const email  = coureur.email || '';
           if (!email) continue;
@@ -5782,11 +6337,24 @@ async function fetchDestinataires({ typeDestinataire, filtreEquipe, depuisFrance
           const runner  = coureur.runner || dossard;
           const urlPageCoureur     = runner ? `https://defienfance.fr/suivre-la-collecte-defi-enfance/?de_view=runners&de_event=${EVENT_ID_JOUE}&de_runner=${runner}` : '';
           const urlPromesseCoureur = runner ? `https://defienfance.fr/suivre-la-collecte-defi-enfance/?de_view=runners&de_event=${EVENT_ID_JOUE}&de_runner=${runner}&de_promise=1` : '';
-          let kmsEquipe = 0, classementEquipe = 0;
-          if (equipe && CLASSEMENT_EQUIPES[equipe]) { kmsEquipe = CLASSEMENT_EQUIPES[equipe].kms; classementEquipe = CLASSEMENT_EQUIPES[equipe].classement; }
-          destinataires.push({ prenom, nom, email, contactId: coureur.id, nomEquipe: equipe, nomAsso: asso, numeroDossard: dossard, urlPageCoureur, urlPromesseCoureur, kmsPerso: 0, kmsEquipe, classementEquipe });
+          // Enrichissement classement
+          const cl = CLASSEMENT_JOUE_2026[dossard] || {};
+          const eqData = equipe && CLASSEMENT_EQUIPES_JOUE[equipe] ? CLASSEMENT_EQUIPES_JOUE[equipe] : {};
+          destinataires.push({
+            prenom, nom, email, contactId: coureur.id, nomEquipe: equipe, nomAsso: asso, numeroDossard: dossard,
+            urlPageCoureur, urlPromesseCoureur,
+            clTotal: cl.cl_total || 0, clReel: cl.cl_reel || 0,
+            kmTotal: cl.km_total || 0, kmReel: cl.km_reel || 0, kmBonus: cl.km_bonus || 0,
+            clEquipeTotal: eqData.cl_total || 0, clEquipeReel: eqData.cl_reel || 0, kmEquipeTotal: eqData.km_total || 0,
+          });
         }
-        addLog(`📦 Coureurs Joué depuis index : ${destinataires.length} trouvés`, 'info');
+        if (typeDestinataire === 'merci_coureurs_joue') {
+          const avant = destinataires.length;
+          destinataires.splice(0, destinataires.length, ...destinataires.filter(d => d.kmTotal > 0));
+          addLog(`📦 Merci coureurs Joué : ${destinataires.length} coureurs avec kms (${avant - destinataires.length} sans résultat exclus)`, 'info');
+        } else {
+          addLog(`📦 Coureurs Joué depuis index : ${destinataires.length} trouvés`, 'info');
+        }
         return destinataires;
       }
 
@@ -7301,6 +7869,9 @@ app.post('/api/envoi-groupe/start', async (req, res) => {
             sujetFinal = `🏃 ${p.prenom || ''} — Boost collecte Joué ! Dans ${nbJours || 7} jours, c'est votre tour !`;
           } else if (template === 'groupe_jourj_joue_coureurs') {
             sujetFinal = `🏁 ${p.prenom || 'Coureur'}, c'est aujourd'hui — votre dossard + tout ce qu'il faut savoir !`;
+          } else if (template === 'groupe_merci_coureurs_joue') {
+            const kmt = p.kmTotal || 0;
+            sujetFinal = `🎉 ${p.prenom || 'Coureur'}, merci — ${kmt > 0 ? `vous avez parcouru ${kmt} km pour l'enfance !` : 'vous avez couru pour l\'enfance !'}`;
           } else {
             if (nbJours) sujetBase = sujetBase ? sujetBase.replace(/\$\{j\}/g, nbJours).replace(/\d+ jours?/gi, `${nbJours} jours`) : template;
             sujetFinal = sujetBase ? sujetBase.replace(/\$\{prenom\}/g, p.prenom || 'Participant') : template;
@@ -7404,6 +7975,74 @@ app.post('/api/promesses/:idx/concretiser', async (req, res) => {
   prom.montantDon = parseFloat(montantDon) || null;
   addLog(`✅ Promesse marquée manuellement concrétisée : ${prom.donateur} → ${prom.cible}${montantDon ? ' (' + montantDon + ' €)' : ''}`, 'ok');
   res.json({ success: true });
+});
+
+
+// ── POST /api/envoi-cible — envoi ciblé par contact IDs
+app.post('/api/envoi-cible', async (req, res) => {
+  const { contactIds, template, nbJours, testEmail } = req.body;
+  if (!contactIds?.length) return res.json({ success: false, error: 'contactIds requis' });
+  if (!template) return res.json({ success: false, error: 'template requis' });
+  if (envoiGroupe.running) return res.json({ success: false, error: 'Un envoi groupé est déjà en cours' });
+
+  addLog(`🎯 Envoi ciblé — ${contactIds.length} contact(s) → template: ${template}`, 'info');
+  let sent = 0, errors = 0;
+
+  for (const contactId of contactIds) {
+    try {
+      await sleep(OHME_DELAY_MS);
+      // Récupérer le contact depuis le cache ou Ohme
+      let contact = contactsCache.get(String(contactId));
+      if (!contact) {
+        const r = await fetchOhmeWithRetry(`${CONFIG.ohmeBase}/api/v1/contacts/${contactId}`, {
+          headers: { 'Accept': 'application/json', 'client-name': CONFIG.ohmeClientName, 'client-secret': CONFIG.ohmeClientSecret }
+        });
+        if (!r?.ok) { errors++; addLog(`⚠️ Contact ${contactId} introuvable`, 'warn'); continue; }
+        const j = await r.json(); contact = j.data || j;
+        if (contact?.id) contactsCache.set(String(contact.id), contact);
+      }
+      const cf = contact.custom_fields || contact;
+      const prenom = (cf.first_name || contact.first_name || '').split(' ')[0] || 'Participant';
+      const nom    = cf.last_name  || contact.last_name  || '';
+      const email  = cf.email      || contact.email      || '';
+      if (!email) { errors++; addLog(`⚠️ Pas d'email pour contact ${contactId}`, 'warn'); continue; }
+
+      // Chercher le dossard Joué
+      const dossardJoue = cf.numero_de_dossard_joue2026 || '';
+      // URL page coureur Joué
+      const runnerJoue = cf.numero_runner_joue2026 || dossardJoue || '';
+      const urlPageCoureur = runnerJoue ? `https://defienfance.fr/suivre-la-collecte-defi-enfance/?de_view=runners&de_event=${EVENT_ID_JOUE}&de_runner=${runnerJoue}` : '';
+      const urlPromesseCoureur = urlPageCoureur ? urlPageCoureur + '&de_promise=1' : '';
+      const nomEquipe = cf.equipe_defi_enfance_coureur || '';
+
+      const tplFn = TEMPLATES_GROUPES[template];
+      if (!tplFn) { errors++; addLog(`⚠️ Template inconnu: ${template}`, 'warn'); continue; }
+
+      const html = tplFn(prenom, nbJours || 1, {
+        numeroDossard: dossardJoue,
+        urlPageCoureur, urlPromesseCoureur,
+        nomEquipe, nomComplet: `${prenom} ${nom}`.trim()
+      });
+
+      // Sujet
+      let sujetFinal = TEMPLATES_SUJETS[template] || template;
+      if (template === 'groupe_jourj_joue_coureurs') sujetFinal = `🏁 ${prenom}, c'est aujourd'hui — votre dossard + tout ce qu'il faut savoir !`;
+      else if (template === 'groupe_j1_joue_coureurs') sujetFinal = `🌊 ${prenom}, Joué court pour l'enfance sous 35°C — tout ce qu'il faut savoir !`;
+      else sujetFinal = sujetFinal.replace(/\${prenom}/g, prenom);
+
+      const destinEmail = testEmail || email;
+      if (testEmail) addLog(`🧪 Mode test — envoi vers ${testEmail} au lieu de ${email}`, 'info');
+      const ok = await sendBrevo(destinEmail, sujetFinal, html);
+      if (ok) { sent++; addLog(`✅ Ciblé → ${prenom} ${nom} (${destinEmail})`, 'ok'); }
+      else     { errors++; addLog(`❌ Échec → ${destinEmail}`, 'error'); }
+    } catch(e) {
+      errors++;
+      addLog(`❌ Exception contact ${contactId} : ${e.message}`, 'error');
+    }
+  }
+
+  addLog(`🎯 Envoi ciblé terminé — ${sent} envoyé(s), ${errors} erreur(s)`, 'ok');
+  res.json({ success: true, sent, errors });
 });
 
 // ── POST /api/cache/prechauffer — préchauffer le cache contacts + structures
