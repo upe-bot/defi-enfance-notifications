@@ -3989,7 +3989,7 @@ function tplGroupeJourJJoueCoureurs({ prenom, numeroDossard, urlPageCoureur, url
 
 
 // ── Template Merci Coureurs Joué 2026
-function tplGroupeMerciCoureurJoue({ prenom, nomComplet, nomEquipe, nomAsso, numeroDossard, clTotal, clReel, kmTotal, kmReel, kmBonus, clEquipeTotal, clEquipeReel, kmEquipeTotal, urlPageCoureur, urlDon }) {
+function tplGroupeMerciCoureurJoue({ prenom, nomComplet, nomEquipe, nomAsso, numeroDossard, clTotal, clReel, kmTotal, kmReel, kmBonus, clEquipeTotal, clEquipeReel, kmEquipeTotal, kmEquipeReel, urlPageCoureur, urlDon }) {
   urlPageCoureur = urlPageCoureur || 'https://defienfance.fr/suivre-la-collecte-defi-enfance/';
   urlDon = urlDon || 'https://defienfance.fr/faire-un-don/';
   const urlClassement = 'https://upe-bot.github.io/defi-enfance-dossard/index.html';
@@ -4013,6 +4013,7 @@ function tplGroupeMerciCoureurJoue({ prenom, nomComplet, nomEquipe, nomAsso, num
       + '<td width="50%" style="text-align:center;background:#ffffff;border-radius:8px;padding:10px 6px">'
       + '<div style="font-size:28px;font-weight:700;color:#0d9488;font-family:Arial,sans-serif">#' + clEquipeReel + '</div>'
       + '<div style="font-size:11px;color:#0d9488;font-weight:600;font-family:Arial,sans-serif">Classement km r&eacute;els</div>'
+      + '<div style="font-size:13px;font-weight:700;color:#1a3a1a;margin-top:4px;font-family:Arial,sans-serif">' + kmEquipeReel + ' km r&eacute;els</div>'
       + '</td></tr></table>'
       + '</td></tr></table></td></tr>';
   }
@@ -6296,7 +6297,7 @@ function getTemplateFunction(templateId) {
     'groupe_j2_referents_joue':     (prenom, nbJours, extra) => tplGroupeJ2ReferentsJoue({ prenom, nbJours, urlPromesseEquipe: extra?.urlPromesseEquipe || extra?.urlPromesseCoureur, urlPageEquipe: extra?.urlPageEquipe }),
     'groupe_j1_joue_coureurs':       (prenom, nbJours, extra) => tplGroupeJ1JoueCoureurs({ prenom, nbJours, numeroDossard: extra?.numeroDossard || '', urlPageCoureur: extra?.urlPageCoureur, urlPromesseCoureur: extra?.urlPromesseCoureur }),
     'groupe_jourj_joue_coureurs':   (prenom, nbJours, extra) => tplGroupeJourJJoueCoureurs({ prenom, numeroDossard: extra?.numeroDossard || '', urlPageCoureur: extra?.urlPageCoureur, urlPromesseCoureur: extra?.urlPromesseCoureur }),
-    'groupe_merci_coureurs_joue':   (prenom, nbJours, extra) => tplGroupeMerciCoureurJoue({ prenom, nomComplet: extra?.nomComplet || prenom, nomEquipe: extra?.nomEquipe || '', nomAsso: extra?.nomAsso || '', numeroDossard: extra?.numeroDossard || '', clTotal: extra?.clTotal || 0, clReel: extra?.clReel || 0, kmTotal: extra?.kmTotal || 0, kmReel: extra?.kmReel || 0, kmBonus: extra?.kmBonus || 0, clEquipeTotal: extra?.clEquipeTotal || 0, clEquipeReel: extra?.clEquipeReel || 0, kmEquipeTotal: extra?.kmEquipeTotal || 0, urlPageCoureur: extra?.urlPageCoureur, urlDon: extra?.urlDon }),
+    'groupe_merci_coureurs_joue':   (prenom, nbJours, extra) => tplGroupeMerciCoureurJoue({ prenom, nomComplet: extra?.nomComplet || prenom, nomEquipe: extra?.nomEquipe || '', nomAsso: extra?.nomAsso || '', numeroDossard: extra?.numeroDossard || '', clTotal: extra?.clTotal || 0, clReel: extra?.clReel || 0, kmTotal: extra?.kmTotal || 0, kmReel: extra?.kmReel || 0, kmBonus: extra?.kmBonus || 0, clEquipeTotal: extra?.clEquipeTotal || 0, clEquipeReel: extra?.clEquipeReel || 0, kmEquipeTotal: extra?.kmEquipeTotal || 0, kmEquipeReel: extra?.kmEquipeReel || 0, urlPageCoureur: extra?.urlPageCoureur, urlDon: extra?.urlDon }),
     'groupe_j1_joue_donateurs':      (prenom, nbJours, extra) => tplGroupeJ1JoueDonateurs({ prenom, urlDon: extra?.urlDon, urlProm: extra?.urlProm }),
     'groupe_j1_joue_supporters':    (prenom, nbJours, extra) => tplGroupeJ1JoueSupporters({ prenom, urlDon: extra?.urlDon, urlProm: extra?.urlProm }),
     'groupe_j1_joue_referents':      (prenom, nbJours, extra) => tplGroupeJ1JoueReferents({ prenom, nomEquipe: extra?.nomEquipe || '', urlPromesseEquipe: extra?.urlPromesseEquipe, urlPageEquipe: extra?.urlPageEquipe }),
@@ -6411,7 +6412,7 @@ async function fetchDestinataires({ typeDestinataire, filtreEquipe, depuisFrance
             urlPageCoureur, urlPromesseCoureur,
             clTotal: cl.cl_total || 0, clReel: cl.cl_reel || 0,
             kmTotal: cl.km_total || 0, kmReel: cl.km_reel || 0, kmBonus: cl.km_bonus || 0,
-            clEquipeTotal: eqData.cl_total || 0, clEquipeReel: eqData.cl_reel || 0, kmEquipeTotal: eqData.km_total || 0,
+            clEquipeTotal: eqData.cl_total || 0, clEquipeReel: eqData.cl_reel || 0, kmEquipeTotal: eqData.km_total || 0, kmEquipeReel: eqData.km_reel || 0,
           });
         }
         if (typeDestinataire === 'merci_coureurs_joue') {
@@ -8274,6 +8275,7 @@ app.post('/api/envoi-groupe/test-contact', async (req, res) => {
         kmTotal: modele.kmTotal || 0, kmReel: modele.kmReel || 0, kmBonus: modele.kmBonus || 0,
         clEquipeTotal: modele.clEquipeTotal || 0, clEquipeReel: modele.clEquipeReel || 0,
         kmEquipeTotal: modele.kmEquipeTotal || 0,
+        kmEquipeReel: modele.kmEquipeReel || 0,
         nomComplet: (modele.prenom + ' ' + (modele.nom || '')).trim(),
       };
       const html = tplFn(modele.prenom || 'Participant', nbJours, extra);
