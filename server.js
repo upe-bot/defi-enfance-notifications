@@ -6297,7 +6297,7 @@ async function fetchDestinataires({ typeDestinataire, filtreEquipe, depuisFrance
   try {
 
     // ── CAS 1 : Coureurs / Supporters / Déjeuner (paiements billetterie type 3)
-    if (['angers_coureurs','joue_coureurs','joue_coureurs_equipe','global_coureurs',
+    if (['angers_coureurs','joue_coureurs','joue_coureurs_equipe','merci_coureurs_joue','global_coureurs',
          'angers_supporters','joue_supporters','global_supporters','dejeuner'].includes(typeDestinataire)) {
 
       // Pré-charger contacts puis structures — seulement si cache vide
