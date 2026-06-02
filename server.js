@@ -3976,10 +3976,10 @@ function tplGroupeJourJJoueCoureurs({ prenom, numeroDossard, urlPageCoureur, url
 
 
 // ── Template Merci Coureurs Joué 2026
-function tplGroupeMerciCoureurJoue({ prenom, nomComplet, nomEquipe, numeroDossard, clTotal, clReel, kmTotal, kmReel, kmBonus, clEquipeTotal, clEquipeReel, kmEquipeTotal, urlPageCoureur, urlDon }) {
+function tplGroupeMerciCoureurJoue({ prenom, nomComplet, nomEquipe, nomAsso, numeroDossard, clTotal, clReel, kmTotal, kmReel, kmBonus, clEquipeTotal, clEquipeReel, kmEquipeTotal, urlPageCoureur, urlDon }) {
   urlPageCoureur = urlPageCoureur || 'https://defienfance.fr/suivre-la-collecte-defi-enfance/';
   urlDon = urlDon || 'https://defienfance.fr/faire-un-don/';
-  const urlClassement = 'https://defienfance.fr/suivre-la-collecte-defi-enfance/';
+  const urlClassement = 'https://upe-bot.github.io/defi-enfance-dossard/index.html';
   const hasBonus = kmBonus > 0;
   const hasEquipe = nomEquipe && nomEquipe !== 'je cours solo' && clEquipeTotal;
   const hasCl = clTotal > 0;
@@ -3994,12 +3994,12 @@ function tplGroupeMerciCoureurJoue({ prenom, nomComplet, nomEquipe, numeroDossar
       + '<table width="100%" cellpadding="0" cellspacing="0"><tr>'
       + '<td width="50%" style="text-align:center;background:#ffffff;border-radius:8px;padding:10px 6px">'
       + '<div style="font-size:28px;font-weight:700;color:#16a34a;font-family:Arial,sans-serif">#' + clEquipeTotal + '</div>'
-      + '<div style="font-size:11px;color:#16a34a;font-weight:600;font-family:Arial,sans-serif">avec bonus</div>'
+      + '<div style="font-size:11px;color:#16a34a;font-weight:600;font-family:Arial,sans-serif">Classement km totaux</div>'
       + '<div style="font-size:13px;font-weight:700;color:#1a3a1a;margin-top:4px;font-family:Arial,sans-serif">' + kmEquipeTotal + ' km</div>'
       + '</td><td width="4"></td>'
       + '<td width="50%" style="text-align:center;background:#ffffff;border-radius:8px;padding:10px 6px">'
       + '<div style="font-size:28px;font-weight:700;color:#0d9488;font-family:Arial,sans-serif">#' + clEquipeReel + '</div>'
-      + '<div style="font-size:11px;color:#0d9488;font-weight:600;font-family:Arial,sans-serif">classement r&eacute;el</div>'
+      + '<div style="font-size:11px;color:#0d9488;font-weight:600;font-family:Arial,sans-serif">Classement km r&eacute;els</div>'
       + '</td></tr></table>'
       + '</td></tr></table></td></tr>';
   }
@@ -4025,19 +4025,18 @@ function tplGroupeMerciCoureurJoue({ prenom, nomComplet, nomEquipe, numeroDossar
       + '<table width="100%" cellpadding="0" cellspacing="0"><tr>'
       + '<td width="50%" style="text-align:center;background:#ffffff;border-radius:10px;padding:12px 6px">'
       + '<div style="font-size:36px;font-weight:700;color:#fb0089;font-family:Arial,sans-serif">#' + clTotal + '</div>'
-      + '<div style="font-size:11px;color:#fb0089;font-weight:600;font-family:Arial,sans-serif">classement avec bonus</div>'
+      + '<div style="font-size:11px;color:#fb0089;font-weight:600;font-family:Arial,sans-serif">Classement km totaux</div>'
       + '<div style="font-size:14px;font-weight:700;color:#3d1830;margin-top:4px;font-family:Arial,sans-serif">' + kmTotal + ' km</div>'
       + bonusDetail
       + '</td><td width="4"></td>'
       + '<td width="50%" style="text-align:center;background:#ffffff;border-radius:10px;padding:12px 6px">'
       + '<div style="font-size:36px;font-weight:700;color:#0d9488;font-family:Arial,sans-serif">#' + clReel + '</div>'
-      + '<div style="font-size:11px;color:#0d9488;font-weight:600;font-family:Arial,sans-serif">classement r&eacute;el</div>'
+      + '<div style="font-size:11px;color:#0d9488;font-weight:600;font-family:Arial,sans-serif">Classement km r&eacute;els</div>'
       + '<div style="font-size:14px;font-weight:700;color:#3d1830;margin-top:4px;font-family:Arial,sans-serif">' + kmReel + ' km</div>'
-      + '<div style="font-size:11px;color:#888;font-family:Arial,sans-serif">km sur le terrain</div>'
       + '</td></tr></table>'
       + blocBonus
       + '<table width="100%" cellpadding="0" cellspacing="0" style="margin-top:12px"><tr><td align="center">'
-      + '<a href="' + urlClassement + '" style="display:inline-block;background-color:#fb0089;color:#ffffff;text-decoration:none;padding:9px 20px;border-radius:99px;font-weight:700;font-size:12px;font-family:Arial,sans-serif">&#127942; Voir le classement général en ligne</a>'
+      + '<a href="' + urlClassement + '" style="display:inline-block;background-color:#fb0089;color:#ffffff;text-decoration:none;padding:9px 20px;border-radius:99px;font-weight:700;font-size:12px;font-family:Arial,sans-serif">&#127942; Voir le classement général Joué &amp; Angers</a>'
       + '</td></tr></table>'
       + '</td></tr></table></td></tr>';
   }
@@ -4088,6 +4087,17 @@ function tplGroupeMerciCoureurJoue({ prenom, nomComplet, nomEquipe, numeroDossar
     + '<table width="100%" cellpadding="0" cellspacing="0" style="border-radius:14px">'
     + '<tr><td bgcolor="#3d1830" style="background-color:#3d1830;padding:18px 20px;border-radius:14px">'
     + '<div style="font-size:11px;font-weight:700;color:#fb0089;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;font-family:Arial,sans-serif">&#10084;&#65039; La collecte de dons continue jusqu\'au 15 juin !</div>'
+    + (nomAsso ? '<table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:12px"><tr>'
+      + '<td width="48%" style="background-color:rgba(255,255,255,.1);border-radius:8px;padding:10px 12px;text-align:center">'
+      + '<div style="font-size:11px;color:rgba(255,255,255,.6);font-family:Arial,sans-serif;margin-bottom:4px">50% pour</div>'
+      + '<div style="font-size:13px;font-weight:700;color:#ffd6ec;font-family:Arial,sans-serif">' + nomAsso + '</div>'
+      + '<div style="font-size:11px;color:rgba(255,255,255,.6);font-family:Arial,sans-serif;margin-top:2px">l\'association que vous avez choisie</div>'
+      + '</td><td width="4%"></td>'
+      + '<td width="48%" style="background-color:rgba(255,255,255,.1);border-radius:8px;padding:10px 12px;text-align:center">'
+      + '<div style="font-size:11px;color:rgba(255,255,255,.6);font-family:Arial,sans-serif;margin-bottom:4px">50% pour</div>'
+      + '<div style="font-size:13px;font-weight:700;color:#ffd6ec;font-family:Arial,sans-serif">le Plaidoyer Défi Enfance</div>'
+      + '<div style="font-size:11px;color:rgba(255,255,255,.6);font-family:Arial,sans-serif;margin-top:2px">financement du mouvement national</div>'
+      + '</td></tr></table>' : '')
     + '<p style="font-size:14px;color:#ffffff;line-height:1.75;margin:0 0 6px;font-family:Arial,sans-serif">'
     + 'La course est terminée mais <strong style="color:#fb0089">la collecte est ouverte jusqu\'au 15 juin</strong>. C\'est uniquement grâce aux dons de vos proches et de vos réseaux professionnels que vous pouvez soutenir concrètement <strong style="color:#ffd6ec">l\'association que vous avez choisie de parrainer</strong> lors de votre inscription.'
     + '</p>'
@@ -4103,10 +4113,10 @@ function tplGroupeMerciCoureurJoue({ prenom, nomComplet, nomEquipe, numeroDossar
     // MESSAGE FINAL
     + '<tr><td style="padding:0 24px 20px">'
     + '<p style="font-size:14px;color:#3d1830;line-height:1.75;margin:0 0 16px;font-family:Arial,sans-serif">'
-    + 'Vous faites partie de ceux qui ont osé courir pour l\'enfance avec tant d\'enthousiasme. Les équipes de l\'Union pour l\'Enfance et les enfants que nous accompagnons vous remercient infiniment. <strong>Vous avez fait quelque chose de grand.</strong>'
+    + 'Vous faites partie de ceux qui ont osé courir pour l\'enfance avec enthousiasme, joie et simplicité. Avec Baptiste Bech, le responsable des bénévoles et toute l\'équipe d\'organisation, nous vous remercions infiniment pour votre participation. Ensemble, nous avons posé les bases du Défi Enfance en Touraine au service de tout le secteur de l\'aide à l\'enfance. <strong>Tout commence !</strong> À très vite.'
     + '</p>'
     + '<div style="border-top:1px solid #f5dced;margin:16px 0"></div>'
-    + '<p style="font-size:14px;color:#3d1830;text-align:center;font-style:italic;margin:0 0 6px;font-family:Arial,sans-serif">À l\'année prochaine — encore plus fort ! &#128170;</p>'
+    + '<p style="font-size:14px;color:#3d1830;text-align:center;font-style:italic;margin:0 0 6px;font-family:Arial,sans-serif">À l\'année prochaine !</p>'
     + '<p style="font-size:13px;color:#fb0089;font-weight:700;text-align:center;margin:0;font-family:Arial,sans-serif">&mdash; L\'équipe d\'organisation Défi Enfance</p>'
     + '</td></tr>'
 
@@ -6247,7 +6257,7 @@ const TEMPLATES_SUJETS = {
   'groupe_j1_joue_coureurs':         null, // sujet dynamique
   'groupe_j1_joue_referents':        null, // sujet dynamique
   'groupe_jourj_joue_coureurs':   '🏁 C\'est aujourd\'hui — votre dossard + tout ce qu\'il faut savoir !',
-  'groupe_merci_coureurs_joue':   null, // sujet dynamique avec prénom + kms
+  'groupe_merci_coureurs_joue':   '💖 3000 km pour cette première édition à Joué !',
   'groupe_j1_joue_donateurs':      '❤️ Vendredi, votre soutien court avec eux ! 🌊',
   'groupe_j1_joue_supporters':     '🎉 Vendredi, votre présence fait toute la différence ! 🌊',
   'groupe_j1_angers_coureurs':    '🎽 Demain, c\'est le jour J ! 🎽',
@@ -6274,7 +6284,7 @@ function getTemplateFunction(templateId) {
     'groupe_j2_referents_joue':     (prenom, nbJours, extra) => tplGroupeJ2ReferentsJoue({ prenom, nbJours, urlPromesseEquipe: extra?.urlPromesseEquipe || extra?.urlPromesseCoureur, urlPageEquipe: extra?.urlPageEquipe }),
     'groupe_j1_joue_coureurs':       (prenom, nbJours, extra) => tplGroupeJ1JoueCoureurs({ prenom, nbJours, numeroDossard: extra?.numeroDossard || '', urlPageCoureur: extra?.urlPageCoureur, urlPromesseCoureur: extra?.urlPromesseCoureur }),
     'groupe_jourj_joue_coureurs':   (prenom, nbJours, extra) => tplGroupeJourJJoueCoureurs({ prenom, numeroDossard: extra?.numeroDossard || '', urlPageCoureur: extra?.urlPageCoureur, urlPromesseCoureur: extra?.urlPromesseCoureur }),
-    'groupe_merci_coureurs_joue':   (prenom, nbJours, extra) => tplGroupeMerciCoureurJoue({ prenom, nomComplet: extra?.nomComplet || prenom, nomEquipe: extra?.nomEquipe || '', numeroDossard: extra?.numeroDossard || '', clTotal: extra?.clTotal || 0, clReel: extra?.clReel || 0, kmTotal: extra?.kmTotal || 0, kmReel: extra?.kmReel || 0, kmBonus: extra?.kmBonus || 0, clEquipeTotal: extra?.clEquipeTotal || 0, clEquipeReel: extra?.clEquipeReel || 0, kmEquipeTotal: extra?.kmEquipeTotal || 0, urlPageCoureur: extra?.urlPageCoureur, urlDon: extra?.urlDon }),
+    'groupe_merci_coureurs_joue':   (prenom, nbJours, extra) => tplGroupeMerciCoureurJoue({ prenom, nomComplet: extra?.nomComplet || prenom, nomEquipe: extra?.nomEquipe || '', nomAsso: extra?.nomAsso || '', numeroDossard: extra?.numeroDossard || '', clTotal: extra?.clTotal || 0, clReel: extra?.clReel || 0, kmTotal: extra?.kmTotal || 0, kmReel: extra?.kmReel || 0, kmBonus: extra?.kmBonus || 0, clEquipeTotal: extra?.clEquipeTotal || 0, clEquipeReel: extra?.clEquipeReel || 0, kmEquipeTotal: extra?.kmEquipeTotal || 0, urlPageCoureur: extra?.urlPageCoureur, urlDon: extra?.urlDon }),
     'groupe_j1_joue_donateurs':      (prenom, nbJours, extra) => tplGroupeJ1JoueDonateurs({ prenom, urlDon: extra?.urlDon, urlProm: extra?.urlProm }),
     'groupe_j1_joue_supporters':    (prenom, nbJours, extra) => tplGroupeJ1JoueSupporters({ prenom, urlDon: extra?.urlDon, urlProm: extra?.urlProm }),
     'groupe_j1_joue_referents':      (prenom, nbJours, extra) => tplGroupeJ1JoueReferents({ prenom, nomEquipe: extra?.nomEquipe || '', urlPromesseEquipe: extra?.urlPromesseEquipe, urlPageEquipe: extra?.urlPageEquipe }),
